@@ -31,6 +31,6 @@ const  iletisimSchema = new mongoose.Schema(
   { timestamps: true }
 );
 
-const Iletisim = mongoose.model("yardimet", iletisimSchema);
+const Iletisim = mongoose.model("iletisim", iletisimSchema);
 
-module.exports = YardimEt;
+module.exports = Iletisim;

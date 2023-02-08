@@ -84,7 +84,16 @@ router.post('/yardim', async function (req, res) {
   }  
 
     var clientIp = requestIp.getClientIp(req); // on localhost > 127.0.0.1
-   
+
+    const fields = {};
+
+    for (const key in req.body) {
+      if (key.startsWith('fields-')) {
+        const fieldName = key.split('-')[1];
+        fields[fieldName] = req.body[key];
+      }
+    }
+    
     // Create a new Yardim document
     const newYardim = new Yardim({
       yardimTipi,
@@ -100,7 +109,7 @@ router.post('/yardim', async function (req, res) {
       tweetLink: req.body.tweetLink || "",
       googleMapLink:  req.body.googleMapLink || "",
       ip: clientIp,
-      fields: req.body.fields|| {},
+      fields: fields|| {},
     });
 
     cache.getCache().flushAll();
@@ -131,6 +140,16 @@ router.post('/yardimet', async function (req, res) {
     return res.status(409).json({ error: "Bu yardım bildirimi daha önce veritabanımıza eklendi." });
   }  
     var clientIp = requestIp.getClientIp(req); // on localhost > 127.0.0.1
+
+    const fields = {};
+
+    for (const key in req.body) {
+      if (key.startsWith('fields-')) {
+        const fieldName = key.split('-')[1];
+        fields[fieldName] = req.body[key];
+      }
+    }
+    
     
     // Create a new Yardim document
     const newYardim = new YardimEt({
@@ -143,7 +162,7 @@ router.post('/yardimet', async function (req, res) {
       aciklama: req.body.aciklama || "",
       tweetLink: req.body.tweetLink || "",
       googleMapLink:  req.body.googleMapLink || "",
-      fields: req.body.fields|| {},
+      fields: fields || {},
       ip: clientIp
     });
 
