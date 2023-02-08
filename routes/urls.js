@@ -17,13 +17,17 @@ router.get("/yardim", async function (req, res) {
     const page = parseInt(req.query.page) || 1;
     const limit = parseInt(req.query.limit) || 10;
     let data ;
+    
+    const yardimTipi = req.query.yardimTipi|| "";
 
     const startIndex = (page - 1) * limit;
-    const endIndex = page * limit;
+    const endIndex = page * limit; 
 
     const results = {};
 
-    const cacheKey = `yardim_${page}_${limit}`;
+    let cacheKey = `yardim_${page}_${limit}`+yardimTipi;
+
+    console.log(cacheKey);
   
     if (cache.getCache().has(cacheKey)) {
       data = cache.getCache().get(cacheKey);
@@ -34,7 +38,8 @@ router.get("/yardim", async function (req, res) {
     if (endIndex < (await Yardim.countDocuments().exec())) {
       results.next = {
         page: page + 1,
-        limit
+        limit,
+     
       };
     }
 
@@ -45,10 +50,15 @@ router.get("/yardim", async function (req, res) {
       };
     }
 
+    if(yardimTipi != ""){
+      results.data = await Yardim.find({ yardimTipi: yardimTipi }).sort({ _id: -1 }).limit(limit).skip(startIndex).exec();
+    }
+    else{
+      
     results.data = await Yardim.find().sort({ _id: -1 }).limit(limit).skip(startIndex).exec();
-
+    }
+   
     cache.getCache().set(cacheKey, results);
-
     if(!data){res.json(results);}
   } catch (error) {
     console.log(error);
@@ -309,6 +319,7 @@ router.get("/yardimet/:id", async (req, res) => {
     res.status(500).send("Error occurred while fetching Yardim");
   }
 });
+
 
    
 
