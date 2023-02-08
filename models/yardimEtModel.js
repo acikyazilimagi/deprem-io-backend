@@ -34,6 +34,12 @@ const  yardimEtSchema = new mongoose.Schema(
       required: false
     },
 
+    yardimDurumu: {
+      type: String,
+      enum: ['hazir', 'yapiliyor','yapildi'],
+      required: true
+    },
+
     ip: {
         type: String,
         required: true,

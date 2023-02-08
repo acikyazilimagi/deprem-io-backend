@@ -125,6 +125,7 @@ router.post('/yardimet', async function (req, res) {
       telefon,
       sehir,
       hedefSehir,
+      yardimDurumu :req.body.yardimDurumu || "",
       aciklama: req.body.aciklama || "",
       tweetLink: req.body.tweetLink || "",
       googleMapLink:  req.body.googleMapLink || "",
@@ -187,6 +188,40 @@ router.get("/yardimet", async function (req, res) {
     res.status(500).send({ error: "Could not retrieve the Yardim documents." });
   }
 });
+
+router.get('/ara-yardimet', async (req, res) => {
+  const queryString = req.query.q;
+  const yardimDurumuQuery = req.query.yardimDurumu
+  try {
+
+    let query = {
+      $or: [
+        { adSoyad: { $regex: queryString, $options: 'i' } },
+            { telefon: { $regex: queryString, $options: 'i' } },
+            { sehir: { $regex: queryString, $options: 'i' } },
+            { hedefSehir: { $regex: queryString, $options: 'i' } }
+      ]
+    };
+
+    if (yardimDurumuQuery) {
+      query = {
+        $and: [
+          query,
+          { yardimDurumu: yardimDurumuQuery }
+        ]
+      };
+    }
+
+    
+    const results = await YardimEt.find(query);
+    res.json(results);
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+});
+
+module.exports = router;
+
 
 async function checkConnection() {
   if (mongoose.connection.readyState != 1) {
