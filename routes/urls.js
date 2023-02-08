@@ -25,10 +25,8 @@ router.get("/yardim", async function (req, res) {
 
     const results = {};
 
-    let cacheKey = `yardim_${page}_${limit}`+yardimTipi;
 
-    console.log(cacheKey);
-  
+    let cacheKey = `yardim_${page}_${limit}`+yardimTipi;
     if (cache.getCache().has(cacheKey)) {
       data = cache.getCache().get(cacheKey);
       res.send(data);
@@ -51,11 +49,12 @@ router.get("/yardim", async function (req, res) {
     }
 
     if(yardimTipi != ""){
+      results.totalPage = Math.ceil(await Yardim.countDocuments({ yardimTipi: yardimTipi })/limit);     
       results.data = await Yardim.find({ yardimTipi: yardimTipi }).sort({ _id: -1 }).limit(limit).skip(startIndex).exec();
     }
     else{
-      
-    results.data = await Yardim.find().sort({ _id: -1 }).limit(limit).skip(startIndex).exec();
+      results.totalPage = Math.ceil(await Yardim.countDocuments()/limit);   
+      results.data = await Yardim.find().sort({ _id: -1 }).limit(limit).skip(startIndex).exec();
     }
    
     cache.getCache().set(cacheKey, results);
@@ -163,6 +162,7 @@ router.get("/yardimet", async function (req, res) {
   try {
     const page = parseInt(req.query.page) || 1;
     const limit = parseInt(req.query.limit) || 10;
+    const yardimTipi = req.query.yardimTipi|| "";
     let data ;
 
     const startIndex = (page - 1) * limit;
@@ -170,7 +170,7 @@ router.get("/yardimet", async function (req, res) {
 
     const results = {};
 
-    const cacheKey = `yardimet_${page}_${limit}`;
+    const cacheKey = `yardimet_${page}_${limit}`+yardimTipi;
   
     if (cache.getCache().has(cacheKey)) {
       data = cache.getCache().get(cacheKey);
@@ -189,10 +189,17 @@ router.get("/yardimet", async function (req, res) {
       results.previous = {
         page: page - 1,
         limit
-      };
-
+      }; 
     }
-    results.data = await YardimEt.find().sort({ _id: -1 }).limit(limit).skip(startIndex).exec();
+
+    if(yardimTipi != ""){
+        results.totalPage = Math.ceil(await YardimEt.countDocuments({ yardimTipi: yardimTipi })/limit);     
+       results.data = await YardimEt.find({ yardimTipi: yardimTipi }).sort({ _id: -1 }).limit(limit).skip(startIndex).exec();
+    }
+    else{
+      results.totalPage = Math.ceil(await YardimEt.countDocuments()/limit);    
+      results.data = await YardimEt.find().sort({ _id: -1 }).limit(limit).skip(startIndex).exec();
+    }
 
     cache.getCache().set(cacheKey, results);
 
