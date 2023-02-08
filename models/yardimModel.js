@@ -31,16 +31,27 @@ const  yardimSchema = new mongoose.Schema(
       type: String,
       required: false
     },
+    googleMapLink: {
+      type: String,
+      required: false
+    },
   
     tweetLink: {
       type: String,
       required: false
     },
 
-    fields: {
+    fields: { // Tüm alternatif kullanımlar için buraya json yollayın
       type: Object,
       required: false
-    }
+    },
+
+    ip: {
+      type: String,
+      required: true,
+      select: false
+    },
+
 
   },
   { timestamps: true }

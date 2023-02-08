@@ -1,13 +1,14 @@
 # deprem-io-backend
 
 ## Yardımları listeleme (GET)
+istenen yardımları listeler
 /yardim 
 localhost:8079/yardim?page=1&limit=1
 
-## Yardım Ekleme (POST)
+## Yardımiste Ekleme (POST)
 Json Yolla
 localhost:8079/yardim
-
+* /models/yardimModel.js e bak 
 ÖRNEK JSON POSTU
 ```
 {
@@ -25,7 +26,29 @@ localhost:8079/yardim
     }
      }
 
+```
 
+## YardımEt ekleme (GET)
+insanların sağladığı yardımları listeler
+localhost:8079/yardimet
+
+## YardımEt ekleme (POST)
+Json Yolla
+localhost:8079/yardimet
+
+```
+{
+    "yardimTipi": "Yolcu Taşıma",
+    "adSoyad": "John Doe",
+    "telefon": "1234567890",
+    "sehir": "Istanbul",
+    "hedefSehir": "Ankara",
+    "aciklama": "Need transportation to Ankara",
+    "fields": {
+        "field1": "value1",
+        "field2": "value2"
+    }
+      }
 ```
 ## Cache i temizleme
 /cache/flushall
