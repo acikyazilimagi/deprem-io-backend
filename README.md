@@ -6,7 +6,6 @@
 * Env variable olarak MONGOURL kullanın
 * Container Portu 8080
 
-
 ## Yardımları listeleme (GET)
 istenen yardımları listeler
 /yardim 

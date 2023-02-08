@@ -1,5 +1,6 @@
 const mongoose = require("mongoose");
 
+// yardım edebilecek kişilerin model dosyası
 const  yardimEtSchema = new mongoose.Schema(
   {
     yardimTipi: {  // Yolcu Taşıma - konaklama - işmakinesi kullanma

@@ -1,5 +1,6 @@
 const mongoose = require("mongoose");
 
+// yardım istyenlerin model dosyası
 const  yardimSchema = new mongoose.Schema(
   {
     yardimTipi: {  // Gıda, İlaç, Enkaz, Isınma, Kayıp

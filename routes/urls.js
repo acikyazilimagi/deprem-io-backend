@@ -29,6 +29,7 @@ router.get("/yardim", async function (req, res) {
       res.send(data);
     }
 
+    await checkConnection();
     if (endIndex < (await Yardim.countDocuments().exec())) {
       results.next = {
         page: page + 1,
@@ -63,6 +64,7 @@ router.post('/yardim', async function (req, res) {
   if (!yardimTipi || !adSoyad || !adres || !acilDurum) {
     return res.status(400).json({ error: "yardimTipi, adSoyad, adres and acilDurum alanları gerekli" });
   }
+  await checkConnection();
 
   // check exist
   const existingYardim = await Yardim.findOne({ adSoyad, adres });
@@ -107,6 +109,7 @@ router.post('/yardimet', async function (req, res) {
   if (!yardimTipi || !adSoyad || !telefon || !sehir) {
     return res.status(400).json({ error: "yardimTipi, adSoyad, telefon and sehir alanları gerekli" });
   }
+  await checkConnection();
 
   // check exist
   const existingYardim = await YardimEt.findOne({ adSoyad, sehir });
@@ -158,6 +161,7 @@ router.get("/yardimet", async function (req, res) {
       data = cache.getCache().get(cacheKey);
       res.send(data);
     }
+    await checkConnection();
 
     if (endIndex < (await YardimEt.countDocuments().exec())) {
       results.next = {
