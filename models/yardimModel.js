@@ -15,6 +15,10 @@ const  yardimSchema = new mongoose.Schema(
       type: String,
       required: false
     },
+    email: {
+      type: String,
+      required: false
+    },
     adres: {
       type: String,
       required: true

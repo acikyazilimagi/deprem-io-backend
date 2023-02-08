@@ -80,6 +80,7 @@ router.post('/yardim', async function (req, res) {
       yardimTipi,
       adSoyad,
       telefon: req.body.telefon || "",  // optional fields
+      email: req.body.email || "",
       adres,
       adresTarifi: req.body.adresTarifi || "",
       acilDurum,
@@ -309,9 +310,6 @@ router.get("/yardimet/:id", async (req, res) => {
 });
 
    
-
-
-
 
 module.exports = router;
 
