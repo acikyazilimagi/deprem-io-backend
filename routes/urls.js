@@ -13,6 +13,7 @@ router.get("/", function (req, res) {
 
 router.get("/yardim", async function (req, res) {
   try {
+    
     const page = parseInt(req.query.page) || 1;
     const limit = parseInt(req.query.limit) || 10;
     let data ;
@@ -260,6 +261,54 @@ router.get('/ara-yardim', async (req, res) => {
     res.status(500).json({ message: error.message });
   }
 });
+
+router.get("/yardim/:id", async (req, res) => {
+  try {
+    let data;
+
+    const cacheKey = `yardim_${req.params.id}`;
+  
+    if (cache.getCache().has(cacheKey)) {
+      data = cache.getCache().get(cacheKey);
+      res.send(data);
+    }
+    await checkConnection();
+    const results = await Yardim.findById(req.params.id);
+    cache.getCache().set(cacheKey, results);
+    if (!results) {
+      return res.status(404).send("Yardim not found");
+    }
+    res.send(results);
+  } catch (error) {
+    console.error(error);
+    res.status(500).send("Error occurred while fetching Yardim");
+  }
+});
+
+router.get("/yardimet/:id", async (req, res) => {
+  try {
+    let data;
+
+    const cacheKey = `yardimet_${req.params.id}`;
+  
+    if (cache.getCache().has(cacheKey)) {
+      data = cache.getCache().get(cacheKey);
+      res.send(data);
+    }
+    await checkConnection();
+    const results = await YardimEt.findById(req.params.id);
+    cache.getCache().set(cacheKey, results);
+    if (!results) {
+      return res.status(404).send("Yardim not found");
+    }
+    res.send(results);
+  } catch (error) {
+    console.error(error);
+    res.status(500).send("Error occurred while fetching Yardim");
+  }
+});
+
+   
 
 
 
