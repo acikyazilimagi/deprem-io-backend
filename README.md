@@ -1,5 +1,7 @@
 # deprem-io-backend
 
+
+
 ## Yardımları listeleme (GET)
 istenen yardımları listeler
 /yardim 
@@ -50,6 +52,11 @@ localhost:8079/yardimet
     }
       }
 ```
+
+## Not
+Opsiyonel her türlü yardım isteme ve yardımEt kısmına eklenecek özellikler için
+fields alanını kullanın isteidğiniz gibi json objesi post edebilirsiniz 
+
 ## Cache i temizleme
 /cache/flushall
 
