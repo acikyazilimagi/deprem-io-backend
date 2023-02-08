@@ -45,7 +45,7 @@ router.get("/yardim", async function (req, res) {
       };
     }
 
-    results.data = await Yardim.find().limit(limit).skip(startIndex).exec();
+    results.data = await Yardim.find().sort({ _id: -1 }).limit(limit).skip(startIndex).exec();
 
     cache.getCache().set(cacheKey, results);
 
@@ -60,6 +60,7 @@ router.post('/yardim', async function (req, res) {
   try {
 
   const { yardimTipi, adSoyad, adres, acilDurum } = req.body;  
+  console.log(req);
 
   // Validate required fields
   if (!yardimTipi || !adSoyad || !adres || !acilDurum) {
@@ -179,9 +180,9 @@ router.get("/yardimet", async function (req, res) {
         page: page - 1,
         limit
       };
-    }
 
-    results.data = await YardimEt.find().limit(limit).skip(startIndex).exec();
+    }
+    results.data = await YardimEt.find().sort({ _id: -1 }).limit(limit).skip(startIndex).exec();
 
     cache.getCache().set(cacheKey, results);
 
