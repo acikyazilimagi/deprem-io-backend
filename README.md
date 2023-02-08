@@ -68,6 +68,20 @@ fields alanını kullanın isteidğiniz gibi json objesi post edebilirsiniz
 
 /cache/getstats
 
+## iletisim (POST)
+
+localhost:8080/iletisim
+```
+{
+   
+    "adSoyad": "jo2hn",
+    "telefon": "123",
+    "email": "email@email.com",
+    "mesaj": "mesaj"
+
+      }
+```
+
 
 ## TODO:
 
