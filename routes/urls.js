@@ -6,6 +6,7 @@ const Yardim = require("../models/yardimModel");
 const cache = require("../cache");
 var requestIp = require('request-ip');
 const YardimEt = require("../models/yardimEtModel");
+const Iletisim = require("../models/iletisimModel");
 
 router.get("/", function (req, res) {
   res.send("depremio backend");
@@ -69,8 +70,7 @@ router.post('/yardim', async function (req, res) {
   try {
 
   const { yardimTipi, adSoyad, adres, acilDurum } = req.body;  
-  console.log(req);
-
+ 
   // Validate required fields
   if (!yardimTipi || !adSoyad || !adres || !acilDurum) {
     return res.status(400).json({ error: "yardimTipi, adSoyad, adres and acilDurum alanları gerekli" });
@@ -328,8 +328,34 @@ router.get("/yardimet/:id", async (req, res) => {
   }
 });
 
+router.post('/iletisim', async function (req, res) {
+  try {
+  await checkConnection();
+  var clientIp = requestIp.getClientIp(req); // on localhost > 127.0.0.1
+    
+    // Create a new Yardim document
+    const newIletisim = new Iletisim({
+     
+      adSoyad :req.body.adSoyad || "",
+      email: req.body.email || "",
+      telefon: req.body.telefon || "",
+      mesaj: req.body.mesaj || "",
+      ip: clientIp
+    });
 
-   
+    const saveIletisim = await newIletisim.save();
+
+    res.json({message: "İletişim talebiniz başarıyla alındı"} );
+
+  } catch (error) {
+    console.log(error);
+    res.status(500).json({ error: "Hata! Yardım dökümanı kaydedilemedi!" });
+  }
+
+});
+
+
+
 
 module.exports = router;
 
