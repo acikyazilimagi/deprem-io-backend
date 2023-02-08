@@ -94,6 +94,7 @@ router.post('/yardim', async function (req, res) {
       adres,
       adresTarifi: req.body.adresTarifi || "",
       acilDurum,
+      kisiSayisi: req.body.kisiSayisi || "",
       yardimDurumu: req.body.yardimDurumu || "",
       fizikiDurum: req.body.fizikiDurum || "",
       tweetLink: req.body.tweetLink || "",
