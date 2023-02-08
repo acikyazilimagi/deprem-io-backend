@@ -73,4 +73,11 @@ fields alanını kullanın isteidğiniz gibi json objesi post edebilirsiniz
 
 * Yeni data eklenince tüm cache i temizliyor onun düzeltilmesi lazım sadece ilgili cache temizlenecek
 * İp logging kısmını biri kontrol etsin
+* export scriptlerinde fields kısmında bug var ama acil değil kullanılacaksa bakılır şuan çalışıyor 
+
+## Scripts 
+
+* exportYardimEtCsv.js
+`node scripts/exportYardimEtCsv.js`
+YardimEt datasını csv export eder 
 
