@@ -4,7 +4,7 @@ const cache = require("./cache");
 const cacheRoutes = require("./routes/cacheUrls");
 
 const app = express();
-const PORT = process.env.PORT || 8079;
+const PORT = process.env.PORT || 8080;
 var cors = require("cors");
 require("dotenv").config();
 

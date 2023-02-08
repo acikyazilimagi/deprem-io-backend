@@ -1,15 +1,20 @@
 # deprem-io-backend
 
+## Nasıl deploy edilir
+
+* Docker dosyasını kullanın
+* Env variable olarak MONGOURL kullanın
+* Container Portu 8080
 
 
 ## Yardımları listeleme (GET)
 istenen yardımları listeler
 /yardim 
-localhost:8079/yardim?page=1&limit=1
+localhost:8080/yardim?page=1&limit=1
 
 ## Yardımiste Ekleme (POST)
 Json Yolla
-localhost:8079/yardim
+localhost:8080/yardim
 * /models/yardimModel.js e bak 
 ÖRNEK JSON POSTU
 ```
@@ -32,11 +37,11 @@ localhost:8079/yardim
 
 ## YardımEt ekleme (GET)
 insanların sağladığı yardımları listeler
-localhost:8079/yardimet
+localhost:8080/yardimet
 
 ## YardımEt ekleme (POST)
 Json Yolla
-localhost:8079/yardimet
+localhost:8080/yardimet
 
 ```
 {
@@ -63,3 +68,10 @@ fields alanını kullanın isteidğiniz gibi json objesi post edebilirsiniz
 ## cache i görme 
 
 /cache/getstats
+
+
+## TODO:
+
+* Yeni data eklenince tüm cache i temizliyor onun düzeltilmesi lazım sadece ilgili cache temizlenecek
+* İp logging kısmını biri kontrol etsin
+
