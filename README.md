@@ -26,11 +26,8 @@ localhost:8080/yardim
     "acilDurum": "kritik",
     "fizikiDurum": "Hasar görmüş",
     "tweetLink": "https://twitter.com/example",
-    "fields": {
-        "field1": "value1",
-        "field2": "value2"
-    }
-     }
+    "fields-status": "test-status",
+     "fields-yenialan": "ekstrabilgi"
 
 ```
 
@@ -50,12 +47,23 @@ localhost:8080/yardimet
     "sehir": "Istanbul",
     "hedefSehir": "Ankara",
     "aciklama": "Need transportation to Ankara",
-    "fields": {
-        "field1": "value1",
-        "field2": "value2"
-    }
+    "fields-status": "test-status",
+     "fields-yenialan": "ekstrabilgi"
       }
 ```
+
+## Fields alanını kullanımı
+
+post olarak fields-{burası aalanı adı}: value şeklinde datayı gönderin onunları fields objesi altında birleştirip db ye kayddedecek
+
+örneğin fiels-yardimalani: "ankara" şu şekilde döner
+ ```
+fields: {
+    yardimalani: "ankara"
+}
+
+ ```
+
 
 ## Not
 Opsiyonel her türlü yardım isteme ve yardımEt kısmına eklenecek özellikler için
