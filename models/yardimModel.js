@@ -28,6 +28,11 @@ const  yardimSchema = new mongoose.Schema(
       enum: ['normal', 'orta', 'kritik'],
       required: true
     },
+    yardimDurumu: {
+      type: String,
+      enum: ['bekleniyor', 'yolda','yapildi'],
+      required: true
+    },
     fizikiDurum: {
       type: String,
       required: false

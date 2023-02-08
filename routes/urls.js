@@ -82,6 +82,7 @@ router.post('/yardim', async function (req, res) {
       adres,
       adresTarifi: req.body.adresTarifi || "",
       acilDurum,
+      yardimDurumu: req.body.yardimDurumu || "",
       fizikiDurum: req.body.fizikiDurum || "",
       tweetLink: req.body.tweetLink || "",
       googleMapLink:  req.body.googleMapLink || "",
@@ -219,6 +220,49 @@ router.get('/ara-yardimet', async (req, res) => {
     res.status(500).json({ message: error.message });
   }
 });
+
+router.get('/ara-yardim', async (req, res) => {
+  const queryString = req.query.q;
+  const yardimDurumuQuery = req.query.yardimDurumu;
+  const  acilDurumQuery = req.query.acilDurum;
+  try {
+
+    let query = {
+      $or: [
+        { adSoyad: { $regex: queryString, $options: 'i' } },
+        { telefon: { $regex: queryString, $options: 'i' } },
+        { sehir: { $regex: queryString, $options: 'i' } },
+        { adresTarifi: { $regex: queryString, $options: 'i' } }, 
+      ]
+    };
+
+    if (yardimDurumuQuery) {
+      query = {
+        $and: [
+          query,
+          { yardimDurumu: yardimDurumuQuery }
+        ]
+      };
+    }
+
+    if (acilDurumQuery) {
+      query = {
+        $and: [
+          query,
+          { acilDurum: acilDurumQuery }
+        ]
+      };
+    }
+
+    const results = await Yardim.find(query);
+    res.json(results);
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+});
+
+
+
 
 module.exports = router;
 

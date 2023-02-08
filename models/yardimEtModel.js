@@ -36,7 +36,7 @@ const  yardimEtSchema = new mongoose.Schema(
 
     yardimDurumu: {
       type: String,
-      enum: ['hazir', 'yapiliyor','yapildi'],
+      enum: ['bekleniyor', 'yolda','yapildi'],
       required: true
     },
 
