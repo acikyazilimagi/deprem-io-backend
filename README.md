@@ -73,6 +73,7 @@ fields alanını kullanın isteidğiniz gibi json objesi post edebilirsiniz
 
 * Yeni data eklenince tüm cache i temizliyor onun düzeltilmesi lazım sadece ilgili cache temizlenecek
 * İp logging kısmını biri kontrol etsin
+* Filter kısmında yazılan queryi isim, adres telefon gibi tüm yerlerde arıyor ama araya boşluk konup birden fazla paramatere yollarsa çalışmaz
 * export scriptlerinde fields kısmında bug var ama acil değil kullanılacaksa bakılır şuan çalışıyor 
 
 ## Scripts 
