@@ -52,6 +52,6 @@ jobs:
         uses: aws-actions/amazon-ecs-deploy-task-definition@v1
         with:
           task-definition: ${{ steps.container-name.outputs.task-definition }}
-          service: deprem-io-service
+          service: depremio-service
           cluster: base-cluster
           wait-for-service-stability: false
