@@ -46,7 +46,7 @@ router.get("/yardim", async function (req, res) {
       };
     }
 
-    if (yardimTipi != "") {
+    if (yardimTipi !== "") {
       results.totalPage = Math.ceil(
         (await Yardim.countDocuments({ yardimTipi: yardimTipi })) / limit
       );
@@ -124,8 +124,7 @@ router.post("/yardim", async function (req, res) {
     });
 
     cache.getCache().flushAll();
-    const savedYardim = await newYardim.save();
-
+    await newYardim.save()
     res.json({ message: "Yardım talebiniz başarıyla alındı" });
   } catch (error) {
     res.status(500).json({ error: "Hata! Yardım dökümanı kaydedilemedi!" });
@@ -179,8 +178,7 @@ router.post("/yardimet", async function (req, res) {
     });
 
     cache.getCache().flushAll();
-    const savedYardim = await newYardim.save();
-
+    await newYardim.save()
     res.json({ message: "Yardım talebiniz başarıyla alındı" });
   } catch (error) {
     console.log(error);
@@ -225,11 +223,11 @@ router.get("/yardimet", async function (req, res) {
 
     let searchQuery = {};
 
-    if (yardimTipi != "") {
+    if (yardimTipi !== "") {
       searchQuery = { yardimTipi: yardimTipi };
     }
 
-    if (hedefSehir != "") {
+    if (hedefSehir !== "") {
       searchQuery = { ...searchQuery, hedefSehir: hedefSehir };
     }
 
@@ -242,6 +240,11 @@ router.get("/yardimet", async function (req, res) {
       .limit(limit)
       .skip(startIndex)
       .exec();
+    // hidden telefon field in YardimEt Model
+    results.data = results.data.map((yardim) => {
+      yardim.telefon = yardim.telefon.replace(/.(?=.{4})/g, "*");
+      return yardim;
+    });
 
     cache.getCache().set(cacheKey, results);
 
@@ -377,7 +380,7 @@ router.post("/iletisim", async function (req, res) {
       email: req.body.email,
       mesaj: req.body.mesaj,
     });
-    
+
     if (existingIletisim) {
       return res.status(400).json({
         error: "Bu iletişim talebi zaten var, lütfen farklı bir talepte bulunun.",
@@ -392,9 +395,7 @@ router.post("/iletisim", async function (req, res) {
       mesaj: req.body.mesaj || "",
       ip: clientIp,
     });
-
-    const saveIletisim = await newIletisim.save();
-
+    await newIletisim.save()
     res.json({ message: "İletişim talebiniz başarıyla alındı" });
   } catch (error) {
     console.log(error);
@@ -405,7 +406,7 @@ router.post("/iletisim", async function (req, res) {
 module.exports = router;
 
 async function checkConnection() {
-  if (mongoose.connection.readyState != 1) {
+  if (mongoose.connection.readyState !== 1) {
     await connectDB();
   }
 }
