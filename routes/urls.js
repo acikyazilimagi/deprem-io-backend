@@ -64,6 +64,19 @@ router.get("/yardim", async function (req, res) {
         .exec();
     }
 
+    results.data = results.data.map((yardim) => {
+      yardim.telefon = yardim.telefon.replace(/.(?=.{4})/g, "*");
+      const names = yardim.adSoyad.split(" ");
+      if (names.length > 1) {
+        yardim.adSoyad =
+          names[0].charAt(0) +
+          "*".repeat(names[0].length - 2) +
+          " " +
+          names[1].charAt(0) +
+          "*".repeat(names[1].length - 2);
+      }
+      return yardim;
+    });
     cache.getCache().set(cacheKey, results);
     if (!data) {
       res.json(results);
@@ -197,7 +210,7 @@ router.get("/yardimet", async function (req, res) {
     const startIndex = (page - 1) * limit;
     const endIndex = page * limit;
 
-    const results = {};
+    let results = {};
 
     const cacheKey = `yardimet_${page}_${limit}` + yardimTipi;
 
@@ -240,11 +253,21 @@ router.get("/yardimet", async function (req, res) {
       .limit(limit)
       .skip(startIndex)
       .exec();
-    // hidden telefon field in YardimEt Model
     results.data = results.data.map((yardim) => {
       yardim.telefon = yardim.telefon.replace(/.(?=.{4})/g, "*");
+      const names = yardim.adSoyad.split(" ");
+      if (names.length > 1) {
+        yardim.adSoyad =
+          names[0].charAt(0) +
+          "*".repeat(names[0].length - 2) +
+          " " +
+          names[1].charAt(0) +
+          "*".repeat(names[1].length - 2);
+      }
       return yardim;
     });
+
+
 
     cache.getCache().set(cacheKey, results);
 
@@ -275,9 +298,24 @@ router.get("/ara-yardimet", async (req, res) => {
         $and: [query, { yardimDurumu: yardimDurumuQuery }],
       };
     }
+    let results = {};
+    results.data = await YardimEt.find(query);
 
-    const results = await YardimEt.find(query);
-    res.json(results);
+    // hidden phone number for security
+    results.data = results.data.map((yardim) => {
+      yardim.telefon = yardim.telefon.replace(/.(?=.{4})/g, "*");
+      const names = yardim.adSoyad.split(" ");
+      if (names.length > 1) {
+        yardim.adSoyad =
+          names[0].charAt(0) +
+          "*".repeat(names[0].length - 2) +
+          " " +
+          names[1].charAt(0) +
+          "*".repeat(names[1].length - 2);
+      }
+      return yardim;
+    });
+    res.json(results.data);
   } catch (error) {
     res.status(500).json({ message: error.message });
   }
@@ -316,9 +354,22 @@ router.get("/ara-yardim", async (req, res) => {
         $and: [query, { acilDurum: acilDurumQuery }],
       };
     }
-
-    const results = await Yardim.find(query);
-    res.json(results);
+    let results = {};
+    results.data = await Yardim.find(query);
+    results.data = results.data.map((yardim) => {
+      yardim.telefon = yardim.telefon.replace(/.(?=.{4})/g, "*");
+      const names = yardim.adSoyad.split(" ");
+      if (names.length > 1) {
+        yardim.adSoyad =
+          names[0].charAt(0) +
+          "*".repeat(names[0].length - 2) +
+          " " +
+          names[1].charAt(0) +
+          "*".repeat(names[1].length - 2);
+      }
+      return yardim;
+    });
+    res.json(results.data);
   } catch (error) {
     res.status(500).json({ message: error.message });
   }
@@ -335,7 +386,8 @@ router.get("/yardim/:id", async (req, res) => {
       res.send(data);
     }
     await checkConnection();
-    const results = await Yardim.findById(req.params.id);
+    let results = await Yardim.findById(req.params.id);
+    results.telefon = results.telefon.replace(/.(?=.{4})/g, "*");
     cache.getCache().set(cacheKey, results);
     if (!results) {
       return res.status(404).send("Yardim not found");
@@ -359,6 +411,7 @@ router.get("/yardimet/:id", async (req, res) => {
     }
     await checkConnection();
     const results = await YardimEt.findById(req.params.id);
+    results.telefon = results.telefon.replace(/.(?=.{4})/g, "*");
     cache.getCache().set(cacheKey, results);
     if (!results) {
       return res.status(404).send("Yardim not found");
