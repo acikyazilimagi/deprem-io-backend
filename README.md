@@ -18,17 +18,23 @@ localhost:8080/yardim
 ÖRNEK JSON POSTU
 ```
 {
-    "yardimTipi": "İlaç",
+    "yardimTipi": "Gıda",
     "adSoyad": "John Doe",
     "telefon": "555-555-5555",
+    "yedekTelefonlar": ["555-555-5556", "555-555-5557"],
+    "email": "johndoe@example.com",
     "adres": "123 Main St",
-    "adresTarifi": "Apartment 4B",
-    "acilDurum": "kritik",
-    "fizikiDurum": "Hasar görmüş",
-    "tweetLink": "https://twitter.com/example",
-    "fields-status": "test-status",
+    "adresTarifi": "2nd floor, apartment 4B",
+    "acilDurum": "normal",
+    "kisiSayisi": "3",
+    "yardimDurumu": "bekleniyor",
+    "fizikiDurum": "normal",
+    "googleMapLink": "https://maps.google.com/maps?q=123+Main+St",
+    "tweetLink": "https://twitter.com/johndoe/status/1234567890",
+     "fields-status": "test-status",
      "fields-yenialan": "ekstrabilgi"
-
+   
+}
 ```
 
 ## YardımEt ekleme (GET)
@@ -40,16 +46,17 @@ Json Yolla
 localhost:8080/yardimet
 
 ```
-{
+ {
     "yardimTipi": "Yolcu Taşıma",
-    "adSoyad": "John Doe",
-    "telefon": "1234567890",
+    "adSoyad": "Jane Doe",
+    "telefon": "+1 987 654 3210",
     "sehir": "Istanbul",
     "hedefSehir": "Ankara",
-    "aciklama": "Need transportation to Ankara",
-    "fields-status": "test-status",
-     "fields-yenialan": "ekstrabilgi"
-      }
+    "aciklama": "Need transportation from Istanbul to Ankara.",
+      "fields-status": "test-status",
+     "fields-yenialan": "ekstrabilgi",
+    "yardimDurumu": "bekleniyor"
+}
 ```
 
 ## Fields alanını kullanımı
@@ -63,7 +70,6 @@ fields: {
 }
 
  ```
-
 
 ## Not
 Opsiyonel her türlü yardım isteme ve yardımEt kısmına eklenecek özellikler için
@@ -81,13 +87,11 @@ fields alanını kullanın isteidğiniz gibi json objesi post edebilirsiniz
 localhost:8080/iletisim
 ```
 {
-   
-    "adSoyad": "jo2hn",
-    "telefon": "123",
-    "email": "email@email.com",
-    "mesaj": "mesaj"
-
-      }
+    "adSoyad": "John Doe",
+    "email": "johndoe@example.com",
+    "telefon": "+1 123 456 7890",
+    "mesaj": "This is a test message."
+}
 ```
 
 ## TODO:
