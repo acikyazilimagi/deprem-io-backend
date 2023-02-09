@@ -20,7 +20,11 @@ class CollabrationController {
           const collabrationListings = await CollabrationListing.find({
             where,
           });
-          res.json(collabrationListings);
+          res.json({
+            totalPage:0,
+            data:collabrationListings
+
+          });
         } catch (error) {
             res.status(500).json({
                 message: error.message,
@@ -30,7 +34,11 @@ class CollabrationController {
     async show(req, res) {
       try {
         const collabrationListing = await CollabrationListing.findById(req.params.id)
-        return res.json(collabrationListing);
+        return res.json({
+          totalPage:0,
+          data:collabrationListing,
+
+        });
       } catch (error) {
           res.status(500).json({
               message: error.message,
