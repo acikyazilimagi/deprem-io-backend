@@ -134,12 +134,12 @@ router.post("/yardim", async function (req, res) {
 
 router.post("/yardimet", async function (req, res) {
   try {
-    const { yardimTipi, adSoyad, telefon, sehir, hedefSehir } = req.body;
+    const { yardimTipi, adSoyad, telefon, sehir, hedefSehir, ilce } = req.body;
 
     // Validate required fields
-    if (!yardimTipi || !adSoyad || !telefon || !sehir) {
+    if (!yardimTipi || !adSoyad || !telefon || !sehir || !ilce) {
       return res.status(400).json({
-        error: "yardimTipi, adSoyad, telefon and sehir alanları gerekli",
+        error: "yardimTipi, adSoyad, telefon, sehir ve ilçe alanları gerekli",
       });
     }
     await checkConnection();
@@ -168,6 +168,7 @@ router.post("/yardimet", async function (req, res) {
       adSoyad,
       telefon,
       sehir,
+      ilce,
       hedefSehir,
       yardimDurumu: req.body.yardimDurumu || "",
       aciklama: req.body.aciklama || "",
@@ -241,7 +242,7 @@ router.get("/yardimet", async function (req, res) {
       .limit(limit)
       .skip(startIndex)
       .exec();
-    
+
     cache.getCache().set(cacheKey, results);
 
     if (!data) {
