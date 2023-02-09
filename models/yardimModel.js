@@ -4,7 +4,7 @@ const mongoose = require("mongoose");
 const  yardimSchema = new mongoose.Schema(
   {
     yardimTipi: {  // Gıda, İlaç, Enkaz, Isınma, Kayıp
-      type: String, 
+      type: String,
       required: true
     },
     adSoyad: {
@@ -53,7 +53,7 @@ const  yardimSchema = new mongoose.Schema(
       type: String,
       required: false
     },
-  
+
     tweetLink: {
       type: String,
       required: false

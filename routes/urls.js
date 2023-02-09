@@ -98,11 +98,32 @@ router.post("/yardim", async function (req, res) {
   try {
     const { yardimTipi, adSoyad, adres, acilDurum } = req.body;
 
-    // Validate required fields
     if (!yardimTipi || !adSoyad || !adres || !acilDurum) {
       return res.status(400).json({
         error: "yardimTipi, adSoyad, adres and acilDurum alanları gerekli",
       });
+    }
+    if (req.body.telefon.trim().replace(/ /g, "")) {
+      if (!/^\d+$/.test(req.body.telefon)) {
+        return res.status(400).json({
+          error: "Telefon numarası sadece rakamlardan oluşmalıdır.",
+        });
+      }
+    }
+    req.body.telefon = req.body.telefon.replace(/ /g, "");
+    if (req.body.yedekTelefonlar) {
+      if (req.body.yedekTelefonlar.length > 0) {
+        let yedekTelefonlar = req.body.yedekTelefonlar;
+        for (let i = 0; i < yedekTelefonlar.length; i++) {
+          if (!/^\d+$/.test(yedekTelefonlar[i])) {
+            return res.status(400).json({
+              error: "Telefon numarası sadece rakamlardan oluşmalıdır.",
+            });
+          }
+          yedekTelefonlar[i] = yedekTelefonlar[i].replace(/ /g, "");
+        }
+        req.body.yedekTelefonlar = yedekTelefonlar;
+      }
     }
     await checkConnection();
 
@@ -161,6 +182,28 @@ router.post("/yardimet", async function (req, res) {
       return res.status(400).json({
         error: "yardimTipi, adSoyad, telefon, sehir ve ilçe alanları gerekli",
       });
+    }
+    if (req.body.telefon.trim().replace(/ /g, "")) {
+      if (!/^\d+$/.test(req.body.telefon)) {
+        return res.status(400).json({
+          error: "Telefon numarası sadece rakamlardan oluşmalıdır.",
+        });
+      }
+    }
+    req.body.telefon = req.body.telefon.replace(/ /g, "");
+    if (req.body.yedekTelefonlar) {
+      if (req.body.yedekTelefonlar.length > 0) {
+        let yedekTelefonlar = req.body.yedekTelefonlar;
+        for (let i = 0; i < yedekTelefonlar.length; i++) {
+          if (!/^\d+$/.test(yedekTelefonlar[i])) {
+            return res.status(400).json({
+              error: "Telefon numarası sadece rakamlardan oluşmalıdır.",
+            });
+          }
+          yedekTelefonlar[i] = yedekTelefonlar[i].replace(/ /g, "");
+        }
+        req.body.yedekTelefonlar = yedekTelefonlar;
+      }
     }
     await checkConnection();
 
