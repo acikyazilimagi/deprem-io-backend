@@ -363,6 +363,18 @@ router.post("/iletisim", async function (req, res) {
     await checkConnection();
     var clientIp = requestIp.getClientIp(req); // on localhost > 127.0.0.1
 
+    const existingIletisim = await Iletisim.findOne({
+      adSoyad: req.body.adSoyad,
+      email: req.body.email,
+      mesaj: req.body.mesaj,
+    });
+    
+    if (existingIletisim) {
+      return res.status(400).json({
+        error: "Bu iletişim talebi zaten var, lütfen farklı bir talepte bulunun.",
+      });
+    }
+
     // Create a new Yardim document
     const newIletisim = new Iletisim({
       adSoyad: req.body.adSoyad || "",

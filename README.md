@@ -16,6 +16,7 @@ Json Yolla
 localhost:8080/yardim
 * /models/yardimModel.js e bak 
 ÖRNEK JSON POSTU
+
 ```
 {
     "yardimTipi": "Gıda",
@@ -31,8 +32,8 @@ localhost:8080/yardim
     "fizikiDurum": "normal",
     "googleMapLink": "https://maps.google.com/maps?q=123+Main+St",
     "tweetLink": "https://twitter.com/johndoe/status/1234567890",
-     "fields-status": "test-status",
-     "fields-yenialan": "ekstrabilgi"
+    "fields-status": "test-status",
+    "fields-yenialan": "ekstrabilgi"
    
 }
 ```
@@ -53,8 +54,8 @@ localhost:8080/yardimet
     "sehir": "Istanbul",
     "hedefSehir": "Ankara",
     "aciklama": "Need transportation from Istanbul to Ankara.",
-      "fields-status": "test-status",
-     "fields-yenialan": "ekstrabilgi",
+    "fields-status": "test-status",
+    "fields-yenialan": "ekstrabilgi",
     "yardimDurumu": "bekleniyor"
 }
 ```
@@ -68,8 +69,7 @@ post olarak fields-{burası aalanı adı}: value şeklinde datayı gönderin onu
 fields: {
     yardimalani: "ankara"
 }
-
- ```
+```
 
 ## Not
 Opsiyonel her türlü yardım isteme ve yardımEt kısmına eklenecek özellikler için
