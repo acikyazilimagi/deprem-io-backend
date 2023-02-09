@@ -60,6 +60,19 @@ localhost:8080/yardimet
 }
 ```
 
+## yardimet (POST)
+İstenen yardımların altındaki formlara eklenen yardımkaydi bildirimleri
+```
+{
+"postId": "63e3940d3c12f65e945ff371",
+"adSoyad": "Jane Doe",
+"telefon": "555-555-5555",
+"sonDurum": "yardim-bekleniyor",
+"email": "jane.doe@example.com",
+"aciklama": "Merhaba, ben Jane Doe. Bu posta yardım etmek istiyorum."
+}
+```
+
 ## Fields alanını kullanımı
 
 post olarak fields-{burası aalanı adı}: value şeklinde datayı gönderin onunları fields objesi altında birleştirip db ye kayddedecek
@@ -94,6 +107,22 @@ localhost:8080/iletisim
 }
 ```
 
+## /ekleYardimKaydi (POST)
+
+istenen yardımların altında form var süreci takip etmek için yardimKaydi olarak ekleyebilirsiniz
+
+```
+{
+"postId": "63e3940d3c12f65e945ff371",
+"adSoyad": "Jane Doe",
+"telefon": "555-555-5555",
+"sonDurum": "yardim-bekleniyor",
+"email": "jane.doe@example.com",
+"aciklama": "Merhaba, ben Jane Doe. Bu posta yardım etmek istiyorum."
+}
+```
+
+
 ## TODO:
 
 * Yeni data eklenince tüm cache i temizliyor onun düzeltilmesi lazım sadece ilgili cache temizlenecek
@@ -110,6 +139,8 @@ localhost:8080/iletisim
 * /yardim/:id (GET)
 * /yardimet/:id (GET)
 * /iletisim (POST)  
+* /yardimet (POST)
+* /ekleYardimKaydi (POST)
 
 ## Scripts 
 
