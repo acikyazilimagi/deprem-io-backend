@@ -76,6 +76,12 @@ router.get("/yardim", async function (req, res) {
           names[1].charAt(0) +
           "*".repeat(names[1].length - 2);
       }
+      const yedekTelefonlar = yardim.yedekTelefonlar;
+      if (yedekTelefonlar) {
+        yardim.yedekTelefonlar = yedekTelefonlar.map((yedekTelefon) => {
+          return yedekTelefon.replace(/.(?=.{4})/g, "*");
+        });
+      }
       return yardim;
     });
     cache.getCache().set(cacheKey, results);
@@ -124,6 +130,7 @@ router.post("/yardim", async function (req, res) {
       yardimTipi,
       adSoyad,
       telefon: req.body.telefon || "", // optional fields
+      yedekTelefonlar: req.body.yedekTelefonlar || "",
       email: req.body.email || "",
       adres,
       acilDurum,
@@ -184,6 +191,7 @@ router.post("/yardimet", async function (req, res) {
       ilce: req.body.ilce || "",
       hedefSehir,
       yardimDurumu: req.body.yardimDurumu || "",
+      yedekTelefonlar: req.body.yedekTelefonlar || "",
       aciklama: req.body.aciklama || "",
       tweetLink: req.body.tweetLink || "",
       googleMapLink: req.body.googleMapLink || "",
@@ -265,6 +273,12 @@ router.get("/yardimet", async function (req, res) {
           names[1].charAt(0) +
           "*".repeat(names[1].length - 2);
       }
+      const yedekTelefonlar = yardim.yedekTelefonlar;
+      if (yedekTelefonlar) {
+        yardim.yedekTelefonlar = yedekTelefonlar.map((yedekTelefon) => {
+          return yedekTelefon.replace(/.(?=.{4})/g, "*");
+        });
+      }
       return yardim;
     });
 
@@ -336,6 +350,12 @@ router.get("/ara-yardimet", async (req, res) => {
           names[1].charAt(0) +
           "*".repeat(names[1].length - 2);
       }
+      const yedekTelefonlar = yardim.yedekTelefonlar;
+      if (yedekTelefonlar) {
+        yardim.yedekTelefonlar = yedekTelefonlar.map((yedekTelefon) => {
+          return yedekTelefon.replace(/.(?=.{4})/g, "*");
+        });
+      }
       return yardim;
     });
     res.json(results.data);
@@ -397,6 +417,12 @@ router.get("/ara-yardim", async (req, res) => {
           names[1].charAt(0) +
           "*".repeat(names[1].length - 2);
       }
+      const yedekTelefonlar = yardim.yedekTelefonlar;
+      if (yedekTelefonlar) {
+        yardim.yedekTelefonlar = yedekTelefonlar.map((yedekTelefon) => {
+          return yedekTelefon.replace(/.(?=.{4})/g, "*");
+        });
+      }
       return yardim;
     });
     res.json(results.data);
@@ -418,6 +444,12 @@ router.get("/yardim/:id", async (req, res) => {
     await checkConnection();
     let results = await Yardim.findById(req.params.id);
     results.telefon = results.telefon.replace(/.(?=.{4})/g, "*");
+    const yedekTelefonlar = results.yedekTelefonlar;
+    if (results.yedekTelefonlar) {
+      results.yedekTelefonlar = yedekTelefonlar.map((yedekTelefon) => {
+        return yedekTelefon.replace(/.(?=.{4})/g, "*");
+      });
+    }
     cache.getCache().set(cacheKey, results);
     if (!results) {
       return res.status(404).send("Yardim not found");
@@ -442,6 +474,12 @@ router.get("/yardimet/:id", async (req, res) => {
     await checkConnection();
     const results = await YardimEt.findById(req.params.id);
     results.telefon = results.telefon.replace(/.(?=.{4})/g, "*");
+    const yedekTelefonlar = results.yedekTelefonlar;
+    if (results.yedekTelefonlar) {
+      results.yedekTelefonlar = yedekTelefonlar.map((yedekTelefon) => {
+        return yedekTelefon.replace(/.(?=.{4})/g, "*");
+      });
+    }
     cache.getCache().set(cacheKey, results);
     if (!results) {
       return res.status(404).send("Yardim not found");
