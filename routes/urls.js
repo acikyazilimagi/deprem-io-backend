@@ -494,16 +494,19 @@ router.get("/yardim/:id", async (req, res) => {
         return yedekTelefon.replace(/.(?=.{4})/g, "*");
       });
     }
+  
     let yardimKaydi = await YardimKaydi.find({postId:req.params.id});
-    
-    results["yardimKaydi"] = yardimKaydi;
-
-
+  
     cache.getCache().set(cacheKey, results);
     if (!results) {
       return res.status(404).send("Yardim not found");
     }
-    res.send(results);
+    if(!data){
+      res.send({
+        results: results,
+        yardimKaydi: yardimKaydi
+      });
+    }
   } catch (error) {
     console.error(error);
     res.status(500).send("Error occurred while fetching Yardim");
