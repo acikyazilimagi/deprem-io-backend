@@ -14,11 +14,11 @@ router.get("/", function (req, res) {
 
 router.get("/yardim", async function (req, res) {
   try {
-    const page = parseInt(req.query.page) || 1;
-    const limit = parseInt(req.query.limit) || 10;
+    const page = parseInt(req.body.page) || 1;
+    const limit = parseInt(req.body.limit) || 10;
     let data;
 
-    const yardimTipi = req.query.yardimTipi || "";
+    const yardimTipi = req.body.yardimTipi || "";
 
     const startIndex = (page - 1) * limit;
     const endIndex = page * limit;
@@ -189,9 +189,11 @@ router.post("/yardimet", async function (req, res) {
 
 router.get("/yardimet", async function (req, res) {
   try {
-    const page = parseInt(req.query.page) || 1;
-    const limit = parseInt(req.query.limit) || 10;
-    const yardimTipi = req.query.yardimTipi || "";
+    const page = parseInt(req.body.page) || 1;
+    const limit = parseInt(req.body.limit) || 10;
+    const yardimTipi = req.body.yardimTipi || "";
+
+    console.log(req.body);
     let data;
 
     const startIndex = (page - 1) * limit;
