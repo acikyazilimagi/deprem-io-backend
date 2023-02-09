@@ -90,7 +90,6 @@ localhost:8080/iletisim
       }
 ```
 
-
 ## TODO:
 
 * Yeni data eklenince tüm cache i temizliyor onun düzeltilmesi lazım sadece ilgili cache temizlenecek
@@ -100,17 +99,13 @@ localhost:8080/iletisim
 
 ## Endpoint Listsi
 
-* localhost:8080/yardim
-* localhost:8080/yardim?page=2&limit=10
-* localhost:8080/yardimet?page=1&limit=1
-* localhost:8080/ara-yardimet?q=emre
-* localhost:8080/ara-yardim?q=555&acilDurum=kritik&yardimDurumu=bekleniyor
-* localhost:8080/yardim/63e3940d3c12f65e945ff371
-* localhost:8080/yardimet
-* localhost:8080/yardimet/63e39ff530e5e72e05bb7557
-* localhost:8080/yardimet?page=1&limit=10
-
-
+* /yardim (POST/GET)
+* /yardimet (POST/GET)
+* /ara-yardimet (/GET)
+* /ara-yardim (GET)
+* /yardim/:id (GET)
+* /yardimet/:id (GET)
+* /iletisim (POST)  
 
 ## Scripts 
 
