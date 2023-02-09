@@ -8,6 +8,7 @@ var requestIp = require("request-ip");
 const YardimEt = require("../models/yardimEtModel");
 const Iletisim = require("../models/iletisimModel");
 const YardimKaydi = require("../models/yardimKaydiModel");
+const check = new (require("../lib/Check"))();
 
 router.get("/", function (req, res) {
   res.send("depremio backend");
@@ -181,6 +182,10 @@ router.post("/yardimet", async function (req, res) {
     if (!yardimTipi || !adSoyad || !telefon || !sehir) {
       return res.status(400).json({
         error: "yardimTipi, adSoyad, telefon, sehir ve ilçe alanları gerekli",
+      });
+    } else if (!check.isPhoneNumber(telefon)) {
+      return res.status(400).json({
+        error: "Lütfen telefon numarasını doğru formatta giriniz.",
       });
     }
     if (req.body.telefon.trim().replace(/ /g, "")) {
