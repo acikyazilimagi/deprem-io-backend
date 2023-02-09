@@ -134,10 +134,10 @@ router.post("/yardim", async function (req, res) {
 
 router.post("/yardimet", async function (req, res) {
   try {
-    const { yardimTipi, adSoyad, telefon, sehir, hedefSehir, ilce } = req.body;
+    const { yardimTipi, adSoyad, telefon, sehir, hedefSehir } = req.body;
 
     // Validate required fields
-    if (!yardimTipi || !adSoyad || !telefon || !sehir || !ilce) {
+    if (!yardimTipi || !adSoyad || !telefon || !sehir ) {
       return res.status(400).json({
         error: "yardimTipi, adSoyad, telefon, sehir ve ilçe alanları gerekli",
       });
@@ -168,7 +168,7 @@ router.post("/yardimet", async function (req, res) {
       adSoyad,
       telefon,
       sehir,
-      ilce,
+      ilce: req.body.ilce || "",
       hedefSehir,
       yardimDurumu: req.body.yardimDurumu || "",
       aciklama: req.body.aciklama || "",
