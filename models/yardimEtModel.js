@@ -16,6 +16,10 @@ const yardimEtSchema = new mongoose.Schema(
       type: String,
       required: true,
     },
+    yedekTelefonlar: {
+      type: [String],
+      required: false
+    },
     sehir: {
       type: String,
       required: true,
@@ -27,7 +31,7 @@ const yardimEtSchema = new mongoose.Schema(
     },
     hedefSehir: {
       type: String,
-      required: true,
+      required: false,
     },
     aciklama: {
       type: String,
