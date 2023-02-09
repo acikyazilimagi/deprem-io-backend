@@ -1,9 +1,11 @@
 const CollabrationController = require('../Controller/Collabration/CollabrationController');
+const express = require('express');
+const router = express.Router();
 
-module.exports = (app) => {
-  app.get('/collabration', CollabrationController.getAll);
-  app.get('/collabration/:id', CollabrationController.show);
-  app.put('/collabration/:id', CollabrationController.update);
-  app.delete('/collabration/:id', CollabrationController.delete);
-  app.post('/collabration', CollabrationController.store);
-}
+router.get('/', CollabrationController.getAll);
+router.get('/:id(\\d+)', CollabrationController.show);
+router.post('/', CollabrationController.store);
+router.put('/:id(\\d+)', CollabrationController.update);
+router.delete('/:id(\\d+)', CollabrationController.delete);
+
+module.exports = router;

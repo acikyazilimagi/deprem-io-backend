@@ -7,7 +7,9 @@ const cache = require("../cache");
 var requestIp = require("request-ip");
 const YardimEt = require("../models/yardimEtModel");
 const Iletisim = require("../models/iletisimModel");
+const collabrationRoute = require("../Controller/index");
 
+router.use("/collabration", collabrationRoute);
 router.get("/", function (req, res) {
   res.send("depremio backend");
 });
@@ -46,7 +48,7 @@ router.get("/yardim", async function (req, res) {
       };
     }
 
-    if (yardimTipi != "") {
+    if (yardimTipi !== "") {
       results.totalPage = Math.ceil(
         (await Yardim.countDocuments({ yardimTipi: yardimTipi })) / limit
       );
@@ -124,8 +126,7 @@ router.post("/yardim", async function (req, res) {
     });
 
     cache.getCache().flushAll();
-    const savedYardim = await newYardim.save();
-
+    await newYardim.save()
     res.json({ message: "Yardım talebiniz başarıyla alındı" });
   } catch (error) {
     res.status(500).json({ error: "Hata! Yardım dökümanı kaydedilemedi!" });
@@ -178,8 +179,7 @@ router.post("/yardimet", async function (req, res) {
     });
 
     cache.getCache().flushAll();
-    const savedYardim = await newYardim.save();
-
+    await newYardim.save()
     res.json({ message: "Yardım talebiniz başarıyla alındı" });
   } catch (error) {
     console.log(error);
@@ -221,7 +221,7 @@ router.get("/yardimet", async function (req, res) {
       };
     }
 
-    if (yardimTipi != "") {
+    if (yardimTipi !== "") {
       results.totalPage = Math.ceil(
         (await YardimEt.countDocuments({ yardimTipi: yardimTipi })) / limit
       );
@@ -368,9 +368,7 @@ router.post("/iletisim", async function (req, res) {
       mesaj: req.body.mesaj || "",
       ip: clientIp,
     });
-
-    const saveIletisim = await newIletisim.save();
-
+    await newIletisim.save()
     res.json({ message: "İletişim talebiniz başarıyla alındı" });
   } catch (error) {
     console.log(error);
@@ -381,7 +379,7 @@ router.post("/iletisim", async function (req, res) {
 module.exports = router;
 
 async function checkConnection() {
-  if (mongoose.connection.readyState != 1) {
+  if (mongoose.connection.readyState !== 1) {
     await connectDB();
   }
 }

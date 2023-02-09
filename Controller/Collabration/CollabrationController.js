@@ -17,7 +17,7 @@ class CollabrationController {
           if (query.emergency) {
             where.emergencyStatus = query.emergency;
           }
-          const collabrationListings = await CollabrationListing.findAll({
+          const collabrationListings = await CollabrationListing.find({
             where,
           });
           res.json(collabrationListings);
@@ -28,7 +28,7 @@ class CollabrationController {
         }
     }
     async show(req, res) {
-        const collabrationListing = await CollabrationListing.findByPk(req.params.id);
+        const collabrationListing = await CollabrationListing.findById(req.params.id);
         return res.json(collabrationListing);
     }
 
@@ -39,7 +39,7 @@ class CollabrationController {
     }
 
     async update(req, res) {
-        const collabrationListing = await CollabrationListing.findByPk(req.params.id);
+        const collabrationListing = await CollabrationListing.findById(req.params.id);
 
         await collabrationListing.update(req.body);
 
@@ -47,7 +47,7 @@ class CollabrationController {
     }
 
     async delete(req, res) {
-        const collabrationListing = await CollabrationListing.findByPk(req.params.id);
+        const collabrationListing = await CollabrationListing.findById(req.params.id);
 
         await collabrationListing.destroy();
 
@@ -56,3 +56,4 @@ class CollabrationController {
 }
 
 module.exports = new CollabrationController();
+
