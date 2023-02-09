@@ -7,6 +7,7 @@ const cache = require("../cache");
 var requestIp = require("request-ip");
 const YardimEt = require("../models/yardimEtModel");
 const Iletisim = require("../models/iletisimModel");
+const YardimKaydi = require("../models/yardimKaydiModel");
 
 router.get("/", function (req, res) {
   res.send("depremio backend");
@@ -454,6 +455,42 @@ router.post("/iletisim", async function (req, res) {
     console.log(error);
     res.status(500).json({ error: "Hata! Yardım dökümanı kaydedilemedi!" });
   }
+});
+
+router.post('/ekleYardimKaydi', (req, res) => {
+  //const { postId, adSoyad, telefon, sonDurum, email, aciklama } = req.body;
+
+  Yardim.findById(req.body.postId)
+    .then(post => {
+      if (!post) {
+        return res.status(400).json({
+          message: 'Belirtilen postId bulunamadi.'
+        });
+      }
+
+      const newYardimKaydi = new YardimKaydi({
+        postId: req.body.postId || "",
+        adSoyad: req.body.adSoyad || "",
+        telefon: req.body.telefon || "",
+        sonDurum: req.body.sonDurum || "",
+        email: req.body.email || "",
+        aciklama: req.body.aciklama || "",
+      });
+
+      return newYardimKaydi.save();
+    })
+    .then(createdYardimKaydi => {
+      res.status(201).json({
+        message: 'Yardim kaydi basariyla olusturuldu.',
+        createdYardimKaydi
+      });
+    })
+    .catch(error => {
+      res.status(500).json({
+        message: 'Yardim kaydi olusturulamadi.',
+        error
+      });
+    });
 });
 
 module.exports = router;
