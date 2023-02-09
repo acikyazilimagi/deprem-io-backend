@@ -1,51 +1,54 @@
 const mongoose = require("mongoose");
 
 // yardım edebilecek kişilerin model dosyası
-const  yardimEtSchema = new mongoose.Schema(
+const yardimEtSchema = new mongoose.Schema(
   {
-    yardimTipi: {  // Yolcu Taşıma - konaklama - işmakinesi kullanma
-      type: String, 
-      required: true
+    yardimTipi: {
+      // Yolcu Taşıma - konaklama - işmakinesi kullanma
+      type: String,
+      required: true,
     },
     adSoyad: {
       type: String,
-      required: true
+      required: true,
     },
     telefon: {
       type: String,
-      required: true
+      required: true,
     },
     sehir: {
       type: String,
-      required: true
+      required: true,
     },
-    hedefSehir: 
-    {
-        type: String,
-        required: true
+    ilce: {
+      type: String,
+      required: true,
     },
-    aciklama: 
-    {
-        type: String,
-        required: false
+    hedefSehir: {
+      type: String,
+      required: true,
     },
-    fields: {   // Tüm alternatif kullanımlar için buraya json yollayın
+    aciklama: {
+      type: String,
+      required: false,
+    },
+    fields: {
+      // Tüm alternatif kullanımlar için buraya json yollayın
       type: Object,
-      required: false
+      required: false,
     },
 
     yardimDurumu: {
       type: String,
-      enum: ['bekleniyor', 'yolda','yapildi'],
-      required: true
+      enum: ["bekleniyor", "yolda", "yapildi"],
+      required: true,
     },
 
     ip: {
-        type: String,
-        required: true,
-        select: false
-      },
-
+      type: String,
+      required: true,
+      select: false,
+    },
   },
   { timestamps: true }
 );
