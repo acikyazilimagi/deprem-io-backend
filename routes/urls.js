@@ -192,6 +192,7 @@ router.get("/yardimet", async function (req, res) {
     const page = parseInt(req.query.page) || 1;
     const limit = parseInt(req.query.limit) || 10;
     const yardimTipi = req.query.yardimTipi || "";
+    const hedefSehir = req.query.hedefSehir || "";
     let data;
 
     const startIndex = (page - 1) * limit;
@@ -221,24 +222,26 @@ router.get("/yardimet", async function (req, res) {
       };
     }
 
+    let searchQuery = {};
+
     if (yardimTipi != "") {
-      results.totalPage = Math.ceil(
-        (await YardimEt.countDocuments({ yardimTipi: yardimTipi })) / limit
-      );
-      results.data = await YardimEt.find({ yardimTipi: yardimTipi })
-        .sort({ _id: -1 })
-        .limit(limit)
-        .skip(startIndex)
-        .exec();
-    } else {
-      results.totalPage = Math.ceil((await YardimEt.countDocuments()) / limit);
-      results.data = await YardimEt.find()
-        .sort({ _id: -1 })
-        .limit(limit)
-        .skip(startIndex)
-        .exec();
+      searchQuery = { yardimTipi: yardimTipi };
     }
 
+    if (hedefSehir != "") {
+      searchQuery = { ...searchQuery, hedefSehir: hedefSehir };
+    }
+
+    results.totalPage = Math.ceil(
+      (await YardimEt.countDocuments(searchQuery)) / limit
+    );
+
+    results.data = await YardimEt.find(searchQuery)
+      .sort({ _id: -1 })
+      .limit(limit)
+      .skip(startIndex)
+      .exec();
+    
     cache.getCache().set(cacheKey, results);
 
     if (!data) {
