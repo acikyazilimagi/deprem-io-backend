@@ -1,17 +1,18 @@
-FROM node:18
+FROM node:18-alpine
+
+ENV PORT 80
+ENV HOST 0.0.0.0
 
 WORKDIR /app
 
-ENV PORT 8080
-ENV HOST 0.0.0.0
-
-COPY package.json ./
+COPY package*.json ./
 
 RUN npm install
 
 COPY . .
 
-EXPOSE 8080
+RUN apk add --no-cache tini
 
+ENTRYPOINT ["/sbin/tini", "--"]
 
-CMD [ "node", "index.js" ]
+CMD ["node", "index.js"]
