@@ -46,7 +46,7 @@ router.get("/yardim", async function (req, res) {
       };
     }
 
-    if (yardimTipi != "") {
+    if (yardimTipi !== "") {
       results.totalPage = Math.ceil(
         (await Yardim.countDocuments({ yardimTipi: yardimTipi })) / limit
       );
@@ -64,6 +64,19 @@ router.get("/yardim", async function (req, res) {
         .exec();
     }
 
+    results.data = results.data.map((yardim) => {
+      yardim.telefon = yardim.telefon.replace(/.(?=.{4})/g, "*");
+      const names = yardim.adSoyad.split(" ");
+      if (names.length > 1) {
+        yardim.adSoyad =
+          names[0].charAt(0) +
+          "*".repeat(names[0].length - 2) +
+          " " +
+          names[1].charAt(0) +
+          "*".repeat(names[1].length - 2);
+      }
+      return yardim;
+    });
     cache.getCache().set(cacheKey, results);
     if (!data) {
       res.json(results);
@@ -124,8 +137,7 @@ router.post("/yardim", async function (req, res) {
     });
 
     cache.getCache().flushAll();
-    const savedYardim = await newYardim.save();
-
+    await newYardim.save()
     res.json({ message: "Yardım talebiniz başarıyla alındı" });
   } catch (error) {
     res.status(500).json({ error: "Hata! Yardım dökümanı kaydedilemedi!" });
@@ -179,8 +191,7 @@ router.post("/yardimet", async function (req, res) {
     });
 
     cache.getCache().flushAll();
-    const savedYardim = await newYardim.save();
-
+    await newYardim.save()
     res.json({ message: "Yardım talebiniz başarıyla alındı" });
   } catch (error) {
     console.log(error);
@@ -199,7 +210,7 @@ router.get("/yardimet", async function (req, res) {
     const startIndex = (page - 1) * limit;
     const endIndex = page * limit;
 
-    const results = {};
+    let results = {};
 
     const cacheKey = `yardimet_${page}_${limit}` + yardimTipi;
 
@@ -225,11 +236,11 @@ router.get("/yardimet", async function (req, res) {
 
     let searchQuery = {};
 
-    if (yardimTipi != "") {
+    if (yardimTipi !== "") {
       searchQuery = { yardimTipi: yardimTipi };
     }
 
-    if (hedefSehir != "") {
+    if (hedefSehir !== "") {
       searchQuery = { ...searchQuery, hedefSehir: hedefSehir };
     }
 
@@ -242,6 +253,21 @@ router.get("/yardimet", async function (req, res) {
       .limit(limit)
       .skip(startIndex)
       .exec();
+    results.data = results.data.map((yardim) => {
+      yardim.telefon = yardim.telefon.replace(/.(?=.{4})/g, "*");
+      const names = yardim.adSoyad.split(" ");
+      if (names.length > 1) {
+        yardim.adSoyad =
+          names[0].charAt(0) +
+          "*".repeat(names[0].length - 2) +
+          " " +
+          names[1].charAt(0) +
+          "*".repeat(names[1].length - 2);
+      }
+      return yardim;
+    });
+
+
 
     cache.getCache().set(cacheKey, results);
 
@@ -272,9 +298,24 @@ router.get("/ara-yardimet", async (req, res) => {
         $and: [query, { yardimDurumu: yardimDurumuQuery }],
       };
     }
+    let results = {};
+    results.data = await YardimEt.find(query);
 
-    const results = await YardimEt.find(query);
-    res.json(results);
+    // hidden phone number for security
+    results.data = results.data.map((yardim) => {
+      yardim.telefon = yardim.telefon.replace(/.(?=.{4})/g, "*");
+      const names = yardim.adSoyad.split(" ");
+      if (names.length > 1) {
+        yardim.adSoyad =
+          names[0].charAt(0) +
+          "*".repeat(names[0].length - 2) +
+          " " +
+          names[1].charAt(0) +
+          "*".repeat(names[1].length - 2);
+      }
+      return yardim;
+    });
+    res.json(results.data);
   } catch (error) {
     res.status(500).json({ message: error.message });
   }
@@ -313,9 +354,22 @@ router.get("/ara-yardim", async (req, res) => {
         $and: [query, { acilDurum: acilDurumQuery }],
       };
     }
-
-    const results = await Yardim.find(query);
-    res.json(results);
+    let results = {};
+    results.data = await Yardim.find(query);
+    results.data = results.data.map((yardim) => {
+      yardim.telefon = yardim.telefon.replace(/.(?=.{4})/g, "*");
+      const names = yardim.adSoyad.split(" ");
+      if (names.length > 1) {
+        yardim.adSoyad =
+          names[0].charAt(0) +
+          "*".repeat(names[0].length - 2) +
+          " " +
+          names[1].charAt(0) +
+          "*".repeat(names[1].length - 2);
+      }
+      return yardim;
+    });
+    res.json(results.data);
   } catch (error) {
     res.status(500).json({ message: error.message });
   }
@@ -332,7 +386,8 @@ router.get("/yardim/:id", async (req, res) => {
       res.send(data);
     }
     await checkConnection();
-    const results = await Yardim.findById(req.params.id);
+    let results = await Yardim.findById(req.params.id);
+    results.telefon = results.telefon.replace(/.(?=.{4})/g, "*");
     cache.getCache().set(cacheKey, results);
     if (!results) {
       return res.status(404).send("Yardim not found");
@@ -356,6 +411,7 @@ router.get("/yardimet/:id", async (req, res) => {
     }
     await checkConnection();
     const results = await YardimEt.findById(req.params.id);
+    results.telefon = results.telefon.replace(/.(?=.{4})/g, "*");
     cache.getCache().set(cacheKey, results);
     if (!results) {
       return res.status(404).send("Yardim not found");
@@ -377,7 +433,7 @@ router.post("/iletisim", async function (req, res) {
       email: req.body.email,
       mesaj: req.body.mesaj,
     });
-    
+
     if (existingIletisim) {
       return res.status(400).json({
         error: "Bu iletişim talebi zaten var, lütfen farklı bir talepte bulunun.",
@@ -392,9 +448,7 @@ router.post("/iletisim", async function (req, res) {
       mesaj: req.body.mesaj || "",
       ip: clientIp,
     });
-
-    const saveIletisim = await newIletisim.save();
-
+    await newIletisim.save()
     res.json({ message: "İletişim talebiniz başarıyla alındı" });
   } catch (error) {
     console.log(error);
@@ -405,7 +459,7 @@ router.post("/iletisim", async function (req, res) {
 module.exports = router;
 
 async function checkConnection() {
-  if (mongoose.connection.readyState != 1) {
+  if (mongoose.connection.readyState !== 1) {
     await connectDB();
   }
 }
