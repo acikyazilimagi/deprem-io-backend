@@ -31,7 +31,7 @@ const yardimEtSchema = new mongoose.Schema(
     },
     hedefSehir: {
       type: String,
-      required: true,
+      required: false,
     },
     aciklama: {
       type: String,
