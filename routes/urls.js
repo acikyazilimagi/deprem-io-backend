@@ -277,9 +277,11 @@ router.get("/ara-yardimet", async (req, res) => {
 });
 
 router.get("/ara-yardim", async (req, res) => {
-  const queryString = req.query.q;
+  const queryString = req.query.q || "";
   const yardimDurumuQuery = req.query.yardimDurumu;
   const acilDurumQuery = req.query.acilDurum;
+  const helpType = req.query.yardimTipi;
+
   try {
     let query = {
       $or: [
@@ -289,6 +291,12 @@ router.get("/ara-yardim", async (req, res) => {
         { adresTarifi: { $regex: queryString, $options: "i" } },
       ],
     };
+
+    if (helpType) {
+      query = {
+        $and: [query, { yardimTipi: helpType }],
+      };
+    }
 
     if (yardimDurumuQuery) {
       query = {
