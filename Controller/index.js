@@ -3,9 +3,9 @@ const express = require('express');
 const router = express.Router();
 
 router.get('/', CollabrationController.getAll);
-router.get('/:id(\\d+)', CollabrationController.show);
+router.get('/:id', CollabrationController.show);
 router.post('/', CollabrationController.store);
-router.put('/:id(\\d+)', CollabrationController.update);
-router.delete('/:id(\\d+)', CollabrationController.delete);
+router.put('/:id', CollabrationController.update);
+router.delete('/:id', CollabrationController.delete);
 
 module.exports = router;

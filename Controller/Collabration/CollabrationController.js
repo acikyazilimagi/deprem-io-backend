@@ -28,8 +28,14 @@ class CollabrationController {
         }
     }
     async show(req, res) {
-        const collabrationListing = await CollabrationListing.findById(req.params.id);
+      try {
+        const collabrationListing = await CollabrationListing.findById(req.params.id)
         return res.json(collabrationListing);
+      } catch (error) {
+          res.status(500).json({
+              message: error.message,
+          });
+      }
     }
 
     async store(req, res) {
