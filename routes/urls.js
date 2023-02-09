@@ -137,7 +137,7 @@ router.post("/yardimet", async function (req, res) {
     const { yardimTipi, adSoyad, telefon, sehir, hedefSehir } = req.body;
 
     // Validate required fields
-    if (!yardimTipi || !adSoyad || !telefon || !sehir ) {
+    if (!yardimTipi || !adSoyad || !telefon || !sehir) {
       return res.status(400).json({
         error: "yardimTipi, adSoyad, telefon, sehir ve ilçe alanları gerekli",
       });
@@ -257,6 +257,10 @@ router.get("/yardimet", async function (req, res) {
 router.get("/ara-yardimet", async (req, res) => {
   const queryString = req.query.q;
   const yardimDurumuQuery = req.query.yardimDurumu;
+  const helpType = req.query.yardimTipi;
+  const location = req.query.sehir;
+  const dest = req.query.hedefSehir;
+
   try {
     let query = {
       $or: [
@@ -266,6 +270,24 @@ router.get("/ara-yardimet", async (req, res) => {
         { hedefSehir: { $regex: queryString, $options: "i" } },
       ],
     };
+
+    if (helpType) {
+      query = {
+        $and: [query, { yardimTipi: helpType }],
+      };
+    }
+
+    if (location) {
+      query = {
+        $and: [query, { sehir: location }],
+      };
+    }
+
+    if (dest) {
+      query = {
+        $and: [query, { hedefSehir: dest }],
+      };
+    }
 
     if (yardimDurumuQuery) {
       query = {
@@ -285,6 +307,7 @@ router.get("/ara-yardim", async (req, res) => {
   const yardimDurumuQuery = req.query.yardimDurumu;
   const acilDurumQuery = req.query.acilDurum;
   const helpType = req.query.yardimTipi;
+  const vehicle = req.query.aracDurumu;
 
   try {
     let query = {
@@ -299,6 +322,12 @@ router.get("/ara-yardim", async (req, res) => {
     if (helpType) {
       query = {
         $and: [query, { yardimTipi: helpType }],
+      };
+    }
+
+    if (vehicle) {
+      query = {
+        $and: [query, { aracDurumu: vehicle }],
       };
     }
 
@@ -377,10 +406,11 @@ router.post("/iletisim", async function (req, res) {
       email: req.body.email,
       mesaj: req.body.mesaj,
     });
-    
+
     if (existingIletisim) {
       return res.status(400).json({
-        error: "Bu iletişim talebi zaten var, lütfen farklı bir talepte bulunun.",
+        error:
+          "Bu iletişim talebi zaten var, lütfen farklı bir talepte bulunun.",
       });
     }
 
