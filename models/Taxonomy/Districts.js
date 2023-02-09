@@ -4,11 +4,15 @@ const districtsSchema = new mongoose.Schema({
   title: {
     type: String,
   },
-  districtId: {
+  id: {
     type: Number,
   },
   cityId: {
     type: Number,
+    references: {
+      model: "cities",
+      key: "id",
+    }
   }
 });
 

@@ -4,7 +4,7 @@ const citiesSchema = new mongoose.Schema({
   title: {
     type: String,
   },
-  cityId: {
+  id: {
     type: Number,
   }
 });
