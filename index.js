@@ -2,6 +2,7 @@ const express = require("express");
 const mainRoutes = require("./routes/urls");
 const cache = require("./cache");
 const cacheRoutes = require("./routes/cacheUrls");
+const log = require('./routes/logger');
 
 const app = express();
 const PORT = process.env.PORT || 8080;
@@ -12,6 +13,8 @@ const mongoUrl = process.env.MONGOURL;
 const mongoose = require("mongoose");
 
 app.use(express.json());
+
+app.use(log.logger);
 
 app.use(cors({
   origin: '*'
