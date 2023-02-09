@@ -20,9 +20,10 @@ const yardimEtSchema = new mongoose.Schema(
       type: String,
       required: true,
     },
+    // TODO: ilçe geçici required false yapıldı
     ilce: {
       type: String,
-      required: true,
+      required: false,
     },
     hedefSehir: {
       type: String,
