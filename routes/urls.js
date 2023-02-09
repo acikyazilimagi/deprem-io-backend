@@ -7,6 +7,7 @@ const cache = require("../cache");
 var requestIp = require("request-ip");
 const YardimEt = require("../models/yardimEtModel");
 const Iletisim = require("../models/iletisimModel");
+const telefonKontrol = require("../scripts/telefonKontrol");
 
 router.get("/", function (req, res) {
   res.send("depremio backend");
@@ -99,6 +100,12 @@ router.post("/yardim", async function (req, res) {
     }
     await checkConnection();
 
+    //telefon numarası kontrolü
+    const cevap = telefonKontrol(telefon);
+    if(cevap == false){
+      return res.status(400).json({ error: "Telefon numaranızı doğru girdiğinizden emin olunuz!" });
+    }
+
     // check exist
     const existingYardim = await Yardim.findOne({ adSoyad, adres });
     if (existingYardim) {
@@ -155,6 +162,12 @@ router.post("/yardimet", async function (req, res) {
       });
     }
     await checkConnection();
+
+    //telefon numarası kontrolü
+    const cevap = telefonKontrol(telefon);
+    if(cevap == false){
+      return res.status(400).json({ error: "Telefon numaranızı doğru girdiğinizden emin olunuz!" });
+    }
 
     // check exist
     const existingYardim = await YardimEt.findOne({ adSoyad, sehir });
@@ -427,18 +440,6 @@ router.post("/iletisim", async function (req, res) {
   try {
     await checkConnection();
     var clientIp = requestIp.getClientIp(req); // on localhost > 127.0.0.1
-
-    const existingIletisim = await Iletisim.findOne({
-      adSoyad: req.body.adSoyad,
-      email: req.body.email,
-      mesaj: req.body.mesaj,
-    });
-
-    if (existingIletisim) {
-      return res.status(400).json({
-        error: "Bu iletişim talebi zaten var, lütfen farklı bir talepte bulunun.",
-      });
-    }
 
     // Create a new Yardim document
     const newIletisim = new Iletisim({
