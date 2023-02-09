@@ -167,7 +167,7 @@ router.post("/yardim", async function (req, res) {
     });
 
     cache.getCache().flushAll();
-    await newYardim.save()
+    await newYardim.save();
     res.json({ message: "Yardım talebiniz başarıyla alındı" });
   } catch (error) {
     res.status(500).json({ error: "Hata! Yardım dökümanı kaydedilemedi!" });
@@ -248,7 +248,7 @@ router.post("/yardimet", async function (req, res) {
     });
 
     cache.getCache().flushAll();
-    await newYardim.save()
+    await newYardim.save();
     res.json({ message: "Yardım talebiniz başarıyla alındı" });
   } catch (error) {
     console.log(error);
@@ -330,8 +330,6 @@ router.get("/yardimet", async function (req, res) {
       return yardim;
     });
 
-
-
     cache.getCache().set(cacheKey, results);
 
     if (!data) {
@@ -346,17 +344,15 @@ router.get("/yardimet", async function (req, res) {
 router.get("/ara-yardimet", async (req, res) => {
   const queryString = req.query.q;
   const yardimDurumuQuery = req.query.yardimDurumu;
-  const helpType = req.query.yardimTipi;
-  const location = req.query.sehir;
-  const dest = req.query.hedefSehir;
+  const helpType = req.query.yardimTipi || "";
+  const location = req.query.sehir || "";
+  const dest = req.query.hedefSehir || "";
 
   try {
     let query = {
       $or: [
         { adSoyad: { $regex: queryString, $options: "i" } },
         { telefon: { $regex: queryString, $options: "i" } },
-        { sehir: { $regex: queryString, $options: "i" } },
-        { hedefSehir: { $regex: queryString, $options: "i" } },
       ],
     };
 
@@ -565,7 +561,7 @@ router.post("/iletisim", async function (req, res) {
       mesaj: req.body.mesaj || "",
       ip: clientIp,
     });
-    await newIletisim.save()
+    await newIletisim.save();
     res.json({ message: "İletişim talebiniz başarıyla alındı" });
   } catch (error) {
     console.log(error);
@@ -573,14 +569,14 @@ router.post("/iletisim", async function (req, res) {
   }
 });
 
-router.post('/ekleYardimKaydi', (req, res) => {
+router.post("/ekleYardimKaydi", (req, res) => {
   //const { postId, adSoyad, telefon, sonDurum, email, aciklama } = req.body;
 
   Yardim.findById(req.body.postId)
-    .then(post => {
+    .then((post) => {
       if (!post) {
         return res.status(400).json({
-          message: 'Belirtilen postId bulunamadi.'
+          message: "Belirtilen postId bulunamadi.",
         });
       }
 
@@ -595,16 +591,16 @@ router.post('/ekleYardimKaydi', (req, res) => {
 
       return newYardimKaydi.save();
     })
-    .then(createdYardimKaydi => {
+    .then((createdYardimKaydi) => {
       res.status(201).json({
-        message: 'Yardim kaydi basariyla olusturuldu.',
-        createdYardimKaydi
+        message: "Yardim kaydi basariyla olusturuldu.",
+        createdYardimKaydi,
       });
     })
-    .catch(error => {
+    .catch((error) => {
       res.status(500).json({
-        message: 'Yardim kaydi olusturulamadi.',
-        error
+        message: "Yardim kaydi olusturulamadi.",
+        error,
       });
     });
 });
