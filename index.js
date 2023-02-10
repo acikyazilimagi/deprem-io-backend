@@ -1,21 +1,21 @@
-const express = require('express');
-const mainRoutes = require('./routes/urls');
-const cache = require('./cache');
-const cacheRoutes = require('./routes/cacheUrls');
+const express = require("express");
+const mainRoutes = require("./routes/urls");
+const cache = require("./cache");
+const cacheRoutes = require("./routes/cacheUrls");
 
 const app = express();
 const PORT = process.env.PORT || 8080;
-var cors = require('cors');
-require('dotenv').config();
+var cors = require("cors");
+require("dotenv").config();
 
 const mongoUrl = process.env.MONGOURL;
-const mongoose = require('mongoose');
+const mongoose = require("mongoose");
 
 app.use(express.json());
 
 app.use(
   cors({
-    origin: '*',
+    origin: "*",
   })
 );
 
@@ -29,9 +29,9 @@ app.use(
 );
 */
 
-app.use('/', mainRoutes);
-app.use('/cache/', cacheRoutes);
-mongoose.set('strictQuery', true);
+app.use("/", mainRoutes);
+app.use("/cache/", cacheRoutes);
+mongoose.set("strictQuery", true);
 
 // DB connection
 mongoose
@@ -41,7 +41,7 @@ mongoose
   })
   .then((r) => {
     cache.createCacheInstance();
-    console.log('Connected to DB...');
+    console.log("Connected to DB...");
     app.listen(PORT, () => console.log(`App listening on port ${PORT}...`)); // App start
   })
   .catch((err) => console.log(err));
