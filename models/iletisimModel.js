@@ -3,7 +3,7 @@ const mongoose = require("mongoose");
 // yardım edebilecek kişilerin model dosyası
 const  iletisimSchema = new mongoose.Schema(
   {
-  
+
     adSoyad: {
       type: String,
       required: false,
@@ -16,7 +16,9 @@ const  iletisimSchema = new mongoose.Schema(
     telefon: {
         type: String,
         required: false,
-      },
+      pattern: /^\d{10}$/,
+      message: "Telefon numarası 10 karakterli olmalıdır"
+    },
     mesaj: {
         type: String,
         required: false,

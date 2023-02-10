@@ -21,7 +21,7 @@ router.get("/yardim", async function (req, res) {
     let data;
 
     const yardimTipi = req.query.yardimTipi || "";
-    
+
     const startIndex = (page - 1) * limit;
     const endIndex = page * limit;
 
@@ -52,7 +52,7 @@ router.get("/yardim", async function (req, res) {
     if (yardimTipi !== "") {
       query.yardimTipi = yardimTipi;
     }
-    
+
     results.totalPage = Math.ceil(
       (await Yardim.countDocuments(query)) / limit
     );
@@ -96,19 +96,20 @@ router.post("/yardim", async function (req, res) {
         error: "yardimTipi, adSoyad, adres and acilDurum alanları gerekli",
       });
     }
-    if (req.body.telefon.trim().replace(/ /g, "")) {
-      if (!/^\d+$/.test(req.body.telefon)) {
+    req.body.telefon = req.body.telefon.trim().replace(/ /g, "");
+
+    if (req.body.telefon) {
+      if (!/^\d+$/.test(req.body.telefon) || req.body.telefon.length !== 10) {
         return res.status(400).json({
-          error: "Telefon numarası sadece rakamlardan oluşmalıdır.",
+          error: "Telefon numarası sadece rakamlardan ve 10 karakterden oluşmalıdır.",
         });
       }
     }
-    req.body.telefon = req.body.telefon.replace(/ /g, "");
     if (req.body.yedekTelefonlar) {
       if (req.body.yedekTelefonlar.length > 0) {
         let yedekTelefonlar = req.body.yedekTelefonlar;
         for (let i = 0; i < yedekTelefonlar.length; i++) {
-          if (!/^\d+$/.test(yedekTelefonlar[i])) {
+          if (!/^\d+$/.test(yedekTelefonlar[i]) || yedekTelefonlar[i].length !== 10) {
             return res.status(400).json({
               error: "Telefon numarası sadece rakamlardan oluşmalıdır.",
             });
@@ -118,6 +119,7 @@ router.post("/yardim", async function (req, res) {
         req.body.yedekTelefonlar = yedekTelefonlar;
       }
     }
+    console.log(req.body.telefon);
     await checkConnection();
 
     // check exist
@@ -181,7 +183,7 @@ router.post("/yardimet", async function (req, res) {
       });
     }
     if (req.body.telefon.trim().replace(/ /g, "")) {
-      if (!/^\d+$/.test(req.body.telefon)) {
+      if (!/^\d+$/.test(req.body.telefon) || req.body.telefon.length !== 10) {
         return res.status(400).json({
           error: "Telefon numarası sadece rakamlardan oluşmalıdır.",
         });
@@ -192,7 +194,7 @@ router.post("/yardimet", async function (req, res) {
       if (req.body.yedekTelefonlar.length > 0) {
         let yedekTelefonlar = req.body.yedekTelefonlar;
         for (let i = 0; i < yedekTelefonlar.length; i++) {
-          if (!/^\d+$/.test(yedekTelefonlar[i])) {
+          if (!/^\d+$/.test(yedekTelefonlar[i]) || yedekTelefonlar[i].length !== 10) {
             return res.status(400).json({
               error: "Telefon numarası sadece rakamlardan oluşmalıdır.",
             });
@@ -558,6 +560,16 @@ router.post("/iletisim", async function (req, res) {
         error:
           "Bu iletişim talebi zaten var, lütfen farklı bir talepte bulunun.",
       });
+    }
+    if (req.body.telefon) {
+      if (req.body.telefon.trim().replace(/ /g, "")) {
+        if (!/^\d+$/.test(req.body.telefon) || req.body.telefon.length !== 10) {
+          return res.status(400).json({
+            error: "Telefon numarası sadece rakamlardan ve 10 karakterden oluşmalıdır.",
+          });
+        }
+      }
+      req.body.telefon = req.body.telefon.replace(/ /g, "");
     }
 
     // Create a new Yardim document
