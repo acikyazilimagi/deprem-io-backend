@@ -11,7 +11,7 @@ const mongoose = require("mongoose");
 module.exports = function () {
   const app = fastify({
     trustProxy: true,
-    ignoreTrailingSlash: true
+    ignoreTrailingSlash: true,
   });
 
   app.register(require("@fastify/swagger"), {
