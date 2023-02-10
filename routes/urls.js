@@ -141,7 +141,7 @@ module.exports = async function (app) {
       if (telefon && !check.isPhoneNumber(telefon)) {
         res.statusCode = 400;
         return {
-          error: "Lütfen doğru formatta bir telefon numarası formatı giriniz.",
+          error: "Lütfen doğru formatta bir telefon numarası giriniz.",
         };
       }
 
@@ -234,7 +234,7 @@ module.exports = async function (app) {
       if (telefon && !check.isPhoneNumber(telefon)) {
         res.statusCode = 400;
         return {
-          error: "Lütfen doğru formatta bir telefon numarası formatı giriniz.",
+          error: "Lütfen doğru formatta bir telefon numarası giriniz.",
         };
       }
 
