@@ -745,11 +745,11 @@ module.exports = async function (app) {
           required: ["postId", "adSoyad", "sonDurum", "telefon", "aciklama"],
         },
       },
+      preHandler: [yardimEtPostIdExists],
     },
+
     async (req, res) => {
       await checkConnection();
-      await yardimEtPostIdExists(req, res);
-
       const newYardimEtKaydi = new YardimEtKaydi({
         postId: req.body.postId,
         adSoyad: req.body.adSoyad,
