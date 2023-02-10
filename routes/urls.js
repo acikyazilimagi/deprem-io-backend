@@ -5,6 +5,7 @@ const cache = require("../cache");
 const YardimEt = require("../models/yardimEtModel");
 const Iletisim = require("../models/iletisimModel");
 const YardimKaydi = require("../models/yardimKaydiModel");
+const YardimEtKaydi = require("../models/yardimEtKaydiModel");
 const check = new (require("../lib/Check"))();
 
 /**
@@ -356,7 +357,7 @@ module.exports = async function (app) {
       results.totalPage = Math.ceil((await YardimEt.countDocuments(searchQuery)) / limit);
 
       results.data = await YardimEt.find(searchQuery).sort({ _id: -1 }).limit(limit).skip(startIndex).exec();
-      results.data = results.data.map((yardim) => { 
+      results.data = results.data.map((yardim) => {
         //console.log('res: '+Object.values(results));
         yardim.telefon = yardim.telefon.replace(/.(?=.{4})/g, "*");
         const names = yardim.adSoyad.split(" ");
@@ -538,8 +539,6 @@ module.exports = async function (app) {
   );
 
   app.get("/yardim/:id", async (req, res) => {
-    let data;
-
     const cacheKey = `yardim_${req.params.id}`;
 
     if (cache.getCache().has(cacheKey)) {
@@ -597,7 +596,21 @@ module.exports = async function (app) {
       return { status: 404 };
     }
 
-    return results;
+    let yardimEtKaydi = await YardimEtKaydi.find({ postId: req.params.id });
+
+    cache.getCache().set(cacheKey, {
+      results: results,
+      yardimEtKaydi: yardimEtKaydi,
+    });
+    if (!results) {
+      res.statusCode = 404;
+      return { status: 404 };
+    }
+
+    return {
+      results,
+      yardimEtKaydi,
+    };
   });
 
   app.post(
@@ -698,6 +711,61 @@ module.exports = async function (app) {
           aciklama: req.body.aciklama || "",
         });
         await newYardimKaydi.save();
+      } else {
+        res.statusCode = 400;
+        return {
+          error: "postId bulunamadı.",
+        };
+      }
+
+      return { status: 200 };
+    },
+  );
+
+  app.post(
+    "/ekleYardimEtKaydi",
+    {
+      schema: {
+        body: {
+          type: "object",
+          properties: {
+            postId: { type: "string" },
+            adSoyad: { type: "string" },
+            sonDurum: { type: "string" },
+            email: { type: "string" },
+            aciklama: { type: "string" },
+            telefon: { type: "string" },
+          },
+          required: ["postId"],
+        },
+      },
+    },
+    async (req, res) => {
+      await checkConnection();
+      const existingYardimEtKaydi = await YardimEt.findOne({
+        _id: req.body.postId,
+      });
+      if (existingYardimEtKaydi) {
+        if (req.body.telefon) {
+          if (req.body.telefon.trim().replace(/ /g, "")) {
+            if (!check.isPhoneNumber(req.body.telefon)) {
+              res.statusCode = 400;
+              return {
+                error: "Lütfen doğru formatta bir telefon numarası giriniz.(örn: 05554443322)"
+              }
+            }
+          }
+          req.body.telefon = req.body.telefon.replace(/ /g, "");
+        }
+        const newYardimEtKaydi = new YardimEtKaydi({
+          postId: req.body.postId || "",
+          adSoyad: req.body.adSoyad || "",
+          telefon: req.body.telefon || "",
+          sonDurum: req.body.sonDurum || "",
+          email: req.body.email || "",
+          aciklama: req.body.aciklama || "",
+        });
+        await newYardimEtKaydi.save();
       } else {
         res.statusCode = 400;
         return {
