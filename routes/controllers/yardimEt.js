@@ -1,4 +1,4 @@
-const cache = require("../cache");
+const cache = require("../../cache");
 const check = new (require("../../lib/Check"))();
 const { checkConnection } = require("../utils");
 const YardimEt = require("../../models/yardimEtModel");
@@ -49,7 +49,7 @@ module.exports = async function (fastifyInstance) {
         }
       }
 
-      await checkConnection();
+      await checkConnection(fastifyInstance);
 
       // check exist
       const existingYardim = await YardimEt.findOne({ adSoyad, sehir });
@@ -123,7 +123,7 @@ module.exports = async function (fastifyInstance) {
       if (cache.getCache().has(cacheKey)) {
         return cache.getCache().get(cacheKey);
       }
-      await checkConnection();
+      await checkConnection(fastifyInstance);
 
       if (endIndex < (await YardimEt.countDocuments().exec())) {
         results.next = {
@@ -178,7 +178,7 @@ module.exports = async function (fastifyInstance) {
     if (cache.getCache().has(cacheKey)) {
       return cache.getCache().get(cacheKey);
     }
-    await checkConnection();
+    await checkConnection(fastifyInstance);
     const results = await YardimEt.findById(req.params.id);
     results.telefon = results.telefon.replace(/.(?=.{4})/g, "*");
     const yedekTelefonlar = results.yedekTelefonlar;

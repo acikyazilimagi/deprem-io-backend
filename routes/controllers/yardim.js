@@ -1,4 +1,4 @@
-const cache = require("../cache");
+const cache = require("../../cache");
 const check = new (require("../../lib/Check"))();
 const { checkConnection } = require("../utils");
 const Yardim = require("../../models/yardimModel");
@@ -40,7 +40,7 @@ module.exports = async function (fastifyInstance) {
         return cache.getCache().get(cacheKey);
       }
 
-      await checkConnection();
+      await checkConnection(fastifyInstance);
       if (endIndex < (await Yardim.countDocuments().exec())) {
         results.next = {
           page: page + 1,
@@ -138,7 +138,7 @@ module.exports = async function (fastifyInstance) {
         }
       }
 
-      await checkConnection();
+      await checkConnection(fastifyInstance);
 
       // check exist
       const existingYardim = await Yardim.findOne({ adSoyad, adres });
@@ -192,7 +192,7 @@ module.exports = async function (fastifyInstance) {
     if (cache.getCache().has(cacheKey)) {
       return cache.getCache().get(cacheKey);
     }
-    await checkConnection();
+    await checkConnection(fastifyInstance);
     let results = await Yardim.findById(req.params.id);
     let yardimKaydi = await YardimKaydi.find({ postId: req.params.id });
     try {
