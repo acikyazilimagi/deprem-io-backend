@@ -1,4 +1,4 @@
-FROM node:18-alpine
+FROM node:18-alpine AS build
 
 ENV PORT 80
 ENV HOST 0.0.0.0
@@ -11,6 +11,11 @@ RUN npm install
 
 COPY . .
 
+FROM alpine
+COPY --from=build /app /app
+WORKDIR /app
+
+RUN apk add --update nodejs npm
 RUN apk add --no-cache tini
 
 ENTRYPOINT ["/sbin/tini", "--"]
