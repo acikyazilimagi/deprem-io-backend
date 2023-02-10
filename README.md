@@ -25,7 +25,7 @@ docker build -t deprem-io-backend .
 * Container ı run ediniz
 * **English**: Run docker container with following command
 ```
-docker run -p 8080:80 -d deprem-io-backend
+docker run -p 8080:8080 -d deprem-io-backend
 ```
 
 * localhost:8080/ adresine gidebiliyorsanız proje ayakta demektir.
