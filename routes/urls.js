@@ -314,9 +314,11 @@ router.get("/yardimet", async function (req, res) {
     results.data = results.data.map((yardim) => {
       yardim.telefon = yardim.telefon.replace(/.(?=.{4})/g, "*");
       const names = yardim.adSoyad.split(" ");
-      if (names.length > 1) {
-        yardim.adSoyad =
-          `${names[0].charAt(0)}${"*".repeat(names[0].length - 2)} ${names[1].charAt(0)}${"*".repeat(names[1].length - 2)}`;
+      if (names.length > 0) {
+        const name = names[0];
+        const surname = names[names.length - 1];
+        // hidden name and surname
+        yardim.adSoyad = `${name[0]}${"*".repeat(name.length - 1)} ${surname[0]}${"*".repeat(surname.length - 1)}`;
       }
       const yedekTelefonlar = yardim.yedekTelefonlar;
       if (yedekTelefonlar) {
@@ -344,7 +346,8 @@ router.get("/ara-yardimet", async (req, res) => {
     const yardimDurumuQuery = req.query.yardimDurumu;
     const helpType = req.query.yardimTipi || "";
     const location = req.query.sehir || "";
-    const dest = req.query.hedefSehir || "";    let query = {
+    const dest = req.query.hedefSehir || "";
+    let query = {
       $or: [
         { adSoyad: { $regex: queryString, $options: "i" } },
         { telefon: { $regex: queryString, $options: "i" } },
