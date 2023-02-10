@@ -1,7 +1,7 @@
-const { checkConnection } = require("../utils");
-const Yardim = require("../../models/yardimModel");
 const check = new (require("../../lib/Check"))();
-const YardimKaydi = require("../../models/yardimKaydiModel");
+
+const Yardim = require("../../models/Yardim");
+const YardimKaydi = require("../../models/YardimKaydi");
 
 module.exports = async function (fastifyInstance) {
   fastifyInstance.post(
@@ -23,7 +23,6 @@ module.exports = async function (fastifyInstance) {
       },
     },
     async (req, res) => {
-      await checkConnection();
       const existingYardimKaydi = await Yardim.findOne({
         _id: req.body.postId,
       });

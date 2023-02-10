@@ -1,308 +1,327 @@
-const cache = require("../cache");
-const check = new (require("../../lib/Check"))();
-const { checkConnection } = require("../utils");
-const Yardim = require("../../models/yardimModel");
-const YardimKaydi = require("../../models/yardimKaydiModel");
+const cache = require('../../cache')
+const check = new (require('../../lib/Check'))()
+
+const Yardim = require('../../models/Yardim')
+const YardimKaydi = require('../../models/YardimKaydi')
 
 module.exports = async function (fastifyInstance) {
-  fastifyInstance.get(
-    "/yardim",
-    {
-      schema: {
-        querystring: {
-          type: "object",
-          properties: {
-            page: {
-              type: "number",
-              default: 1,
+   fastifyInstance.get(
+      '/yardim',
+      {
+         schema: {
+            querystring: {
+               type: 'object',
+               properties: {
+                  page: {
+                     type: 'number',
+                     default: 1,
+                  },
+                  limit: {
+                     type: 'number',
+                     default: 10,
+                  },
+                  yardimTipi: {
+                     type: 'string',
+                  },
+               },
+               required: [],
             },
-            limit: {
-              type: "number",
-              default: 10,
-            },
-            yardimTipi: {
-              type: "string",
-            },
-          },
-          required: [],
-        },
-        description: "Yardim listesi",
+            description: 'Yardim listesi',
+         },
       },
-    },
-    async function (req, res) {
-      const { page, limit, yardimTipi } = req.query;
-      const startIndex = (page - 1) * limit;
-      const endIndex = page * limit;
-      const results = {};
+      // @ts-ignore
+      async function (req, res) {
+         const { page, limit, yardimTipi } = req.query
+         const startIndex = (page - 1) * limit
+         const endIndex = page * limit
+         const results = {}
 
-      let cacheKey = `yardim_${page}_${limit}${yardimTipi}`;
+         let cacheKey = `yardim_${page}_${limit}${yardimTipi}`
+         if (cache.getCache().has(cacheKey)) {
+            return cache.getCache().get(cacheKey)
+         }
+
+         if (endIndex < (await Yardim.countDocuments().exec())) {
+            results.next = {
+               page: page + 1,
+               limit,
+            }
+         }
+
+         if (startIndex > 0) {
+            results.previous = {
+               page: page - 1,
+               limit,
+            }
+         }
+
+         let query = yardimTipi ? { yardimTipi } : {}
+
+         results.totalPage = Math.ceil(
+            (await Yardim.countDocuments(query)) / limit
+         )
+         results.data = await Yardim.find(query)
+            .sort({ _id: -1 })
+            .limit(limit)
+            .skip(startIndex)
+            .exec()
+
+         results.data = results.data.map((yardim) => {
+            if (yardim.email) {
+               yardim.email = check.hideEmailCharacters(yardim.email)
+            }
+            yardim.telefon = yardim.telefon.replace(/.(?=.{4})/g, '*')
+            const names = yardim.adSoyad.split(' ')
+            if (names.length > 1) {
+               yardim.adSoyad = `${names[0].charAt(0)}${'*'.repeat(
+                  names[0].length - 2
+               )} ${names[1].charAt(0)}${'*'.repeat(names[1].length - 2)}`
+            }
+            const yedekTelefonlar = yardim.yedekTelefonlar
+            if (yedekTelefonlar) {
+               yardim.yedekTelefonlar = yedekTelefonlar.map((yedekTelefon) => {
+                  return yedekTelefon.replace(/.(?=.{4})/g, '*')
+               })
+            }
+            return yardim
+         })
+
+         cache.getCache().set(cacheKey, results)
+
+         return results
+      }
+   )
+
+   fastifyInstance.post(
+      '/yardim',
+      {
+         schema: {
+            body: {
+               type: 'object',
+               properties: {
+                  yardimTipi: {
+                     type: 'string',
+                  },
+                  adSoyad: {
+                     type: 'string',
+                  },
+                  adres: {
+                     type: 'string',
+                  },
+                  acilDurum: {
+                     type: 'string',
+                  },
+                  telefon: {
+                     type: 'string',
+                  },
+                  yedekTelefonlar: {
+                     type: 'array',
+                     items: {
+                        type: 'string',
+                     },
+                  },
+               },
+               required: ['yardimTipi', 'adSoyad', 'adres', 'acilDurum'],
+            },
+         },
+      },
+      async function (req, res) {
+         const {
+            yardimTipi,
+            adSoyad,
+            adres,
+            acilDurum,
+            telefon,
+            yedekTelefonlar,
+         } = req.body
+
+         if (telefon && !check.isPhoneNumber(telefon)) {
+            res.statusCode = 400
+            return {
+               error: 'Lütfen doğru formatta bir telefon numarası giriniz.(örn: 05554443322)',
+            }
+         }
+
+         if (yedekTelefonlar && yedekTelefonlar.length > 0) {
+            if (!check.arePhoneNumbers(yedekTelefonlar)) {
+               res.statusCode = 400
+               return {
+                  error: 'Lütfen doğru formatta bir telefon numarası giriniz.(örn: 05554443322)',
+               }
+            }
+         }
+
+         // check exist
+         const existingYardim = await Yardim.findOne({ adSoyad, adres })
+         if (existingYardim) {
+            res.statusCode = 409
+            return {
+               error: 'Bu yardım bildirimi daha önce veritabanımıza eklendi.',
+            }
+         }
+
+         const fields = {}
+
+         // TODO: Bunlarin hepsini JSON schema'ya tasiyalim.
+         for (const key in req.body) {
+            if (key.startsWith('fields-')) {
+               const fieldName = key.split('-')[1]
+               fields[fieldName] = req.body[key]
+            }
+         }
+
+         // Create a new Yardim document
+         const newYardim = new Yardim({
+            yardimTipi,
+            adSoyad,
+            telefon: req.body.telefon || '', // optional fields
+            yedekTelefonlar: yedekTelefonlar || '',
+            email: req.body.email || '',
+            adres,
+            acilDurum,
+            adresTarifi: req.body.adresTarifi || '',
+            yardimDurumu: 'bekleniyor',
+            kisiSayisi: req.body.kisiSayisi || '',
+            fizikiDurum: req.body.fizikiDurum || '',
+            tweetLink: req.body.tweetLink || '',
+            googleMapLink: req.body.googleMapLink || '',
+            ip: req.ip,
+            fields: fields || {},
+         })
+
+         cache.getCache().flushAll()
+         await newYardim.save()
+         return { message: 'Yardım talebiniz başarıyla alındı' }
+      }
+   )
+
+   fastifyInstance.get('/yardim/:id', async (req, res) => {
+      // @ts-ignore
+      let data
+
+      const cacheKey = `yardim_${req.params.id}`
+
       if (cache.getCache().has(cacheKey)) {
-        return cache.getCache().get(cacheKey);
+         return cache.getCache().get(cacheKey)
       }
 
-      await checkConnection();
-      if (endIndex < (await Yardim.countDocuments().exec())) {
-        results.next = {
-          page: page + 1,
-          limit,
-        };
+      let results = await Yardim.findById(req.params.id)
+      let yardimKaydi = await YardimKaydi.find({ postId: req.params.id })
+      try {
+         yardimKaydi.map((yardim) => {
+            if (yardim.email) {
+               yardim.email = check.hideEmailCharacters(yardim.email)
+            }
+         })
+
+         // @ts-ignore
+         results.telefon = results.telefon.replace(/.(?=.{4})/g, '*')
+         const yedekTelefonlar = results.yedekTelefonlar
+         if (results.yedekTelefonlar) {
+            results.yedekTelefonlar = yedekTelefonlar.map((yedekTelefon) => {
+               // @ts-ignore
+               return yedekTelefon.replace(/.(?=.{4})/g, '*')
+            })
+         }
+      } catch (error) {}
+
+      cache.getCache().set(cacheKey, {
+         results: results,
+         yardimKaydi: yardimKaydi,
+      })
+      if (!results) {
+         res.statusCode = 404
+         return { status: 404 }
       }
 
-      if (startIndex > 0) {
-        results.previous = {
-          page: page - 1,
-          limit,
-        };
+      return {
+         results,
+         yardimKaydi,
       }
+   })
 
-      let query = yardimTipi ? { yardimTipi } : {};
-
-      results.totalPage = Math.ceil((await Yardim.countDocuments(query)) / limit);
-      results.data = await Yardim.find(query).sort({ _id: -1 }).limit(limit).skip(startIndex).exec();
-
-      results.data = results.data.map((yardim) => {
-        if (yardim.email) {
-          yardim.email = check.hideEmailCharacters(yardim.email);
-        }
-        yardim.telefon = yardim.telefon.replace(/.(?=.{4})/g, "*");
-        const names = yardim.adSoyad.split(" ");
-        if (names.length > 1) {
-          yardim.adSoyad = `${names[0].charAt(0)}${"*".repeat(names[0].length - 2)} ${names[1].charAt(0)}${"*".repeat(
-            names[1].length - 2,
-          )}`;
-        }
-        const yedekTelefonlar = yardim.yedekTelefonlar;
-        if (yedekTelefonlar) {
-          yardim.yedekTelefonlar = yedekTelefonlar.map((yedekTelefon) => {
-            return yedekTelefon.replace(/.(?=.{4})/g, "*");
-          });
-        }
-        return yardim;
-      });
-
-      cache.getCache().set(cacheKey, results);
-
-      return results;
-    },
-  );
-
-  fastifyInstance.post(
-    "/yardim",
-    {
-      schema: {
-        body: {
-          type: "object",
-          properties: {
-            yardimTipi: {
-              type: "string",
+   fastifyInstance.get(
+      '/ara-yardim',
+      {
+         schema: {
+            querystring: {
+               type: 'object',
+               properties: {
+                  q: { type: 'string' },
+                  yardimDurumu: { type: 'string' },
+                  acilDurum: { type: 'string' },
+                  yardimTipi: { type: 'string' },
+                  aracDurumu: { type: 'string' },
+               },
+               required: [],
             },
-            adSoyad: {
-              type: "string",
-            },
-            adres: {
-              type: "string",
-            },
-            acilDurum: {
-              type: "string",
-            },
-            telefon: {
-              type: "string",
-            },
-            yedekTelefonlar: {
-              type: "array",
-              items: {
-                type: "string",
-              },
-            },
-          },
-          required: ["yardimTipi", "adSoyad", "adres", "acilDurum"],
-        },
+         },
       },
-    },
-    async function (req, res) {
-      const { yardimTipi, adSoyad, adres, acilDurum, telefon, yedekTelefonlar } = req.body;
+      // @ts-ignore
+      async (req, res) => {
+         const queryString = req.query.q || ''
+         const yardimDurumuQuery = req.query.yardimDurumu
+         const acilDurumQuery = req.query.acilDurum
+         const helpType = req.query.yardimTipi
+         const vehicle = req.query.aracDurumu
+         let query = {
+            $or: [
+               { adSoyad: { $regex: queryString, $options: 'i' } },
+               { telefon: { $regex: queryString, $options: 'i' } },
+               { sehir: { $regex: queryString, $options: 'i' } },
+               { adresTarifi: { $regex: queryString, $options: 'i' } },
+            ],
+         }
 
-      if (telefon && !check.isPhoneNumber(telefon)) {
-        res.statusCode = 400;
-        return {
-          error: "Lütfen doğru formatta bir telefon numarası giriniz.(örn: 05554443322)",
-        };
+         if (helpType) {
+            // @ts-ignore
+            query = {
+               $and: [query, { yardimTipi: helpType }],
+            }
+         }
+
+         if (vehicle) {
+            // @ts-ignore
+            query = {
+               $and: [query, { aracDurumu: vehicle }],
+            }
+         }
+
+         if (yardimDurumuQuery) {
+            // @ts-ignore
+            query = {
+               $and: [query, { yardimDurumu: yardimDurumuQuery }],
+            }
+         }
+
+         if (acilDurumQuery) {
+            // @ts-ignore
+            query = {
+               $and: [query, { acilDurum: acilDurumQuery }],
+            }
+         }
+         let results = {}
+         results.data = await Yardim.find(query)
+         results.data = results.data.map((yardim) => {
+            if (yardim.email) {
+               yardim.email = check.hideEmailCharacters(yardim.email)
+            }
+            yardim.telefon = yardim.telefon.replace(/.(?=.{4})/g, '*')
+            const names = yardim.adSoyad.split(' ')
+            if (names.length > 1) {
+               yardim.adSoyad = `${names[0].charAt(0)}${'*'.repeat(
+                  names[0].length - 2
+               )} ${names[1].charAt(0)}${'*'.repeat(names[1].length - 2)}`
+            }
+            const yedekTelefonlar = yardim.yedekTelefonlar
+            if (yedekTelefonlar) {
+               yardim.yedekTelefonlar = yedekTelefonlar.map((yedekTelefon) => {
+                  return yedekTelefon.replace(/.(?=.{4})/g, '*')
+               })
+            }
+            return yardim
+         })
+         return results.data
       }
-
-      if (yedekTelefonlar && yedekTelefonlar.length > 0) {
-        if (!check.arePhoneNumbers(yedekTelefonlar)) {
-          res.statusCode = 400;
-          return {
-            error: "Lütfen doğru formatta bir telefon numarası giriniz.(örn: 05554443322)",
-          };
-        }
-      }
-
-      await checkConnection();
-
-      // check exist
-      const existingYardim = await Yardim.findOne({ adSoyad, adres });
-      if (existingYardim) {
-        res.statusCode = 409;
-        return {
-          error: "Bu yardım bildirimi daha önce veritabanımıza eklendi.",
-        };
-      }
-
-      const fields = {};
-
-      // TODO: Bunlarin hepsini JSON schema'ya tasiyalim.
-      for (const key in req.body) {
-        if (key.startsWith("fields-")) {
-          const fieldName = key.split("-")[1];
-          fields[fieldName] = req.body[key];
-        }
-      }
-
-      // Create a new Yardim document
-      const newYardim = new Yardim({
-        yardimTipi,
-        adSoyad,
-        telefon: req.body.telefon || "", // optional fields
-        yedekTelefonlar: yedekTelefonlar || "",
-        email: req.body.email || "",
-        adres,
-        acilDurum,
-        adresTarifi: req.body.adresTarifi || "",
-        yardimDurumu: "bekleniyor",
-        kisiSayisi: req.body.kisiSayisi || "",
-        fizikiDurum: req.body.fizikiDurum || "",
-        tweetLink: req.body.tweetLink || "",
-        googleMapLink: req.body.googleMapLink || "",
-        ip: req.ip,
-        fields: fields || {},
-      });
-
-      cache.getCache().flushAll();
-      await newYardim.save();
-      return { message: "Yardım talebiniz başarıyla alındı" };
-    },
-  );
-
-  fastifyInstance.get("/yardim/:id", async (req, res) => {
-    let data;
-
-    const cacheKey = `yardim_${req.params.id}`;
-
-    if (cache.getCache().has(cacheKey)) {
-      return cache.getCache().get(cacheKey);
-    }
-    await checkConnection();
-    let results = await Yardim.findById(req.params.id);
-    let yardimKaydi = await YardimKaydi.find({ postId: req.params.id });
-    try {
-      yardimKaydi.map((yardim) => {
-        if (yardim.email) {
-          yardim.email = check.hideEmailCharacters(yardim.email);
-        }
-      });
-
-      results.telefon = results.telefon.replace(/.(?=.{4})/g, "*");
-      const yedekTelefonlar = results.yedekTelefonlar;
-      if (results.yedekTelefonlar) {
-        results.yedekTelefonlar = yedekTelefonlar.map((yedekTelefon) => {
-          return yedekTelefon.replace(/.(?=.{4})/g, "*");
-        });
-      }
-    } catch (error) {}
-
-    cache.getCache().set(cacheKey, {
-      results: results,
-      yardimKaydi: yardimKaydi,
-    });
-    if (!results) {
-      res.statusCode = 404;
-      return { status: 404 };
-    }
-
-    return {
-      results,
-      yardimKaydi,
-    };
-  });
-
-  fastifyInstance.get(
-    "/ara-yardim",
-    {
-      schema: {
-        querystring: {
-          type: "object",
-          properties: {
-            q: { type: "string" },
-            yardimDurumu: { type: "string" },
-            acilDurum: { type: "string" },
-            yardimTipi: { type: "string" },
-            aracDurumu: { type: "string" },
-          },
-          required: [],
-        },
-      },
-    },
-    async (req, res) => {
-      const queryString = req.query.q || "";
-      const yardimDurumuQuery = req.query.yardimDurumu;
-      const acilDurumQuery = req.query.acilDurum;
-      const helpType = req.query.yardimTipi;
-      const vehicle = req.query.aracDurumu;
-      let query = {
-        $or: [
-          { adSoyad: { $regex: queryString, $options: "i" } },
-          { telefon: { $regex: queryString, $options: "i" } },
-          { sehir: { $regex: queryString, $options: "i" } },
-          { adresTarifi: { $regex: queryString, $options: "i" } },
-        ],
-      };
-
-      if (helpType) {
-        query = {
-          $and: [query, { yardimTipi: helpType }],
-        };
-      }
-
-      if (vehicle) {
-        query = {
-          $and: [query, { aracDurumu: vehicle }],
-        };
-      }
-
-      if (yardimDurumuQuery) {
-        query = {
-          $and: [query, { yardimDurumu: yardimDurumuQuery }],
-        };
-      }
-
-      if (acilDurumQuery) {
-        query = {
-          $and: [query, { acilDurum: acilDurumQuery }],
-        };
-      }
-      let results = {};
-      results.data = await Yardim.find(query);
-      results.data = results.data.map((yardim) => {
-        if (yardim.email) {
-          yardim.email = check.hideEmailCharacters(yardim.email);
-        }
-        yardim.telefon = yardim.telefon.replace(/.(?=.{4})/g, "*");
-        const names = yardim.adSoyad.split(" ");
-        if (names.length > 1) {
-          yardim.adSoyad = `${names[0].charAt(0)}${"*".repeat(names[0].length - 2)} ${names[1].charAt(0)}${"*".repeat(
-            names[1].length - 2,
-          )}`;
-        }
-        const yedekTelefonlar = yardim.yedekTelefonlar;
-        if (yedekTelefonlar) {
-          yardim.yedekTelefonlar = yedekTelefonlar.map((yedekTelefon) => {
-            return yedekTelefon.replace(/.(?=.{4})/g, "*");
-          });
-        }
-        return yardim;
-      });
-      return results.data;
-    },
-  );
-};
+   )
+}

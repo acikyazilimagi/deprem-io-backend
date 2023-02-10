@@ -1,5 +1,5 @@
-const { checkConnection } = require("../utils");
-const Iletisim = require("../../models/iletisimModel");
+
+const Iletisim = require("../../models/İletisim");
 const check = new (require("../../lib/Check"))();
 
 module.exports = async function (fastifyInstance) {
@@ -19,7 +19,6 @@ module.exports = async function (fastifyInstance) {
       },
     },
     async function (req, res) {
-      await checkConnection();
 
       const existingIletisim = await Iletisim.findOne({
         adSoyad: req.body.adSoyad,
