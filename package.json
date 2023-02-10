@@ -8,7 +8,8 @@
     "dev": "npx nodemon --exec \"node index.js\"",
     "test": "vitest run --coverage",
     "lint": "npx rome check --apply-suggested .",
-    "format": "npx rome format --write ."
+    "format": "npx rome format --write .",
+    "cp-pre-commit": "cp scripts/git/pre-commit .git/hooks/ && chmod +x .git/hooks/pre-commit && echo 'hook copied'"
   },
   "repository": {
     "type": "git",
