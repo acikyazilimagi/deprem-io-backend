@@ -1,5 +1,4 @@
 {
-  "$schema": "https://ecs-intellisense.s3-us-west-2.amazonaws.com/task-definition/schema.json",
   "containerDefinitions": [
     {
       "name": "container-name",
