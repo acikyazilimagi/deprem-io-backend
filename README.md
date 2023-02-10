@@ -6,6 +6,9 @@
 * Env variable olarak MONGOURL kullanın
 * Container Portu 8080
 
+## Postman Workspace
+https://www.postman.com/minikdev/workspace/depremio
+
 ## Yardımları listeleme (GET)
 istenen yardımları listeler
 /yardim 
