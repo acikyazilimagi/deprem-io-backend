@@ -1,4 +1,4 @@
-const mongoose = require("mongoose");
+const mongoose = require('mongoose');
 
 // yardım edebilecek kişilerin model dosyası
 const yardimEtSchema = new mongoose.Schema(
@@ -16,13 +16,13 @@ const yardimEtSchema = new mongoose.Schema(
       type: String,
       required: true,
       pattern: /^\d{10}$/,
-      message: "Telefon numarası 10 karakterli olmalıdır"
+      message: 'Telefon numarası 10 karakterli olmalıdır',
     },
     yedekTelefonlar: {
       type: [String],
       required: false,
       pattern: /^\d{10}$/,
-      message: "Yedek Telefon numarası 10 karakterli olmalıdır"
+      message: 'Yedek Telefon numarası 10 karakterli olmalıdır',
     },
     sehir: {
       type: String,
@@ -49,7 +49,7 @@ const yardimEtSchema = new mongoose.Schema(
 
     yardimDurumu: {
       type: String,
-      enum: ["bekleniyor", "yolda", "yapildi"],
+      enum: ['bekleniyor', 'yolda', 'yapildi'],
       required: true,
     },
 
@@ -62,6 +62,6 @@ const yardimEtSchema = new mongoose.Schema(
   { timestamps: true }
 );
 
-const YardimEt = mongoose.model("yardimet", yardimEtSchema);
+const YardimEt = mongoose.model('yardimet', yardimEtSchema);
 
 module.exports = YardimEt;

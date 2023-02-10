@@ -1,38 +1,42 @@
 const mongoose = require('mongoose');
-const { Schema } = require('mongoose')
+const { Schema } = require('mongoose');
 
-const  yardimKaydiSchema = new mongoose.Schema(
-  {
-    postId: {
+const yardimKaydiSchema = new mongoose.Schema({
+  postId: {
     type: Schema.Types.ObjectId,
     ref: 'Post',
-    required: true
+    required: true,
   },
   adSoyad: {
     type: String,
-    required: true
+    required: true,
   },
   telefon: {
     type: String,
     required: false,
     pattern: /^\d{10}$/,
-    message: "Telefon numarası 10 karakterli olmalıdır"
+    message: 'Telefon numarası 10 karakterli olmalıdır',
   },
   sonDurum: {
     type: String,
-    enum: ['yardim-bekleniyor', 'yardim-edildi', 'yetersiz-bilgi','yardim-edilemedi'],
-    required: false
+    enum: [
+      'yardim-bekleniyor',
+      'yardim-edildi',
+      'yetersiz-bilgi',
+      'yardim-edilemedi',
+    ],
+    required: false,
   },
   email: {
     type: String,
-    required: false
+    required: false,
   },
   aciklama: {
     type: String,
-    required: true
-  }
+    required: true,
+  },
 });
 
-const YardimKaydi = mongoose.model("yardimkaydi", yardimKaydiSchema);
+const YardimKaydi = mongoose.model('yardimkaydi', yardimKaydiSchema);
 
 module.exports = YardimKaydi;
