@@ -14,7 +14,8 @@ WORKDIR /app
 
 RUN apk add --update nodejs npm
 RUN apk add --no-cache tini
+RUN apk add --no-cache bash
 
 ENTRYPOINT ["/sbin/tini", "--"]
 
-CMD ["node", "index.js"]
+CMD ["./wait-for-it.sh" , "mongodb:27017" , "--strict" , "--timeout=30" , "--" , "node", "index.js"]
