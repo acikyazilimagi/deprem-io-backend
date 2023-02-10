@@ -140,7 +140,7 @@ module.exports = async function (app) {
       },
     },
     async function (req, res) {
-      const { yardimTipi, adSoyad, adres, acilDurum, telefon } = req.body;
+      const { yardimTipi, adSoyad, adres, acilDurum, telefon, yedekTelefonlar } = req.body;
 
       if (telefon && !check.isPhoneNumber(telefon)) {
         res.statusCode = 400;
@@ -150,19 +150,12 @@ module.exports = async function (app) {
       }
 
       // TODO: yedekTelefonlari JSON schema'ya tasi.
-      if (req.body.yedekTelefonlar) {
-        if (req.body.yedekTelefonlar.length > 0) {
-          let yedekTelefonlar = req.body.yedekTelefonlar;
-          for (let i = 0; i < yedekTelefonlar.length; i++) {
-            if (!check.isPhoneNumber(yedekTelefonlar[i])) {
-              res.statusCode = 400;
-              return {
-                error: "Lütfen doğru formatta bir telefon numarası giriniz.(örn: 05554443322)",
-              };
-            }
-            yedekTelefonlar[i] = yedekTelefonlar[i].replace(/ /g, "");
-          }
-          req.body.yedekTelefonlar = yedekTelefonlar;
+      if (yedekTelefonlar && yedekTelefonlar.length > 0) {
+        if (!check.arePhoneNumbers(yedekTelefonlar)) {
+          res.statusCode = 400;
+          return {
+            error: "Lütfen doğru formatta bir telefon numarası giriniz.(örn: 05554443322)",
+          };
         }
       }
 
@@ -192,7 +185,7 @@ module.exports = async function (app) {
         yardimTipi,
         adSoyad,
         telefon: req.body.telefon || "", // optional fields
-        yedekTelefonlar: req.body.yedekTelefonlar || "",
+        yedekTelefonlar: yedekTelefonlar || "",
         email: req.body.email || "",
         adres,
         acilDurum,
@@ -233,7 +226,7 @@ module.exports = async function (app) {
       },
     },
     async function (req, res) {
-      const { yardimTipi, adSoyad, telefon, sehir } = req.body;
+      const { yardimTipi, adSoyad, telefon, sehir, yedekTelefonlar } = req.body;
 
       if (telefon && !check.isPhoneNumber(telefon)) {
         res.statusCode = 400;
@@ -243,21 +236,16 @@ module.exports = async function (app) {
       }
 
       // TODO: yedekTelefonlari json schemaya tasiyalim.
-      if (req.body.yedekTelefonlar) {
-        if (req.body.yedekTelefonlar.length > 0) {
-          let yedekTelefonlar = req.body.yedekTelefonlar;
-          for (let i = 0; i < yedekTelefonlar.length; i++) {
-            if (!check.isPhoneNumber(yedekTelefonlar[i])) {
-              res.statusCode = 400;
-              return {
-                error: "Lütfen doğru formatta bir telefon numarası giriniz.(örn: 05554443322)"
-              }
-            }
-            yedekTelefonlar[i] = yedekTelefonlar[i].replace(/ /g, "");
-          }
-          req.body.yedekTelefonlar = yedekTelefonlar;
+
+      if (yedekTelefonlar && yedekTelefonlar.length > 0) {
+        if (!check.arePhoneNumbers(yedekTelefonlar)) {
+          res.statusCode = 400;
+          return {
+            error: "Lütfen doğru formatta bir telefon numarası giriniz.(örn: 05554443322)",
+          };
         }
       }
+
       await checkConnection();
 
       // check exist
@@ -288,7 +276,7 @@ module.exports = async function (app) {
         ilce: req.body.ilce || "",
         hedefSehir,
         yardimDurumu: req.body.yardimDurumu || "",
-        yedekTelefonlar: req.body.yedekTelefonlar || "",
+        yedekTelefonlar: yedekTelefonlar || "",
         aciklama: req.body.aciklama || "",
         tweetLink: req.body.tweetLink || "",
         googleMapLink: req.body.googleMapLink || "",
