@@ -9,7 +9,7 @@ services:
       - MONGOURL=mongodb://db:27017
 
   db:
-    image: bitnami/mongodb
+    image: zcube/bitnami-compat-mongodb
     ports:
       - 27017:27017
     volumes:
