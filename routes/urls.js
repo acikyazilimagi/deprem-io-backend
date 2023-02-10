@@ -131,6 +131,12 @@ module.exports = async function (app) {
             telefon: {
               type: "string",
             },
+            yedekTelefonlar: {
+              type: "array",
+              items: {
+                type: "string",
+              },
+            },
           },
           required: ["yardimTipi", "adSoyad", "adres", "acilDurum"],
         },
@@ -146,7 +152,6 @@ module.exports = async function (app) {
         };
       }
 
-      // TODO: yedekTelefonlari JSON schema'ya tasi.
       if (yedekTelefonlar && yedekTelefonlar.length > 0) {
         if (!check.arePhoneNumbers(yedekTelefonlar)) {
           res.statusCode = 400;
@@ -182,7 +187,7 @@ module.exports = async function (app) {
         yardimTipi,
         adSoyad,
         telefon: req.body.telefon || "", // optional fields
-        yedekTelefonlar: yedekTelefonlar || "",
+        yedekTelefonlar,
         email: req.body.email || "",
         adres,
         acilDurum,
@@ -217,6 +222,12 @@ module.exports = async function (app) {
             sehir: {
               type: "string",
             },
+            yedekTelefonlar: {
+              type: "array",
+              items: {
+                type: "string",
+              },
+            },
           },
           required: ["yardimTipi", "adSoyad", "sehir"],
         },
@@ -231,8 +242,6 @@ module.exports = async function (app) {
           error: "Lütfen doğru formatta bir telefon numarası giriniz.(örn: 05554443322)",
         };
       }
-
-      // TODO: yedekTelefonlari json schemaya tasiyalim.
 
       if (yedekTelefonlar && yedekTelefonlar.length > 0) {
         if (!check.arePhoneNumbers(yedekTelefonlar)) {
@@ -273,7 +282,7 @@ module.exports = async function (app) {
         ilce: req.body.ilce || "",
         hedefSehir,
         yardimDurumu: req.body.yardimDurumu || "",
-        yedekTelefonlar: yedekTelefonlar || "",
+        yedekTelefonlar,
         aciklama: req.body.aciklama || "",
         tweetLink: req.body.tweetLink || "",
         googleMapLink: req.body.googleMapLink || "",
