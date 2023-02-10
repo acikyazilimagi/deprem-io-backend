@@ -23,7 +23,7 @@ module.exports = async function (fastifyInstance) {
       },
     },
     async (req, res) => {
-      await checkConnection();
+      await checkConnection(fastifyInstance);
       const existingYardimKaydi = await Yardim.findOne({
         _id: req.body.postId,
       });

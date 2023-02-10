@@ -19,7 +19,7 @@ module.exports = async function (fastifyInstance) {
       },
     },
     async function (req, res) {
-      await checkConnection();
+      await checkConnection(fastifyInstance);
 
       const existingIletisim = await Iletisim.findOne({
         adSoyad: req.body.adSoyad,
