@@ -8,13 +8,12 @@ const requestIp = require("request-ip");
 const YardimEt = require("../models/yardimEtModel");
 const Iletisim = require("../models/iletisimModel");
 const YardimKaydi = require("../models/yardimKaydiModel");
+const check = new (require("../lib/Check"))();
 const validateResource = require("../middleware/validateResource");
 const createContactSchema = require("../schema/contactSchema");
 const createHelpSchema = require("../schema/helpSchema");
 const createAssistantCandidateSchema = require("../schema/assistantCandidateSchema");
 const { removeWhiteSpace } = require("../utils");
-
-const check = new (require("../lib/Check"))();
 
 router.get("/", function (req, res) {
   res.send("depremio backend");
@@ -27,13 +26,14 @@ router.get("/yardim", async function (req, res) {
     let data;
 
     const yardimTipi = req.query.yardimTipi || "";
+    const sehir = req.query.sehir || "";
 
     const startIndex = (page - 1) * limit;
     const endIndex = page * limit;
 
     const results = {};
 
-    let cacheKey = `yardim_${page}_${limit}${yardimTipi}`;
+    let cacheKey = `yardim_${page}_${limit}${yardimTipi}${sehir}`;
     if (cache.getCache().has(cacheKey)) {
       data = cache.getCache().get(cacheKey);
       return res.send(data);
@@ -54,23 +54,20 @@ router.get("/yardim", async function (req, res) {
       };
     }
 
+    let query = {};
     if (yardimTipi !== "") {
-      results.totalPage = Math.ceil(
-        (await Yardim.countDocuments({ yardimTipi: yardimTipi })) / limit
-      );
-      results.data = await Yardim.find({ yardimTipi: yardimTipi })
-        .sort({ _id: -1 })
-        .limit(limit)
-        .skip(startIndex)
-        .exec();
-    } else {
-      results.totalPage = Math.ceil((await Yardim.countDocuments()) / limit);
-      results.data = await Yardim.find()
-        .sort({ _id: -1 })
-        .limit(limit)
-        .skip(startIndex)
-        .exec();
+      query.yardimTipi = yardimTipi;
     }
+    if (sehir !== "") {
+      query.sehir = sehir;
+    }
+
+    results.totalPage = Math.ceil((await Yardim.countDocuments(query)) / limit);
+    results.data = await Yardim.find(query)
+      .sort({ _id: -1 })
+      .limit(limit)
+      .skip(startIndex)
+      .exec();
 
     results.data = results.data.map((yardim) => {
       yardim.telefon = yardim.telefon.replace(/.(?=.{4})/g, "*");
@@ -152,7 +149,6 @@ router.post(
       await newYardim.save();
       res.json({ message: "Yardım talebiniz başarıyla alındı" });
     } catch (error) {
-      console.log({ error });
       res.status(500).json({ error: "Hata! Yardım dökümanı kaydedilemedi!" });
     }
   }
@@ -195,7 +191,10 @@ router.post(
         ilce: req.body.ilce || "",
         hedefSehir,
         yardimDurumu: req.body.yardimDurumu || "",
-        yedekTelefonlar: req.body.yedekTelefonlar || "",
+        yedekTelefonlar:
+          req.body.yedekTelefonlar.map((telefon) =>
+            removeWhiteSpace(telefon)
+          ) || "",
         aciklama: req.body.aciklama || "",
         tweetLink: req.body.tweetLink || "",
         googleMapLink: req.body.googleMapLink || "",
@@ -221,6 +220,7 @@ router.get("/yardimet", async function (req, res) {
     const page = parseInt(req.query.page) || 1;
     const limit = parseInt(req.query.limit) || 10;
     const yardimTipi = req.query.yardimTipi || "";
+    const sehir = req.query.sehir || "";
     const hedefSehir = req.query.hedefSehir || "";
     let data;
 
@@ -229,7 +229,7 @@ router.get("/yardimet", async function (req, res) {
 
     let results = {};
 
-    const cacheKey = `yardimet_${page}_${limit}${yardimTipi}`;
+    const cacheKey = `yardimet_${page}_${limit}${yardimTipi}${sehir}${hedefSehir}`;
 
     if (cache.getCache().has(cacheKey)) {
       data = cache.getCache().get(cacheKey);
@@ -259,6 +259,9 @@ router.get("/yardimet", async function (req, res) {
 
     if (hedefSehir !== "") {
       searchQuery = { ...searchQuery, hedefSehir: hedefSehir };
+    }
+    if (sehir !== "") {
+      searchQuery = { ...searchQuery, sehir: sehir };
     }
 
     results.totalPage = Math.ceil(
@@ -522,8 +525,8 @@ router.post(
         });
       }
 
-      const telefon = removeWhiteSpace(req.body.telefon);
       // Create a new Yardim document
+      const telefon = removeWhiteSpace(req.body.telefon);
       const newIletisim = new Iletisim({
         adSoyad: req.body.adSoyad || "",
         email: req.body.email || "",
