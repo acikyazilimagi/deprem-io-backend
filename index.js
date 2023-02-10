@@ -22,7 +22,7 @@ mongoose
         host: "0.0.0.0",
       },
       (err, address) => {
-        if (process.env.NODE_ENV === "development") {
+        if (config.NODE_ENV === "development") {
           console.log(`Available routes: \n${app.printRoutes()}`);
         }
       },
