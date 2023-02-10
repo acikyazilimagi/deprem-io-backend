@@ -1,480 +1,512 @@
-const express = require("express");
-const router = express.Router();
 const mongoose = require("mongoose");
 const connectDB = require("../mongo-connection");
 const Yardim = require("../models/yardimModel");
 const cache = require("../cache");
-const requestIp = require("request-ip");
 const YardimEt = require("../models/yardimEtModel");
 const Iletisim = require("../models/iletisimModel");
 const YardimKaydi = require("../models/yardimKaydiModel");
-const check = new (require("../lib/Check"))();
 
-router.get("/", function (req, res) {
-  res.send("depremio backend");
-});
+/**
+ * @param {FastifyInstance} app
+ */
+module.exports = function (app) {
+  app.get("/", () => ({ status: "up" }));
 
-router.get("/yardim", async function (req, res) {
-  try {
-    const page = parseInt(req.query.page) || 1;
-    const limit = parseInt(req.query.limit) || 10;
-    let data;
+  app.get(
+    "/yardim",
+    {
+      schema: {
+        querystring: {
+          type: "object",
+          properties: {
+            page: {
+              type: "number",
+              default: 1,
+            },
+            limit: {
+              type: "number",
+              default: 10,
+            },
+            yardimTipi: {
+              type: "string",
+            },
+          },
+          required: [],
+        },
+      },
+    },
+    async function (req, res) {
+      const { page, limit, yardimTipi } = req.query;
+      const startIndex = (page - 1) * limit;
+      const endIndex = page * limit;
+      const results = {};
 
-    const yardimTipi = req.query.yardimTipi || "";
-
-    const startIndex = (page - 1) * limit;
-    const endIndex = page * limit;
-
-    const results = {};
-
-    let cacheKey = `yardim_${page}_${limit}${yardimTipi}`;
-    if (cache.getCache().has(cacheKey)) {
-      data = cache.getCache().get(cacheKey);
-      return res.send(data);
-    }
-
-    await checkConnection();
-    if (endIndex < (await Yardim.countDocuments().exec())) {
-      results.next = {
-        page: page + 1,
-        limit,
-      };
-    }
-
-    if (startIndex > 0) {
-      results.previous = {
-        page: page - 1,
-        limit,
-      };
-    }
-
-    let query = {};
-    if (yardimTipi !== "") {
-      query.yardimTipi = yardimTipi;
-    }
-
-    results.totalPage = Math.ceil(
-      (await Yardim.countDocuments(query)) / limit
-    );
-    results.data = await Yardim.find(query)
-      .sort({ _id: -1 })
-      .limit(limit)
-      .skip(startIndex)
-      .exec();
-
-    results.data = results.data.map((yardim) => {
-      yardim.telefon = yardim.telefon.replace(/.(?=.{4})/g, "*");
-      const names = yardim.adSoyad.split(" ");
-      if (names.length > 1) {
-        yardim.adSoyad =
-          `${names[0].charAt(0)}${"*".repeat(names[0].length - 2)} ${names[1].charAt(0)}${"*".repeat(names[1].length - 2)}`;
+      let cacheKey = `yardim_${page}_${limit}${yardimTipi}`;
+      if (cache.getCache().has(cacheKey)) {
+        return cache.getCache().get(cacheKey);
       }
-      const yedekTelefonlar = yardim.yedekTelefonlar;
-      if (yedekTelefonlar) {
-        yardim.yedekTelefonlar = yedekTelefonlar.map((yedekTelefon) => {
-          return yedekTelefon.replace(/.(?=.{4})/g, "*");
-        });
+
+      await checkConnection();
+      if (endIndex < (await Yardim.countDocuments().exec())) {
+        results.next = {
+          page: page + 1,
+          limit,
+        };
       }
-      return yardim;
-    });
-    cache.getCache().set(cacheKey, results);
-    if (!data) {
-      res.json(results);
-    }
-  } catch (error) {
-    console.log(error);
-    res.status(500).json({ error: "Could not retrieve the Yardim documents" });
-  }
-});
 
-router.post("/yardim", async function (req, res) {
-  try {
-    const { yardimTipi, adSoyad, adres, acilDurum } = req.body;
-
-    if (!(((yardimTipi && adSoyad) && adres) && acilDurum)) {
-      return res.status(400).json({
-        error: "yardimTipi, adSoyad, adres and acilDurum alanları gerekli",
-      });
-    }
-    req.body.telefon = req.body.telefon.trim().replace(/ /g, "");
-
-    if (req.body.telefon) {
-      if (!/^\d+$/.test(req.body.telefon) || req.body.telefon.length !== 10) {
-        return res.status(400).json({
-          error: "Telefon numarası sadece rakamlardan ve 10 karakterden oluşmalıdır.",
-        });
+      if (startIndex > 0) {
+        results.previous = {
+          page: page - 1,
+          limit,
+        };
       }
-    }
-    if (req.body.yedekTelefonlar) {
-      if (req.body.yedekTelefonlar.length > 0) {
-        let yedekTelefonlar = req.body.yedekTelefonlar;
-        for (let i = 0; i < yedekTelefonlar.length; i++) {
-          if (!/^\d+$/.test(yedekTelefonlar[i]) || yedekTelefonlar[i].length !== 10) {
-            return res.status(400).json({
-              error: "Telefon numarası sadece rakamlardan oluşmalıdır.",
-            });
-          }
-          yedekTelefonlar[i] = yedekTelefonlar[i].replace(/ /g, "");
+
+      let query = yardimTipi ? { yardimTipi } : {};
+
+      results.totalPage = Math.ceil((await Yardim.countDocuments(query)) / limit);
+      results.data = await Yardim.find(query).sort({ _id: -1 }).limit(limit).skip(startIndex).exec();
+
+      results.data = results.data.map((yardim) => {
+        yardim.telefon = yardim.telefon.replace(/.(?=.{4})/g, "*");
+        const names = yardim.adSoyad.split(" ");
+        if (names.length > 1) {
+          yardim.adSoyad = `${names[0].charAt(0)}${"*".repeat(names[0].length - 2)} ${names[1].charAt(0)}${"*".repeat(
+            names[1].length - 2,
+          )}`;
         }
-        req.body.yedekTelefonlar = yedekTelefonlar;
-      }
-    }
-    console.log(req.body.telefon);
-    await checkConnection();
-
-    // check exist
-    const existingYardim = await Yardim.findOne({ adSoyad, adres });
-    if (existingYardim) {
-      return res.status(409).json({
-        error: "Bu yardım bildirimi daha önce veritabanımıza eklendi.",
-      });
-    }
-
-    var clientIp = requestIp.getClientIp(req); // on localhost > 127.0.0.1
-
-    const fields = {};
-
-    for (const key in req.body) {
-      if (key.startsWith("fields-")) {
-        const fieldName = key.split("-")[1];
-        fields[fieldName] = req.body[key];
-      }
-    }
-
-    // Create a new Yardim document
-    const newYardim = new Yardim({
-      yardimTipi,
-      adSoyad,
-      telefon: req.body.telefon || "", // optional fields
-      yedekTelefonlar: req.body.yedekTelefonlar || "",
-      email: req.body.email || "",
-      adres,
-      acilDurum,
-      adresTarifi: req.body.adresTarifi || "",
-      yardimDurumu: "bekleniyor",
-      kisiSayisi: req.body.kisiSayisi || "",
-      fizikiDurum: req.body.fizikiDurum || "",
-      tweetLink: req.body.tweetLink || "",
-      googleMapLink: req.body.googleMapLink || "",
-      ip: clientIp,
-      fields: fields || {},
-    });
-
-    cache.getCache().flushAll();
-    await newYardim.save();
-    res.json({ message: "Yardım talebiniz başarıyla alındı" });
-  } catch (error) {
-    res.status(500).json({ error: "Hata! Yardım dökümanı kaydedilemedi!" });
-  }
-});
-
-router.post("/yardimet", async function (req, res) {
-  try {
-    const { yardimTipi, adSoyad, telefon, sehir } = req.body;
-
-    // Validate required fields
-    if (!(((yardimTipi && adSoyad) && telefon) && sehir)) {
-      return res.status(400).json({
-        error: "yardimTipi, adSoyad, telefon, sehir ve ilçe alanları gerekli",
-      });
-    } else if (!check.isPhoneNumber(telefon)) {
-      return res.status(400).json({
-        error: "Lütfen telefon numarasını doğru formatta giriniz.",
-      });
-    }
-    if (req.body.telefon.trim().replace(/ /g, "")) {
-      if (!/^\d+$/.test(req.body.telefon) || req.body.telefon.length !== 10) {
-        return res.status(400).json({
-          error: "Telefon numarası sadece rakamlardan oluşmalıdır.",
-        });
-      }
-    }
-    req.body.telefon = req.body.telefon.replace(/ /g, "");
-    if (req.body.yedekTelefonlar) {
-      if (req.body.yedekTelefonlar.length > 0) {
-        let yedekTelefonlar = req.body.yedekTelefonlar;
-        for (let i = 0; i < yedekTelefonlar.length; i++) {
-          if (!/^\d+$/.test(yedekTelefonlar[i]) || yedekTelefonlar[i].length !== 10) {
-            return res.status(400).json({
-              error: "Telefon numarası sadece rakamlardan oluşmalıdır.",
-            });
-          }
-          yedekTelefonlar[i] = yedekTelefonlar[i].replace(/ /g, "");
+        const yedekTelefonlar = yardim.yedekTelefonlar;
+        if (yedekTelefonlar) {
+          yardim.yedekTelefonlar = yedekTelefonlar.map((yedekTelefon) => {
+            return yedekTelefon.replace(/.(?=.{4})/g, "*");
+          });
         }
-        req.body.yedekTelefonlar = yedekTelefonlar;
-      }
-    }
-    await checkConnection();
-
-    // check exist
-    const existingYardim = await YardimEt.findOne({ adSoyad, sehir });
-    if (existingYardim) {
-      return res.status(409).json({
-        error: "Bu yardım bildirimi daha önce veritabanımıza eklendi.",
+        return yardim;
       });
-    }
-    var clientIp = requestIp.getClientIp(req); // on localhost > 127.0.0.1
 
-    const fields = {};
+      cache.getCache().set(cacheKey, results);
 
-    for (const key in req.body) {
-      if (key.startsWith("fields-")) {
-        const fieldName = key.split("-")[1];
-        fields[fieldName] = req.body[key];
+      return results;
+    },
+  );
+
+  app.post(
+    "/yardim",
+    {
+      schema: {
+        body: {
+          type: "object",
+          properties: {
+            yardimTipi: {
+              type: "string",
+            },
+            adSoyad: {
+              type: "string",
+            },
+            adres: {
+              type: "string",
+            },
+            acilDurum: {
+              type: "string",
+            },
+            telefon: {
+              type: "string",
+              minLength: 10,
+              maxLength: 10,
+              pattern: "^d+$",
+            },
+          },
+          required: ["yardimTipi", "adSoyad", "adres", "acilDurum"],
+        },
+      },
+    },
+    async function (req, res) {
+      const { yardimTipi, adSoyad, adres, acilDurum, telefon } = req.body;
+
+      // TODO: yedekTelefonlari JSON schema'ya tasi.
+      if (req.body.yedekTelefonlar) {
+        if (req.body.yedekTelefonlar.length > 0) {
+          let yedekTelefonlar = req.body.yedekTelefonlar;
+          for (let i = 0; i < yedekTelefonlar.length; i++) {
+            if (!/^\d+$/.test(yedekTelefonlar[i]) || yedekTelefonlar[i].length !== 10) {
+              res.statusCode = 400;
+              return {
+                error: "Telefon numarası sadece rakamlardan oluşmalıdır.",
+              };
+            }
+            yedekTelefonlar[i] = yedekTelefonlar[i].replace(/ /g, "");
+          }
+          req.body.yedekTelefonlar = yedekTelefonlar;
+        }
       }
-    }
 
-    // Create a new Yardim document
-    let hedefSehir = req.body.hedefSehir || "";
-    const newYardim = new YardimEt({
-      yardimTipi,
-      adSoyad,
-      telefon,
-      sehir,
-      ilce: req.body.ilce || "",
-      hedefSehir,
-      yardimDurumu: req.body.yardimDurumu || "",
-      yedekTelefonlar: req.body.yedekTelefonlar || "",
-      aciklama: req.body.aciklama || "",
-      tweetLink: req.body.tweetLink || "",
-      googleMapLink: req.body.googleMapLink || "",
-      fields: fields || {},
-      ip: clientIp,
-    });
+      await checkConnection();
 
-    cache.getCache().flushAll();
-    await newYardim.save();
-    res.json({ message: "Yardım talebiniz başarıyla alındı" });
-  } catch (error) {
-    console.log(error);
-    res.status(500).json({
-      error: "Hata! Yardım dökümanı kaydedilemedi!"
-    });
-  }
-});
-
-router.get("/yardimet", async function (req, res) {
-  try {
-    const page = parseInt(req.query.page) || 1;
-    const limit = parseInt(req.query.limit) || 10;
-    const yardimTipi = req.query.yardimTipi || "";
-    const sehir = req.query.sehir || "";
-    const hedefSehir = req.query.hedefSehir || "";
-    let data;
-
-    const startIndex = (page - 1) * limit;
-    const endIndex = page * limit;
-
-    let results = {};
-
-    const cacheKey = `yardimet_${page}_${limit}${yardimTipi}${sehir}${hedefSehir}`;
-
-    if (cache.getCache().has(cacheKey)) {
-      data = cache.getCache().get(cacheKey);
-      return res.send(data);
-    }
-    await checkConnection();
-
-    if (endIndex < (await YardimEt.countDocuments().exec())) {
-      results.next = {
-        page: page + 1,
-        limit,
-      };
-    }
-
-    if (startIndex > 0) {
-      results.previous = {
-        page: page - 1,
-        limit,
-      };
-    }
-
-    let searchQuery = {};
-
-    if (yardimTipi !== "") {
-      searchQuery = { yardimTipi: yardimTipi };
-    }
-
-    if (hedefSehir !== "") {
-      searchQuery = { ...searchQuery, hedefSehir: hedefSehir };
-    }
-    if (sehir !== "") {
-      searchQuery = { ...searchQuery, sehir: sehir };
-    }
-
-    results.totalPage = Math.ceil(
-      (await YardimEt.countDocuments(searchQuery)) / limit
-    );
-
-    results.data = await YardimEt.find(searchQuery)
-      .sort({ _id: -1 })
-      .limit(limit)
-      .skip(startIndex)
-      .exec();
-    results.data = results.data.map((yardim) => {
-      yardim.telefon = yardim.telefon.replace(/.(?=.{4})/g, "*");
-      const names = yardim.adSoyad.split(" ");
-      if (names.length > 0) {
-        const name = names[0];
-        const surname = names[names.length - 1];
-        // hidden name and surname
-        yardim.adSoyad = `${name[0]}${"*".repeat(name.length - 1)} ${surname[0]}${"*".repeat(surname.length - 1)}`;
+      // check exist
+      const existingYardim = await Yardim.findOne({ adSoyad, adres });
+      if (existingYardim) {
+        res.statusCode = 409;
+        return {
+          error: "Bu yardım bildirimi daha önce veritabanımıza eklendi.",
+        };
       }
-      const yedekTelefonlar = yardim.yedekTelefonlar;
-      if (yedekTelefonlar) {
-        yardim.yedekTelefonlar = yedekTelefonlar.map((yedekTelefon) => {
-          return yedekTelefon.replace(/.(?=.{4})/g, "*");
-        });
+
+      const fields = {};
+
+      // TODO: Bunlarin hepsini JSON schema'ya tasiyalim.
+      for (const key in req.body) {
+        if (key.startsWith("fields-")) {
+          const fieldName = key.split("-")[1];
+          fields[fieldName] = req.body[key];
+        }
       }
-      return yardim;
-    });
 
-    cache.getCache().set(cacheKey, results);
+      // Create a new Yardim document
+      const newYardim = new Yardim({
+        yardimTipi,
+        adSoyad,
+        telefon: req.body.telefon || "", // optional fields
+        yedekTelefonlar: req.body.yedekTelefonlar || "",
+        email: req.body.email || "",
+        adres,
+        acilDurum,
+        adresTarifi: req.body.adresTarifi || "",
+        yardimDurumu: "bekleniyor",
+        kisiSayisi: req.body.kisiSayisi || "",
+        fizikiDurum: req.body.fizikiDurum || "",
+        tweetLink: req.body.tweetLink || "",
+        googleMapLink: req.body.googleMapLink || "",
+        ip: req.ip,
+        fields: fields || {},
+      });
 
-    if (!data) {
-      res.json(results);
-    }
-  } catch (error) {
-    console.log(error);
-    res.status(500).json({error: "Could not retrieve the Yardim documents!"});
-  }
-});
+      cache.getCache().flushAll();
+      await newYardim.save();
+      return { message: "Yardım talebiniz başarıyla alındı" };
+    },
+  );
 
-router.get("/ara-yardimet", async (req, res) => {
-  try {
-    const queryString = req.query.q;
-    const yardimDurumuQuery = req.query.yardimDurumu;
-    const helpType = req.query.yardimTipi || "";
-    const location = req.query.sehir || "";
-    const dest = req.query.hedefSehir || "";
-    let query = {
-      $or: [
-        { adSoyad: { $regex: queryString, $options: "i" } },
-        { telefon: { $regex: queryString, $options: "i" } },
-      ],
-    };
+  app.post(
+    "/yardimet",
+    {
+      schema: {
+        body: {
+          type: "object",
+          properties: {
+            yardimTipi: { type: "string" },
+            adSoyad: { type: "string" },
+            telefon: {
+              type: "string",
+              minLength: 10,
+              maxLength: 10,
+              pattern: "^d+$",
+            },
+            sehir: {
+              type: "string",
+            },
+          },
+          required: ["yardimTipi", "adSoyad", "telefon", "sehir"],
+        },
+      },
+    },
+    async function (req, res) {
+      const { yardimTipi, adSoyad, telefon, sehir } = req.body;
 
-    if (helpType) {
-      query = {
-        $and: [query, { yardimTipi: helpType }],
-      };
-    }
-
-    if (location) {
-      query = {
-        $and: [query, { sehir: location }],
-      };
-    }
-
-    if (dest) {
-      query = {
-        $and: [query, { hedefSehir: dest }],
-      };
-    }
-
-    if (yardimDurumuQuery) {
-      query = {
-        $and: [query, { yardimDurumu: yardimDurumuQuery }],
-      };
-    }
-    let results = {};
-    results.data = await YardimEt.find(query);
-
-    // hidden phone number for security
-    results.data = results.data.map((yardim) => {
-      yardim.telefon = yardim.telefon.replace(/.(?=.{4})/g, "*");
-      const names = yardim.adSoyad.split(" ");
-      if (names.length > 1) {
-        yardim.adSoyad =
-          `${names[0].charAt(0)}${"*".repeat(names[0].length - 2)} ${names[1].charAt(0)}${"*".repeat(names[1].length - 2)}`;
+      // TODO: yedekTelefonlari json schemaya tasiyalim.
+      if (req.body.yedekTelefonlar) {
+        if (req.body.yedekTelefonlar.length > 0) {
+          let yedekTelefonlar = req.body.yedekTelefonlar;
+          for (let i = 0; i < yedekTelefonlar.length; i++) {
+            if (!/^\d+$/.test(yedekTelefonlar[i]) || yedekTelefonlar[i].length !== 10) {
+              return res.status(400).json({
+                error: "Telefon numarası sadece rakamlardan oluşmalıdır.",
+              });
+            }
+            yedekTelefonlar[i] = yedekTelefonlar[i].replace(/ /g, "");
+          }
+          req.body.yedekTelefonlar = yedekTelefonlar;
+        }
       }
-      const yedekTelefonlar = yardim.yedekTelefonlar;
-      if (yedekTelefonlar) {
-        yardim.yedekTelefonlar = yedekTelefonlar.map((yedekTelefon) => {
-          return yedekTelefon.replace(/.(?=.{4})/g, "*");
-        });
+      await checkConnection();
+
+      // check exist
+      const existingYardim = await YardimEt.findOne({ adSoyad, sehir });
+      if (existingYardim) {
+        res.statusCode = 409;
+        return {
+          error: "Bu yardım bildirimi daha önce veritabanımıza eklendi.",
+        };
       }
-      return yardim;
-    });
-    res.json(results.data);
-  } catch (error) {
-    console.log(error);
-    res.status(500).json({ message: error.message });
-  }
-});
+      const fields = {};
 
-router.get("/ara-yardim", async (req, res) => {
-  try {
-    const queryString = req.query.q || "";
-    const yardimDurumuQuery = req.query.yardimDurumu;
-    const acilDurumQuery = req.query.acilDurum;
-    const helpType = req.query.yardimTipi;
-    const vehicle = req.query.aracDurumu;
-    let query = {
-      $or: [
-        { adSoyad: { $regex: queryString, $options: "i" } },
-        { telefon: { $regex: queryString, $options: "i" } },
-        { sehir: { $regex: queryString, $options: "i" } },
-        { adresTarifi: { $regex: queryString, $options: "i" } },
-      ],
-    };
-
-    if (helpType) {
-      query = {
-        $and: [query, { yardimTipi: helpType }],
-      };
-    }
-
-    if (vehicle) {
-      query = {
-        $and: [query, { aracDurumu: vehicle }],
-      };
-    }
-
-    if (yardimDurumuQuery) {
-      query = {
-        $and: [query, { yardimDurumu: yardimDurumuQuery }],
-      };
-    }
-
-    if (acilDurumQuery) {
-      query = {
-        $and: [query, { acilDurum: acilDurumQuery }],
-      };
-    }
-    let results = {};
-    results.data = await Yardim.find(query);
-    results.data = results.data.map((yardim) => {
-      yardim.telefon = yardim.telefon.replace(/.(?=.{4})/g, "*");
-      const names = yardim.adSoyad.split(" ");
-      if (names.length > 1) {
-        yardim.adSoyad =
-          `${names[0].charAt(0)}${"*".repeat(names[0].length - 2)} ${names[1].charAt(0)}${"*".repeat(names[1].length - 2)}`;
+      // TODO: Bunlari JSON schema'ya tasiyalim.
+      for (const key in req.body) {
+        if (key.startsWith("fields-")) {
+          const fieldName = key.split("-")[1];
+          fields[fieldName] = req.body[key];
+        }
       }
-      const yedekTelefonlar = yardim.yedekTelefonlar;
-      if (yedekTelefonlar) {
-        yardim.yedekTelefonlar = yedekTelefonlar.map((yedekTelefon) => {
-          return yedekTelefon.replace(/.(?=.{4})/g, "*");
-        });
-      }
-      return yardim;
-    });
-    res.json(results.data);
-  } catch (error) {
-    console.log(error);
-    res.status(500).json({ message: error.message });
-  }
-});
 
-router.get("/yardim/:id", async (req, res) => {
-  try {
+      // Create a new Yardim document
+      let hedefSehir = req.body.hedefSehir || "";
+      const newYardim = new YardimEt({
+        yardimTipi,
+        adSoyad,
+        telefon,
+        sehir,
+        ilce: req.body.ilce || "",
+        hedefSehir,
+        yardimDurumu: req.body.yardimDurumu || "",
+        yedekTelefonlar: req.body.yedekTelefonlar || "",
+        aciklama: req.body.aciklama || "",
+        tweetLink: req.body.tweetLink || "",
+        googleMapLink: req.body.googleMapLink || "",
+        fields: fields || {},
+        ip: clientIp,
+      });
+
+      cache.getCache().flushAll();
+      await newYardim.save();
+      return { message: "Yardım talebiniz başarıyla alındı" };
+    },
+  );
+
+  app.get(
+    "/yardimet",
+    {
+      schema: {
+        querystring: {
+          type: "object",
+          properties: {
+            page: { type: "number", default: 1 },
+            limit: { type: "number", default: 10 },
+            yardimTipi: { type: "string" },
+            sehir: { type: "string" },
+            hedefSehir: { type: "string" },
+          },
+          required: [],
+        },
+      },
+    },
+    async function (req, res) {
+      const { page, limit, yardimTipi, sehir, hedefSehir } = req.query;
+      const startIndex = (page - 1) * limit;
+      const endIndex = page * limit;
+
+      let data;
+      let results = {};
+
+      const cacheKey = `yardimet_${page}_${limit}${yardimTipi}${sehir}${hedefSehir}`;
+
+      if (cache.getCache().has(cacheKey)) {
+        return cache.getCache().get(cacheKey);
+      }
+      await checkConnection();
+
+      if (endIndex < (await YardimEt.countDocuments().exec())) {
+        results.next = {
+          page: page + 1,
+          limit,
+        };
+      }
+
+      if (startIndex > 0) {
+        results.previous = {
+          page: page - 1,
+          limit,
+        };
+      }
+
+      const searchQuery = yardimTipi ? { yardimTipi } : {};
+
+      if (hedefSehir) searchQuery.hedefSehir = hedefSehir;
+      if (sehir) searchQuery.sehir = sehir;
+
+      results.totalPage = Math.ceil((await YardimEt.countDocuments(searchQuery)) / limit);
+
+      results.data = await YardimEt.find(searchQuery).sort({ _id: -1 }).limit(limit).skip(startIndex).exec();
+      results.data = results.data.map((yardim) => {
+        yardim.telefon = yardim.telefon.replace(/.(?=.{4})/g, "*");
+        const names = yardim.adSoyad.split(" ");
+        if (names.length > 0) {
+          const name = names[0];
+          const surname = names[names.length - 1];
+          // hidden name and surname
+          yardim.adSoyad = `${name[0]}${"*".repeat(name.length - 1)} ${surname[0]}${"*".repeat(surname.length - 1)}`;
+        }
+        const yedekTelefonlar = yardim.yedekTelefonlar;
+        if (yedekTelefonlar) {
+          yardim.yedekTelefonlar = yedekTelefonlar.map((yedekTelefon) => {
+            return yedekTelefon.replace(/.(?=.{4})/g, "*");
+          });
+        }
+        return yardim;
+      });
+
+      cache.getCache().set(cacheKey, results);
+
+      return results;
+    },
+  );
+
+  app.get(
+    "/ara-yardimet",
+    {
+      schema: {
+        querystring: {
+          type: "object",
+          properties: {
+            q: { type: "string" },
+            yardimDurumu: { type: "string" },
+            helpType: { type: "string" },
+            location: { type: "string" },
+            hedefSehir: { type: "string" },
+          },
+          required: [],
+        },
+      },
+    },
+    async (req, res) => {
+      const queryString = req.query.q;
+      const yardimDurumuQuery = req.query.yardimDurumu;
+      const helpType = req.query.yardimTipi || "";
+      const location = req.query.sehir || "";
+      const dest = req.query.hedefSehir || "";
+      let query = {
+        $or: [{ adSoyad: { $regex: queryString, $options: "i" } }, { telefon: { $regex: queryString, $options: "i" } }],
+      };
+
+      if (helpType) {
+        query = {
+          $and: [query, { yardimTipi: helpType }],
+        };
+      }
+
+      if (location) {
+        query = {
+          $and: [query, { sehir: location }],
+        };
+      }
+
+      if (dest) {
+        query = {
+          $and: [query, { hedefSehir: dest }],
+        };
+      }
+
+      if (yardimDurumuQuery) {
+        query = {
+          $and: [query, { yardimDurumu: yardimDurumuQuery }],
+        };
+      }
+      let results = {};
+      results.data = await YardimEt.find(query);
+
+      // hidden phone number for security
+      results.data = results.data.map((yardim) => {
+        yardim.telefon = yardim.telefon.replace(/.(?=.{4})/g, "*");
+        const names = yardim.adSoyad.split(" ");
+        if (names.length > 1) {
+          yardim.adSoyad = `${names[0].charAt(0)}${"*".repeat(names[0].length - 2)} ${names[1].charAt(0)}${"*".repeat(
+            names[1].length - 2,
+          )}`;
+        }
+        const yedekTelefonlar = yardim.yedekTelefonlar;
+        if (yedekTelefonlar) {
+          yardim.yedekTelefonlar = yedekTelefonlar.map((yedekTelefon) => {
+            return yedekTelefon.replace(/.(?=.{4})/g, "*");
+          });
+        }
+        return yardim;
+      });
+
+      return results.data;
+    },
+  );
+
+  app.get(
+    "/ara-yardim",
+    {
+      schema: {
+        querystring: {
+          type: "object",
+          properties: {
+            q: { type: "string" },
+            yardimDurumu: { type: "string" },
+            acilDurum: { type: "string" },
+            yardimTipi: { type: "string" },
+            aracDurumu: { type: "string" },
+          },
+          required: [],
+        },
+      },
+    },
+    async (req, res) => {
+      const queryString = req.query.q || "";
+      const yardimDurumuQuery = req.query.yardimDurumu;
+      const acilDurumQuery = req.query.acilDurum;
+      const helpType = req.query.yardimTipi;
+      const vehicle = req.query.aracDurumu;
+      let query = {
+        $or: [
+          { adSoyad: { $regex: queryString, $options: "i" } },
+          { telefon: { $regex: queryString, $options: "i" } },
+          { sehir: { $regex: queryString, $options: "i" } },
+          { adresTarifi: { $regex: queryString, $options: "i" } },
+        ],
+      };
+
+      if (helpType) {
+        query = {
+          $and: [query, { yardimTipi: helpType }],
+        };
+      }
+
+      if (vehicle) {
+        query = {
+          $and: [query, { aracDurumu: vehicle }],
+        };
+      }
+
+      if (yardimDurumuQuery) {
+        query = {
+          $and: [query, { yardimDurumu: yardimDurumuQuery }],
+        };
+      }
+
+      if (acilDurumQuery) {
+        query = {
+          $and: [query, { acilDurum: acilDurumQuery }],
+        };
+      }
+      let results = {};
+      results.data = await Yardim.find(query);
+      results.data = results.data.map((yardim) => {
+        yardim.telefon = yardim.telefon.replace(/.(?=.{4})/g, "*");
+        const names = yardim.adSoyad.split(" ");
+        if (names.length > 1) {
+          yardim.adSoyad = `${names[0].charAt(0)}${"*".repeat(names[0].length - 2)} ${names[1].charAt(0)}${"*".repeat(
+            names[1].length - 2,
+          )}`;
+        }
+        const yedekTelefonlar = yardim.yedekTelefonlar;
+        if (yedekTelefonlar) {
+          yardim.yedekTelefonlar = yedekTelefonlar.map((yedekTelefon) => {
+            return yedekTelefon.replace(/.(?=.{4})/g, "*");
+          });
+        }
+        return yardim;
+      });
+      return results.data;
+    },
+  );
+
+  app.get("/yardim/:id", async (req, res) => {
     let data;
 
     const cacheKey = `yardim_${req.params.id}`;
 
     if (cache.getCache().has(cacheKey)) {
-      data = cache.getCache().get(cacheKey);
-      return res.send(data);
+      return cache.getCache().get(cacheKey);
     }
     await checkConnection();
     let results = await Yardim.findById(req.params.id);
@@ -486,41 +518,30 @@ router.get("/yardim/:id", async (req, res) => {
           return yedekTelefon.replace(/.(?=.{4})/g, "*");
         });
       }
-
-    } catch (error) {
-    }
+    } catch (error) {}
 
     let yardimKaydi = await YardimKaydi.find({ postId: req.params.id });
 
     cache.getCache().set(cacheKey, {
       results: results,
-      yardimKaydi: yardimKaydi
+      yardimKaydi: yardimKaydi,
     });
     if (!results) {
-      return res.status(404).send("Yardim not found");
-    }
-    if (!data) {
-      res.send({
-        results: results,
-        yardimKaydi: yardimKaydi
-      });
+      res.statusCode = 404;
+      return { status: 404 };
     }
 
-  } catch (error) {
-    console.error(error);
-    res.status(500).json({ message: error.message });
-  }
-});
+    return {
+      results,
+      yardimKaydi,
+    };
+  });
 
-router.get("/yardimet/:id", async (req, res) => {
-  try {
-    let data;
-
+  app.get("/yardimet/:id", async (req, res) => {
     const cacheKey = `yardimet_${req.params.id}`;
 
     if (cache.getCache().has(cacheKey)) {
-      data = cache.getCache().get(cacheKey);
-      return res.send(data);
+      return cache.getCache().get(cacheKey);
     }
     await checkConnection();
     const results = await YardimEt.findById(req.params.id);
@@ -533,95 +554,117 @@ router.get("/yardimet/:id", async (req, res) => {
     }
     cache.getCache().set(cacheKey, results);
     if (!results) {
-      return res.status(404).send("Yardim not found");
-    }
-    if (!data) {
-      res.send(results);
+      res.statusCode = 404;
+      return { status: 404 };
     }
 
-  } catch (error) {
-    console.error(error);
-    res.status(500).json({ message: error.message });
-  }
-});
+    return results;
+  });
 
-router.post("/iletisim", async function (req, res) {
-  try {
-    await checkConnection();
-    var clientIp = requestIp.getClientIp(req); // on localhost > 127.0.0.1
+  app.post(
+    "/iletisim",
+    {
+      schema: {
+        body: {
+          type: "object",
+          properties: {
+            adSoyad: { type: "string" },
+            email: { type: "string" },
+            mesaj: { type: "string" },
+          },
+          required: ["adSoyad", "email", "mesaj"],
+        },
+      },
+    },
+    async function (req, res) {
+      await checkConnection();
 
-    const existingIletisim = await Iletisim.findOne({
-      adSoyad: req.body.adSoyad,
-      email: req.body.email,
-      mesaj: req.body.mesaj,
-    });
-
-    if (existingIletisim) {
-      return res.status(400).json({
-        error:
-          "Bu iletişim talebi zaten var, lütfen farklı bir talepte bulunun.",
+      const existingIletisim = await Iletisim.findOne({
+        adSoyad: req.body.adSoyad,
+        email: req.body.email,
+        mesaj: req.body.mesaj,
       });
-    }
-    if (req.body.telefon) {
-      if (req.body.telefon.trim().replace(/ /g, "")) {
-        if (!/^\d+$/.test(req.body.telefon) || req.body.telefon.length !== 10) {
-          return res.status(400).json({
-            error: "Telefon numarası sadece rakamlardan ve 10 karakterden oluşmalıdır.",
-          });
-        }
+
+      if (existingIletisim) {
+        res.statusCode = 400;
+        return {
+          error: "Bu iletişim talebi zaten var, lütfen farklı bir talepte bulunun.",
+        };
       }
-      req.body.telefon = req.body.telefon.replace(/ /g, "");
-    }
-
-    // Create a new Yardim document
-    const newIletisim = new Iletisim({
-      adSoyad: req.body.adSoyad || "",
-      email: req.body.email || "",
-      telefon: req.body.telefon || "",
-      mesaj: req.body.mesaj || "",
-      ip: clientIp,
-    });
-    await newIletisim.save();
-    res.json({ message: "İletişim talebiniz başarıyla alındı" });
-  } catch (error) {
-    console.log(error);
-    res.status(500).json({ error: "Hata! Yardım dökümanı kaydedilemedi!" });
-  }
-});
-
-router.post("/ekleYardimKaydi", async (req, res) => {
-  //const { postId, adSoyad, telefon, sonDurum, email, aciklama } = req.body;
-  try {
-    await checkConnection();
-    const existingYardimKaydi = await YardimKaydi.findOne({
-      postId: req.body.postId,
-    });
-    if (existingYardimKaydi) {
       if (req.body.telefon) {
         if (req.body.telefon.trim().replace(/ /g, "")) {
           if (!/^\d+$/.test(req.body.telefon) || req.body.telefon.length !== 10) {
-            return res.status(400).json({
+            res.statusCode = 400;
+            return {
               error: "Telefon numarası sadece rakamlardan ve 10 karakterden oluşmalıdır.",
-            });
+            };
           }
         }
         req.body.telefon = req.body.telefon.replace(/ /g, "");
       }
-      const newYardimKaydi = new YardimKaydi({
-        postId: req.body.postId || "",
+
+      // Create a new Yardim document
+      const newIletisim = new Iletisim({
         adSoyad: req.body.adSoyad || "",
-        telefon: req.body.telefon || "",
-        sonDurum: req.body.sonDurum || "",
         email: req.body.email || "",
-        aciklama: req.body.aciklama || "",
+        telefon: req.body.telefon || "",
+        mesaj: req.body.mesaj || "",
+        ip: req.ip,
       });
-      await newYardimKaydi.save();
-    }
-  } catch (error) {
-    console.log(error);
-    res.status(500).json({ error: "Hata! Yardım kaydi kaydedilemedi!" });
-  }
-});
+      await newIletisim.save();
+      return { message: "İletişim talebiniz başarıyla alındı" };
+    },
+  );
+
+  app.post(
+    "/ekleYardimKaydi",
+    {
+      schema: {
+        body: {
+          type: "object",
+          properties: {
+            postId: { type: "string" },
+            adSoyad: { type: "string" },
+            sonDurum: { type: "string" },
+            email: { type: "string" },
+            aciklama: { type: "string" },
+            telefon: { type: "string" },
+          },
+          required: ["postId"],
+        },
+      },
+    },
+    async (req, res) => {
+      await checkConnection();
+      const existingYardimKaydi = await YardimKaydi.findOne({
+        postId: req.body.postId,
+      });
+      if (existingYardimKaydi) {
+        if (req.body.telefon) {
+          if (req.body.telefon.trim().replace(/ /g, "")) {
+            if (!/^\d+$/.test(req.body.telefon) || req.body.telefon.length !== 10) {
+              return res.status(400).json({
+                error: "Telefon numarası sadece rakamlardan ve 10 karakterden oluşmalıdır.",
+              });
+            }
+          }
+          req.body.telefon = req.body.telefon.replace(/ /g, "");
+        }
+        const newYardimKaydi = new YardimKaydi({
+          postId: req.body.postId || "",
+          adSoyad: req.body.adSoyad || "",
+          telefon: req.body.telefon || "",
+          sonDurum: req.body.sonDurum || "",
+          email: req.body.email || "",
+          aciklama: req.body.aciklama || "",
+        });
+        await newYardimKaydi.save();
+      }
+
+      return { status: 200 };
+    },
+  );
+};
 
 async function checkConnection() {
   try {
@@ -632,5 +675,3 @@ async function checkConnection() {
     console.log(error);
   }
 }
-
-module.exports = router;
