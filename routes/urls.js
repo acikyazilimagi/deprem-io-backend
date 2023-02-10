@@ -47,14 +47,12 @@ module.exports = function (app) {
         return cache.getCache().get(cacheKey);
       }
 
-
       await checkConnection();
       if (endIndex < (await Yardim.countDocuments().exec())) {
         results.next = {
           page: page + 1,
           limit,
         };
-
       }
 
       if (startIndex > 0) {
@@ -68,7 +66,6 @@ module.exports = function (app) {
 
       results.totalPage = Math.ceil((await Yardim.countDocuments(query)) / limit);
       results.data = await Yardim.find(query).sort({ _id: -1 }).limit(limit).skip(startIndex).exec();
-
 
       results.data = results.data.map((yardim) => {
         yardim.telefon = yardim.telefon.replace(/.(?=.{4})/g, "*");
@@ -85,7 +82,6 @@ module.exports = function (app) {
           });
         }
         return yardim;
-
       });
 
       cache.getCache().set(cacheKey, results);
@@ -117,7 +113,9 @@ module.exports = function (app) {
               type: "string",
               minLength: 10,
               maxLength: 11,
+
               pattern: "^\\d+$",
+
 
             },
           },
@@ -158,13 +156,11 @@ module.exports = function (app) {
 
       const fields = {};
 
-
       // TODO: Bunlarin hepsini JSON schema'ya tasiyalim.
       for (const key in req.body) {
         if (key.startsWith("fields-")) {
           const fieldName = key.split("-")[1];
           fields[fieldName] = req.body[key];
-
         }
       }
 
@@ -315,7 +311,6 @@ module.exports = function (app) {
           page: page + 1,
           limit,
         };
-
       }
 
       if (startIndex > 0) {
@@ -390,12 +385,10 @@ module.exports = function (app) {
         };
       }
 
-
       if (location) {
         query = {
           $and: [query, { sehir: location }],
         };
-
       }
 
       if (dest) {
@@ -466,13 +459,11 @@ module.exports = function (app) {
         ],
       };
 
-
       if (helpType) {
         query = {
           $and: [query, { yardimTipi: helpType }],
         };
       }
-
 
       if (vehicle) {
         query = {
@@ -480,12 +471,10 @@ module.exports = function (app) {
         };
       }
 
-
       if (yardimDurumuQuery) {
         query = {
           $and: [query, { yardimDurumu: yardimDurumuQuery }],
         };
-
       }
 
       if (acilDurumQuery) {
@@ -542,7 +531,6 @@ module.exports = function (app) {
       yardimKaydi: yardimKaydi,
     });
     if (!results) {
-
       res.statusCode = 404;
       return { status: 404 };
     }
@@ -552,7 +540,6 @@ module.exports = function (app) {
       yardimKaydi,
     };
   });
-
 
   app.get("/yardimet/:id", async (req, res) => {
     const cacheKey = `yardimet_${req.params.id}`;
@@ -571,7 +558,6 @@ module.exports = function (app) {
     }
     cache.getCache().set(cacheKey, results);
     if (!results) {
-
       res.statusCode = 404;
       return { status: 404 };
     }
@@ -601,7 +587,6 @@ module.exports = function (app) {
         adSoyad: req.body.adSoyad,
         email: req.body.email,
         mesaj: req.body.mesaj,
-
       });
 
       if (existingIletisim) {
@@ -691,7 +676,6 @@ module.exports = function (app) {
     },
   );
 };
-
 
 async function checkConnection() {
   try {
