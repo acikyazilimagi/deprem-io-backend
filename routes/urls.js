@@ -83,7 +83,7 @@ router.get("/yardim", async function (req, res) {
     }
   } catch (error) {
     console.log(error);
-    res.status(500).send({ error: "Could not retrieve the Yardim documents." });
+    res.status(500).json({ error: "Could not retrieve the Yardim documents" });
   }
 });
 
@@ -248,8 +248,7 @@ router.post("/yardimet", async function (req, res) {
   } catch (error) {
     console.log(error);
     res.status(500).json({
-      error: "Hata! Yardım dökümanı kaydedilemedi!",
-      message: error.message
+      error: "Hata! Yardım dökümanı kaydedilemedi!"
     });
   }
 });
@@ -335,19 +334,17 @@ router.get("/yardimet", async function (req, res) {
     }
   } catch (error) {
     console.log(error);
-    res.status(500).send({ error: "Could not retrieve the Yardim documents." });
+    res.status(500).json({error: "Could not retrieve the Yardim documents!"});
   }
 });
 
 router.get("/ara-yardimet", async (req, res) => {
-  const queryString = req.query.q;
-  const yardimDurumuQuery = req.query.yardimDurumu;
-  const helpType = req.query.yardimTipi || "";
-  const location = req.query.sehir || "";
-  const dest = req.query.hedefSehir || "";
-
   try {
-    let query = {
+    const queryString = req.query.q;
+    const yardimDurumuQuery = req.query.yardimDurumu;
+    const helpType = req.query.yardimTipi || "";
+    const location = req.query.sehir || "";
+    const dest = req.query.hedefSehir || "";    let query = {
       $or: [
         { adSoyad: { $regex: queryString, $options: "i" } },
         { telefon: { $regex: queryString, $options: "i" } },
@@ -398,18 +395,18 @@ router.get("/ara-yardimet", async (req, res) => {
     });
     res.json(results.data);
   } catch (error) {
+    console.log(error);
     res.status(500).json({ message: error.message });
   }
 });
 
 router.get("/ara-yardim", async (req, res) => {
-  const queryString = req.query.q || "";
-  const yardimDurumuQuery = req.query.yardimDurumu;
-  const acilDurumQuery = req.query.acilDurum;
-  const helpType = req.query.yardimTipi;
-  const vehicle = req.query.aracDurumu;
-
   try {
+    const queryString = req.query.q || "";
+    const yardimDurumuQuery = req.query.yardimDurumu;
+    const acilDurumQuery = req.query.acilDurum;
+    const helpType = req.query.yardimTipi;
+    const vehicle = req.query.aracDurumu;
     let query = {
       $or: [
         { adSoyad: { $regex: queryString, $options: "i" } },
@@ -461,6 +458,7 @@ router.get("/ara-yardim", async (req, res) => {
     });
     res.json(results.data);
   } catch (error) {
+    console.log(error);
     res.status(500).json({ message: error.message });
   }
 });
@@ -507,7 +505,7 @@ router.get("/yardim/:id", async (req, res) => {
 
   } catch (error) {
     console.error(error);
-    res.status(500).send("Error occurred while fetching Yardim");
+    res.status(500).json({ message: error.message });
   }
 });
 
@@ -540,7 +538,7 @@ router.get("/yardimet/:id", async (req, res) => {
 
   } catch (error) {
     console.error(error);
-    res.status(500).send("Error occurred while fetching Yardim");
+    res.status(500).json({ message: error.message });
   }
 });
 
@@ -590,7 +588,7 @@ router.post("/iletisim", async function (req, res) {
 
 router.post("/ekleYardimKaydi", (req, res) => {
   //const { postId, adSoyad, telefon, sonDurum, email, aciklama } = req.body;
-
+try {
   Yardim.findById(req.body.postId)
     .then((post) => {
       if (!post) {
@@ -622,6 +620,10 @@ router.post("/ekleYardimKaydi", (req, res) => {
         error,
       });
     });
+} catch (error) {
+  console.log(error);
+  res.status(500).json({ error: "Hata! Yardım kaydi kaydedilemedi!" });
+}
 });
 
 module.exports = router;
