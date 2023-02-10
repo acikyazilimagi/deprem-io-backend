@@ -128,11 +128,7 @@ module.exports = async function (app) {
               type: "string",
             },
             telefon: {
-              type: "string",
-              minLength: 10,
-              maxLength: 11,
-
-              pattern: "^\\d+$",
+              type: "string"
             },
           },
           required: ["yardimTipi", "adSoyad", "adres", "acilDurum"],
@@ -141,6 +137,13 @@ module.exports = async function (app) {
     },
     async function (req, res) {
       const { yardimTipi, adSoyad, adres, acilDurum, telefon } = req.body;
+
+      if (telefon && !check.isPhoneNumber(telefon)) {
+        res.statusCode = 400;
+        return {
+          error: "Lütfen doğru formatta bir telefon numarası formatı giriniz.",
+        };
+      }
 
       // TODO: yedekTelefonlari JSON schema'ya tasi.
       if (req.body.yedekTelefonlar) {
@@ -215,10 +218,7 @@ module.exports = async function (app) {
             yardimTipi: { type: "string" },
             adSoyad: { type: "string" },
             telefon: {
-              type: "string",
-              minLength: 10,
-              maxLength: 11,
-              pattern: "^\\d+$",
+              type: "string"
             },
             sehir: {
               type: "string",
@@ -231,12 +231,19 @@ module.exports = async function (app) {
     async function (req, res) {
       const { yardimTipi, adSoyad, telefon, sehir } = req.body;
 
+      if (telefon && !check.isPhoneNumber(telefon)) {
+        res.statusCode = 400;
+        return {
+          error: "Lütfen doğru formatta bir telefon numarası formatı giriniz.",
+        };
+      }
+
       // TODO: yedekTelefonlari json schemaya tasiyalim.
       if (req.body.yedekTelefonlar) {
         if (req.body.yedekTelefonlar.length > 0) {
           let yedekTelefonlar = req.body.yedekTelefonlar;
           for (let i = 0; i < yedekTelefonlar.length; i++) {
-            if (!/^\d+$/.test(yedekTelefonlar[i]) || yedekTelefonlar[i].length !== 10) {
+            if (!check.isPhoneNumber(yedekTelefonlar[i])) {
               return res.status(400).json({
                 error: "Telefon numarası sadece rakamlardan oluşmalıdır.",
               });
@@ -538,7 +545,7 @@ module.exports = async function (app) {
           return yedekTelefon.replace(/.(?=.{4})/g, "*");
         });
       }
-    } catch (error) {}
+    } catch (error) { }
 
     let yardimKaydi = await YardimKaydi.find({ postId: req.params.id });
 
@@ -612,23 +619,20 @@ module.exports = async function (app) {
         };
       }
 
-      if (req.body.telefon) {
-        if (req.body.telefon.trim().replace(/ /g, "")) {
-          if (!/^\d+$/.test(req.body.telefon) || req.body.telefon.length !== 10) {
-            res.statusCode = 400;
-            return {
-              error: "Telefon numarası sadece rakamlardan ve 10 karakterden oluşmalıdır.",
-            };
-          }
-        }
-        req.body.telefon = req.body.telefon.replace(/ /g, "");
+      let telefon = req.body.telefon?.trim();
+
+      if (telefon && !check.isPhoneNumber(telefon)) {
+        res.statusCode = 400;
+        return {
+          error: "Telefon numarası sadece rakamlardan ve maksimum 11 karakterden oluşmalıdır.",
+        };
       }
 
       // Create a new Yardim document
       const newIletisim = new Iletisim({
         adSoyad: req.body.adSoyad || "",
         email: req.body.email || "",
-        telefon: req.body.telefon || "",
+        telefon: telefon || "",
         mesaj: req.body.mesaj || "",
         ip: req.ip,
       });
