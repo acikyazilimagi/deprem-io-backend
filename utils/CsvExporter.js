@@ -15,7 +15,7 @@ module.exports = async function (rows, columns, file) {
 
 			// eğer array yapısındaysa
 			else if (Array.isArray(row[key])) {
-				hold[key] = row[key].join(", ");
+				hold[key] = row[key].join(" ");
 			}
 
 			// eğer nested değilse
