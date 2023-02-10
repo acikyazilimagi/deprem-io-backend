@@ -141,7 +141,7 @@ module.exports = async function (app) {
       if (telefon && !check.isPhoneNumber(telefon)) {
         res.statusCode = 400;
         return {
-          error: "Lütfen doğru formatta bir telefon numarası giriniz.",
+          error: "Lütfen doğru formatta bir telefon numarası giriniz.(örn: 05554443322)",
         };
       }
 
@@ -153,7 +153,7 @@ module.exports = async function (app) {
             if (!check.isPhoneNumber(yedekTelefonlar[i])) {
               res.statusCode = 400;
               return {
-                error: "Telefon numarası sadece rakamlardan oluşmalıdır.",
+                error: "Lütfen doğru formatta bir telefon numarası giriniz.(örn: 05554443322)",
               };
             }
             yedekTelefonlar[i] = yedekTelefonlar[i].replace(/ /g, "");
@@ -234,7 +234,7 @@ module.exports = async function (app) {
       if (telefon && !check.isPhoneNumber(telefon)) {
         res.statusCode = 400;
         return {
-          error: "Lütfen doğru formatta bir telefon numarası giriniz.",
+          error: "Lütfen doğru formatta bir telefon numarası giriniz.(örn: 05554443322)",
         };
       }
 
@@ -244,9 +244,10 @@ module.exports = async function (app) {
           let yedekTelefonlar = req.body.yedekTelefonlar;
           for (let i = 0; i < yedekTelefonlar.length; i++) {
             if (!check.isPhoneNumber(yedekTelefonlar[i])) {
-              return res.status(400).json({
-                error: "Telefon numarası sadece rakamlardan oluşmalıdır.",
-              });
+              res.statusCode = 400;
+              return {
+                error: "Lütfen doğru formatta bir telefon numarası giriniz.(örn: 05554443322)"
+              }
             }
             yedekTelefonlar[i] = yedekTelefonlar[i].replace(/ /g, "");
           }
@@ -624,7 +625,7 @@ module.exports = async function (app) {
       if (telefon && !check.isPhoneNumber(telefon)) {
         res.statusCode = 400;
         return {
-          error: "Telefon numarası sadece rakamlardan ve maksimum 11 karakterden oluşmalıdır.",
+          error: "Lütfen doğru formatta bir telefon numarası giriniz.(örn: 05554443322)",
         };
       }
 
@@ -669,9 +670,10 @@ module.exports = async function (app) {
         if (req.body.telefon) {
           if (req.body.telefon.trim().replace(/ /g, "")) {
             if (!check.isPhoneNumber(req.body.telefon)) {
-              return res.status(400).json({
-                error: "Telefon numarası sadece rakamlardan ve 10 karakterden oluşmalıdır.",
-              });
+              res.statusCode = 400;
+              return {
+                error: "Lütfen doğru formatta bir telefon numarası giriniz.(örn: 05554443322)"
+              }
             }
           }
           req.body.telefon = req.body.telefon.replace(/ /g, "");
