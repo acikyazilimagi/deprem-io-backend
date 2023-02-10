@@ -1,5 +1,8 @@
 # deprem-io-backend
 
+Bu proje deprem.io sitesinin backend implementasyonunu icerir.
+This project includes the implementation of the deprem.io website.
+
 ## Requirements
 
 * Docker
@@ -20,6 +23,15 @@ docker run -p 8080:80 -d deprem-io-backend
 ```
 
 * localhost:8080/ adresine gidebiliyorsanız proje ayakta demektir.
+
+
+## Nasıl deploy edilir? (How can I deploy?)
+
+* Docker dosyasını kullanın ve env variable olarak MONGOURL kullanın
+* **English**: Use a dockerfile and set environment variable for MONGOURL.
+
+## Postman Workspace
+https://www.postman.com/minikdev/workspace/depremio
 
 ## Yardımları listeleme (GET)
 istenen yardımları listeler
@@ -55,7 +67,14 @@ localhost:8080/yardim
 
 ## YardımEt ekleme (GET)
 insanların sağladığı yardımları listeler
-localhost:8080/yardimet
+* localhost:8080/yardimet
+
+YardimTipi filtrelemesi:
+
+* localhost:8080/yardimet?yardimTipi=yolcuTasima
+
+Şehir filtrelemesi:
+* localhost:8080/yardimet?sehir=Istanbul
 
 ## YardımEt ekleme (POST)
 Json Yolla
