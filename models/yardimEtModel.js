@@ -14,11 +14,11 @@ const yardimEtSchema = new mongoose.Schema(
     },
     telefon: {
       type: String,
-      required: true
+      required: true,
     },
     yedekTelefonlar: {
       type: [String],
-      required: false
+      required: false,
     },
     sehir: {
       type: String,

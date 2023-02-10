@@ -13,7 +13,7 @@ const yardimKaydiSchema = new mongoose.Schema({
   },
   telefon: {
     type: String,
-    required: false
+    required: false,
   },
   sonDurum: {
     type: String,

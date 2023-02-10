@@ -14,7 +14,7 @@ const iletisimSchema = new mongoose.Schema(
 
     telefon: {
       type: String,
-      required: false
+      required: false,
     },
     mesaj: {
       type: String,
