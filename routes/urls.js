@@ -115,8 +115,7 @@ module.exports = function (app) {
             telefon: {
               type: "string",
               minLength: 10,
-              maxLength: 11,
-              pattern: "^d+$",
+              maxLength: 11, 
               
             },
           },
@@ -204,8 +203,7 @@ module.exports = function (app) {
             telefon: {
               type: "string",
               minLength: 10,
-              maxLength: 10,
-              pattern: "^d+$",
+              maxLength: 11, 
             },
             sehir: {
               type: "string",
