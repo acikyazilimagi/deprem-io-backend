@@ -4,7 +4,7 @@ const mongoose = require("mongoose");
 const connectDB = require("../mongo-connection");
 const Yardim = require("../models/yardimModel");
 const cache = require("../cache");
-var requestIp = require("request-ip");
+const requestIp = require("request-ip");
 const YardimEt = require("../models/yardimEtModel");
 const Iletisim = require("../models/iletisimModel");
 const YardimKaydi = require("../models/yardimKaydiModel");
@@ -27,7 +27,7 @@ router.get("/yardim", async function (req, res) {
 
     const results = {};
 
-    let cacheKey = `yardim_${page}_${limit}` + yardimTipi;
+    let cacheKey = `yardim_${page}_${limit}${yardimTipi}`;
     if (cache.getCache().has(cacheKey)) {
       data = cache.getCache().get(cacheKey);
       res.send(data);
@@ -71,11 +71,7 @@ router.get("/yardim", async function (req, res) {
       const names = yardim.adSoyad.split(" ");
       if (names.length > 1) {
         yardim.adSoyad =
-          names[0].charAt(0) +
-          "*".repeat(names[0].length - 2) +
-          " " +
-          names[1].charAt(0) +
-          "*".repeat(names[1].length - 2);
+          `${names[0].charAt(0)}${"*".repeat(names[0].length - 2)} ${names[1].charAt(0)}${"*".repeat(names[1].length - 2)}`;
       }
       const yedekTelefonlar = yardim.yedekTelefonlar;
       if (yedekTelefonlar) {
@@ -99,7 +95,7 @@ router.post("/yardim", async function (req, res) {
   try {
     const { yardimTipi, adSoyad, adres, acilDurum } = req.body;
 
-    if (!yardimTipi || !adSoyad || !adres || !acilDurum) {
+    if (!(((yardimTipi && adSoyad ) && adres ) && acilDurum)) {
       return res.status(400).json({
         error: "yardimTipi, adSoyad, adres and acilDurum alanları gerekli",
       });
@@ -179,7 +175,7 @@ router.post("/yardimet", async function (req, res) {
     const { yardimTipi, adSoyad, telefon, sehir } = req.body;
 
     // Validate required fields
-    if (!yardimTipi || !adSoyad || !telefon || !sehir) {
+    if (!(((yardimTipi && adSoyad ) && telefon ) && sehir)) {
       return res.status(400).json({
         error: "yardimTipi, adSoyad, telefon, sehir ve ilçe alanları gerekli",
       });
@@ -272,7 +268,7 @@ router.get("/yardimet", async function (req, res) {
 
     let results = {};
 
-    const cacheKey = `yardimet_${page}_${limit}` + yardimTipi;
+    const cacheKey = `yardimet_${page}_${limit}${yardimTipi}`;
 
     if (cache.getCache().has(cacheKey)) {
       data = cache.getCache().get(cacheKey);
@@ -318,11 +314,7 @@ router.get("/yardimet", async function (req, res) {
       const names = yardim.adSoyad.split(" ");
       if (names.length > 1) {
         yardim.adSoyad =
-          names[0].charAt(0) +
-          "*".repeat(names[0].length - 2) +
-          " " +
-          names[1].charAt(0) +
-          "*".repeat(names[1].length - 2);
+          `${names[0].charAt(0)}${"*".repeat(names[0].length - 2)} ${names[1].charAt(0)}${"*".repeat(names[1].length - 2)}`;
       }
       const yedekTelefonlar = yardim.yedekTelefonlar;
       if (yedekTelefonlar) {
@@ -391,11 +383,7 @@ router.get("/ara-yardimet", async (req, res) => {
       const names = yardim.adSoyad.split(" ");
       if (names.length > 1) {
         yardim.adSoyad =
-          names[0].charAt(0) +
-          "*".repeat(names[0].length - 2) +
-          " " +
-          names[1].charAt(0) +
-          "*".repeat(names[1].length - 2);
+          `${names[0].charAt(0)}${"*".repeat(names[0].length - 2)} ${names[1].charAt(0)}${"*".repeat(names[1].length - 2)}`;
       }
       const yedekTelefonlar = yardim.yedekTelefonlar;
       if (yedekTelefonlar) {
@@ -458,11 +446,7 @@ router.get("/ara-yardim", async (req, res) => {
       const names = yardim.adSoyad.split(" ");
       if (names.length > 1) {
         yardim.adSoyad =
-          names[0].charAt(0) +
-          "*".repeat(names[0].length - 2) +
-          " " +
-          names[1].charAt(0) +
-          "*".repeat(names[1].length - 2);
+          `${names[0].charAt(0)}${"*".repeat(names[0].length - 2)} ${names[1].charAt(0)}${"*".repeat(names[1].length - 2)}`;
       }
       const yedekTelefonlar = yardim.yedekTelefonlar;
       if (yedekTelefonlar) {

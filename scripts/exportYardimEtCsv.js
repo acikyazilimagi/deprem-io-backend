@@ -35,7 +35,7 @@ await YardimEt.find({})
 }
 
   async function checkConnection() {
-    if (mongoose.connection.readyState != 1) {
+    if (mongoose.connection.readyState !== 1) {
         console.log("burası");
       await connectDB();
     }
