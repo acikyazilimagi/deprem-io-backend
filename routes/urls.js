@@ -490,22 +490,28 @@ router.get("/yardim/:id", async (req, res) => {
     }
     await checkConnection();
     let results = await Yardim.findById(req.params.id);
-    results.telefon = results.telefon.replace(/.(?=.{4})/g, "*");
-    const yedekTelefonlar = results.yedekTelefonlar;
-    if (results.yedekTelefonlar) {
-      results.yedekTelefonlar = yedekTelefonlar.map((yedekTelefon) => {
-        return yedekTelefon.replace(/.(?=.{4})/g, "*");
-      });
-    }
+    try {
+      results.telefon = results.telefon.replace(/.(?=.{4})/g, "*");
+      const yedekTelefonlar = results.yedekTelefonlar;
+      if (results.yedekTelefonlar) {
+        results.yedekTelefonlar = yedekTelefonlar.map((yedekTelefon) => {
+          return yedekTelefon.replace(/.(?=.{4})/g, "*");
+        });
+      }
+      
+    } catch (error) {
+     }
 
     let yardimKaydi = await YardimKaydi.find({postId:req.params.id});
 
-    cache.getCache().set(cacheKey, results);
+    cache.getCache().set(cacheKey, {
+      results: results,
+      yardimKaydi: yardimKaydi
+    });
     if (!results) {
       return res.status(404).send("Yardim not found");
     }
-
-    if(!data){
+   if(!data){
       res.send({
         results: results,
         yardimKaydi: yardimKaydi
