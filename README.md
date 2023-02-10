@@ -45,6 +45,10 @@ localhost:8080/yardim
 insanların sağladığı yardımları listeler
 * localhost:8080/yardimet
 
+YardimTipi filtrelemesi:
+
+* localhost:8080/yardimet?yardimTipi=yolcuTasima
+
 Şehir filtrelemesi:
 * localhost:8080/yardimet?sehir=Istanbul
 
