@@ -4,6 +4,7 @@ const { Schema } = require("mongoose");
 const yardimKaydiSchema = new mongoose.Schema({
   postId: {
     type: Schema.Types.ObjectId,
+    ref: "Post",
     required: true,
   },
   adSoyad: {
