@@ -1,5 +1,8 @@
 # deprem-io-backend
 
+Bu proje deprem.io sitesinin backend implementasyonunu icerir.
+This project includes the implementation of the deprem.io website.
+
 ## Nasıl deploy edilir
 
 - Docker dosyasını kullanın
