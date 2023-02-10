@@ -14,9 +14,7 @@ const iletisimSchema = new mongoose.Schema(
 
     telefon: {
       type: String,
-      required: false,
-      pattern: /^\d{10}$/,
-      message: "Telefon numarası 10 karakterli olmalıdır",
+      required: false
     },
     mesaj: {
       type: String,
