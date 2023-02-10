@@ -281,7 +281,7 @@ module.exports = async function (app) {
         tweetLink: req.body.tweetLink || "",
         googleMapLink: req.body.googleMapLink || "",
         fields: fields || {},
-        ip: clientIp,
+        ip: req.ip,
       });
 
       cache.getCache().flushAll();
