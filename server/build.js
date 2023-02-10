@@ -1,9 +1,10 @@
 const fastify = require("fastify");
 const cors = require("@fastify/cors");
+const autoload = require("@fastify/autoload");
+const path = require("path");
 const config = require("../config.js");
 const cache = require("../cache.js");
 
-const mainRoutes = require("../routes/urls");
 const cacheRoutes = require("../routes/cache");
 
 const mongoose = require("mongoose");
@@ -44,7 +45,10 @@ module.exports = function () {
   app.decorate("mongoose", mongoose);
   app.decorate("cache", cache);
 
-  app.register(mainRoutes);
+  app.register(autoload, {
+    dir: path.join(__dirname, "../routes/controllers"),
+  });
+
   cacheRoutes(app);
 
   return app;

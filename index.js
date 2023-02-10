@@ -16,10 +16,17 @@ mongoose
   .then(() => {
     cache.createCacheInstance();
     app.log.info("Connected to DB...");
-    return app.listen({
-      port: config.port,
-      host: "0.0.0.0",
-    });
+    return app.listen(
+      {
+        port: config.port,
+        host: "0.0.0.0",
+      },
+      (err, address) => {
+        if (process.env.NODE_ENV === "development") {
+          console.log(`Available routes: \n${app.printRoutes()}`);
+        }
+      },
+    );
   })
   .catch((error) => {
     app.log.fatal("Uncaught error", error);
