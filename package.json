@@ -8,9 +8,7 @@
     "dev": "npx nodemon --exec \"node index.js\"",
     "test": "vitest run --coverage",
     "lint": "rome check --apply-suggested .",
-    "lint:ci": "rome check .",
-    "format": "rome format --write .",
-    "format:ci": "rome format ."
+    "format": "rome format --write ."
   },
   "repository": {
     "type": "git",
