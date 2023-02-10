@@ -119,15 +119,17 @@ router.post(
         }
       }
 
+      const yedekTelefonlar = req.body.yedekTelefonlar;
+
       // Create a new Yardim document
       const newYardim = new Yardim({
         yardimTipi,
         adSoyad,
         telefon: removeWhiteSpace(req.body.telefon) || "", // optional fields
         yedekTelefonlar:
-          req.body.yedekTelefonlar.map((telefon) =>
-            removeWhiteSpace(telefon)
-          ) || "",
+          yedekTelefonlar && yedekTelefonlar.length > 0
+            ? yedekTelefonlar.map((telefon) => removeWhiteSpace(telefon))
+            : [],
         email: req.body.email || "",
         adres,
         acilDurum,
@@ -177,6 +179,7 @@ router.post(
         }
       }
 
+      const yedekTelefonlar = req.body.yedekTelefonlar;
       // Create a new Yardim document
       let hedefSehir = req.body.hedefSehir || "";
       const newYardim = new YardimEt({
@@ -188,9 +191,9 @@ router.post(
         hedefSehir,
         yardimDurumu: req.body.yardimDurumu || "",
         yedekTelefonlar:
-          req.body.yedekTelefonlar.map((telefon) =>
-            removeWhiteSpace(telefon)
-          ) || "",
+          yedekTelefonlar && yedekTelefonlar.length > 0
+            ? yedekTelefonlar.map((telefon) => removeWhiteSpace(telefon))
+            : [],
         aciklama: req.body.aciklama || "",
         tweetLink: req.body.tweetLink || "",
         googleMapLink: req.body.googleMapLink || "",
