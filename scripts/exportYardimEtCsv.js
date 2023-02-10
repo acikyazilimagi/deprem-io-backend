@@ -1,14 +1,17 @@
-const mongoose = require("mongoose");
 const YardimEt = require("../models/yardimEtModel");
-const fs = require("fs");
-const connectDB = require("../mongo-connection");
+const fs = require("node:fs");
+const mongoose = require("mongoose");
+const config = require("../config.js");
 
 // Datayı csv olarak export etmek için script
 // node scripts/exportYardimEtCsv.js
 // ekstra fields kımsında bug var
 
 async function main() {
-  await checkConnection();
+  await mongoose.connect(config.mongoUrl, {
+    useNewUrlParser: true,
+    useUnifiedTopology: true,
+  });
   const writeStream = fs.createWriteStream("yardimEt.csv");
 
   await YardimEt.find({})
@@ -30,13 +33,6 @@ async function main() {
       console.error(err);
       mongoose.connection.close();
     });
-}
-
-async function checkConnection() {
-  if (mongoose.connection.readyState !== 1) {
-    console.log("burası");
-    await connectDB();
-  }
 }
 
 main();

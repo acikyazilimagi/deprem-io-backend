@@ -1,5 +1,3 @@
-const mongoose = require("mongoose");
-const connectDB = require("../mongo-connection");
 const Yardim = require("../models/yardimModel");
 const cache = require("../cache");
 const YardimEt = require("../models/yardimEtModel");
@@ -65,7 +63,7 @@ module.exports = async function (app) {
         return cache.getCache().get(cacheKey);
       }
 
-      await checkConnection();
+      await checkConnection(app);
       if (endIndex < (await Yardim.countDocuments().exec())) {
         results.next = {
           page: page + 1,
@@ -158,7 +156,7 @@ module.exports = async function (app) {
         }
       }
 
-      await checkConnection();
+      await checkConnection(app);
 
       // check exist
       const existingYardim = await Yardim.findOne({ adSoyad, adres });
@@ -245,7 +243,7 @@ module.exports = async function (app) {
         }
       }
 
-      await checkConnection();
+      await checkConnection(app);
 
       // check exist
       const existingYardim = await YardimEt.findOne({ adSoyad, sehir });
@@ -319,7 +317,7 @@ module.exports = async function (app) {
       if (cache.getCache().has(cacheKey)) {
         return cache.getCache().get(cacheKey);
       }
-      await checkConnection();
+      await checkConnection(app);
 
       if (endIndex < (await YardimEt.countDocuments().exec())) {
         results.next = {
@@ -532,7 +530,7 @@ module.exports = async function (app) {
     if (cache.getCache().has(cacheKey)) {
       return cache.getCache().get(cacheKey);
     }
-    await checkConnection();
+    await checkConnection(app);
     let results = await Yardim.findById(req.params.id);
     let yardimKaydi = await YardimKaydi.find({ postId: req.params.id });
     try {
@@ -572,7 +570,7 @@ module.exports = async function (app) {
     if (cache.getCache().has(cacheKey)) {
       return cache.getCache().get(cacheKey);
     }
-    await checkConnection();
+    await checkConnection(app);
     const results = await YardimEt.findById(req.params.id);
     results.telefon = results.telefon.replace(/.(?=.{4})/g, "*");
     const yedekTelefonlar = results.yedekTelefonlar;
@@ -606,7 +604,7 @@ module.exports = async function (app) {
       },
     },
     async function (req, res) {
-      await checkConnection();
+      await checkConnection(app);
 
       const existingIletisim = await Iletisim.findOne({
         adSoyad: req.body.adSoyad,
@@ -663,7 +661,7 @@ module.exports = async function (app) {
       },
     },
     async (req, res) => {
-      await checkConnection();
+      await checkConnection(app);
       const existingYardimKaydi = await Yardim.findOne({
         _id: req.body.postId,
       });
@@ -700,12 +698,15 @@ module.exports = async function (app) {
   );
 };
 
-async function checkConnection() {
+/**
+ * @param {FastifyInstance} app
+ */
+async function checkConnection(app) {
   try {
-    if (mongoose.connection.readyState !== 1) {
-      await connectDB();
+    if (app.mongoose.connection.readyState !== 1) {
+      await app.mongoose.connect(app.config.mongoose);
     }
   } catch (error) {
-    console.log(error);
+    app.log.fatal(error);
   }
 }
