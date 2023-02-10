@@ -1,26 +1,34 @@
-# `deprem.io` backend
+# deprem-io-backend
 
-Bu proje deprem.io sitesinin backend implementasyonunu icerir.
-This project includes the implementation of the deprem.io website.
+## Nasıl deploy edilir
 
-## Nasıl deploy edilir? (How can I deploy?)
+- Docker dosyasını kullanın
+- Env variable olarak MONGOURL kullanın
+- Container Portu 8080
 
-* Docker dosyasını kullanın ve env variable olarak MONGOURL kullanın
-* **English**: Use a dockerfile and set environment variable for MONGOURL.
+### Docker ile ayağa kaldırma
+
+```bash
+make up
+```
 
 ## Postman Workspace
+
 https://www.postman.com/minikdev/workspace/depremio
 
 ## Yardımları listeleme (GET)
+
 istenen yardımları listeler
-/yardim 
+/yardim
 localhost:8080/yardim?page=1&limit=1
 
 ## Yardımiste Ekleme (POST)
+
 Json Yolla
 localhost:8080/yardim
-* /models/yardimModel.js e bak 
-ÖRNEK JSON POSTU
+
+- /models/yardimModel.js e bak
+  ÖRNEK JSON POSTU
 
 ```
 {
@@ -39,22 +47,26 @@ localhost:8080/yardim
     "tweetLink": "https://twitter.com/johndoe/status/1234567890",
     "fields-status": "test-status",
     "fields-yenialan": "ekstrabilgi"
-   
+
 }
 ```
 
 ## YardımEt ekleme (GET)
+
 insanların sağladığı yardımları listeler
-* localhost:8080/yardimet
+
+- localhost:8080/yardimet
 
 YardimTipi filtrelemesi:
 
-* localhost:8080/yardimet?yardimTipi=yolcuTasima
+- localhost:8080/yardimet?yardimTipi=yolcuTasima
 
 Şehir filtrelemesi:
-* localhost:8080/yardimet?sehir=Istanbul
+
+- localhost:8080/yardimet?sehir=Istanbul
 
 ## YardımEt ekleme (POST)
+
 Json Yolla
 localhost:8080/yardimet
 
@@ -73,7 +85,9 @@ localhost:8080/yardimet
 ```
 
 ## yardimet (POST)
+
 İstenen yardımların altındaki formlara eklenen yardımkaydi bildirimleri
+
 ```
 {
 "postId": "63e3940d3c12f65e945ff371",
@@ -90,26 +104,30 @@ localhost:8080/yardimet
 post olarak fields-{burası aalanı adı}: value şeklinde datayı gönderin onunları fields objesi altında birleştirip db ye kayddedecek
 
 örneğin fiels-yardimalani: "ankara" şu şekilde döner
- ```
+
+```
 fields: {
-    yardimalani: "ankara"
+   yardimalani: "ankara"
 }
 ```
 
 ## Not
+
 Opsiyonel her türlü yardım isteme ve yardımEt kısmına eklenecek özellikler için
-fields alanını kullanın isteidğiniz gibi json objesi post edebilirsiniz 
+fields alanını kullanın isteidğiniz gibi json objesi post edebilirsiniz
 
 ## Cache i temizleme
+
 /cache/flushall
 
-## cache i görme 
+## cache i görme
 
 /cache/getstats
 
 ## iletisim (POST)
 
 localhost:8080/iletisim
+
 ```
 {
     "adSoyad": "John Doe",
@@ -134,29 +152,27 @@ istenen yardımların altında form var süreci takip etmek için yardimKaydi ol
 }
 ```
 
-
 ## TODO:
 
-* Yeni data eklenince tüm cache i temizliyor onun düzeltilmesi lazım sadece ilgili cache temizlenecek
-* İp logging kısmını biri kontrol etsin
-* Filter kısmında yazılan queryi isim, adres telefon gibi tüm yerlerde arıyor ama araya boşluk konup birden fazla paramatere yollarsa çalışmaz
-* export scriptlerinde fields kısmında bug var ama acil değil kullanılacaksa bakılır şuan çalışıyor 
+- Yeni data eklenince tüm cache i temizliyor onun düzeltilmesi lazım sadece ilgili cache temizlenecek
+- İp logging kısmını biri kontrol etsin
+- Filter kısmında yazılan queryi isim, adres telefon gibi tüm yerlerde arıyor ama araya boşluk konup birden fazla paramatere yollarsa çalışmaz
+- export scriptlerinde fields kısmında bug var ama acil değil kullanılacaksa bakılır şuan çalışıyor
 
 ## Endpoint Listsi
 
-* /yardim (POST/GET)
-* /yardimet (POST/GET)
-* /ara-yardimet (/GET)
-* /ara-yardim (GET)
-* /yardim/:id (GET)
-* /yardimet/:id (GET)
-* /iletisim (POST)  
-* /yardimet (POST)
-* /ekleYardimKaydi (POST)
+- /yardim (POST/GET)
+- /yardimet (POST/GET)
+- /ara-yardimet (/GET)
+- /ara-yardim (GET)
+- /yardim/:id (GET)
+- /yardimet/:id (GET)
+- /iletisim (POST)
+- /yardimet (POST)
+- /ekleYardimKaydi (POST)
 
-## Scripts 
+## Scripts
 
-* exportYardimEtCsv.js
-`node scripts/exportYardimEtCsv.js`
-YardimEt datasını csv export eder 
-
+- exportYardimEtCsv.js
+  `node scripts/exportYardimEtCsv.js`
+  YardimEt datasını csv export eder
