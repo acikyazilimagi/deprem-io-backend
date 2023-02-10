@@ -30,7 +30,7 @@ router.get("/yardim", async function (req, res) {
     let cacheKey = `yardim_${page}_${limit}${yardimTipi}`;
     if (cache.getCache().has(cacheKey)) {
       data = cache.getCache().get(cacheKey);
-      res.send(data);
+      return res.send(data);
     }
 
     await checkConnection();
@@ -272,7 +272,7 @@ router.get("/yardimet", async function (req, res) {
 
     if (cache.getCache().has(cacheKey)) {
       data = cache.getCache().get(cacheKey);
-      res.send(data);
+      return res.send(data);
     }
     await checkConnection();
 
@@ -470,7 +470,7 @@ router.get("/yardim/:id", async (req, res) => {
 
     if (cache.getCache().has(cacheKey)) {
       data = cache.getCache().get(cacheKey);
-      res.send(data);
+      return res.send(data);
     }
     await checkConnection();
     let results = await Yardim.findById(req.params.id);
@@ -516,7 +516,7 @@ router.get("/yardimet/:id", async (req, res) => {
 
     if (cache.getCache().has(cacheKey)) {
       data = cache.getCache().get(cacheKey);
-      res.send(data);
+      return res.send(data);
     }
     await checkConnection();
     const results = await YardimEt.findById(req.params.id);
