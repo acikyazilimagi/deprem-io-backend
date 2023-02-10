@@ -586,7 +586,7 @@ router.post("/ekleYardimKaydi", (req, res) => {
         });
       }
 
-       //Validate----
+       //
       if (!check.isPhoneNumber(telefon)) {
         return res.status(400).json({
           error: "Lütfen telefon numarasını doğru formatta giriniz.",
@@ -601,7 +601,7 @@ router.post("/ekleYardimKaydi", (req, res) => {
           });
         }
       } 
-      
+
       const newYardimKaydi = new YardimKaydi({
         postId: req.body.postId || "",
         adSoyad: req.body.adSoyad || "",
