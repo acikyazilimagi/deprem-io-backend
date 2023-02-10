@@ -1,14 +1,13 @@
 const express = require("express");
 const router = express.Router();
-const mongoose = require("mongoose");
-const connectDB = require("../mongo-connection");
-const Yardim = require("../models/yardimModel");
 const cache = require("../cache");
 const requestIp = require("request-ip");
-const YardimEt = require("../models/yardimEtModel");
-const Iletisim = require("../models/iletisimModel");
-const YardimKaydi = require("../models/yardimKaydiModel");
 const check = new (require("../lib/Check"))();
+
+const Yardim = require("../models/Yardim");
+const YardimEt = require("../models/YardimEt");
+const Iletisim = require("../models/İletisim");
+const YardimKaydi = require("../models/YardimKaydi");
 
 router.get("/", function (req, res) {
 	res.send("depremio backend");
@@ -609,13 +608,5 @@ router.post("/ekleYardimKaydi", (req, res) => {
 			});
 		});
 });
-
-module.exports = router;
-
-async function checkConnection() {
-	if (mongoose.connection.readyState !== 1) {
-		await connectDB();
-	}
-}
 
 module.exports = router;

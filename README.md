@@ -17,7 +17,7 @@ localhost:8080/yardim?page=1&limit=1
 ## Yardımiste Ekleme (POST)
 Json Yolla
 localhost:8080/yardim
-* /models/yardimModel.js e bak 
+* /models/Yardim.js e bak 
 ÖRNEK JSON POSTU
 
 ```
