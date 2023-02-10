@@ -13,11 +13,16 @@ const  yardimSchema = new mongoose.Schema(
     },
     telefon: {
       type: String,
-      required: false
+      required: false,
+      pattern: /^\d{10}$/,
+      message: "Telefon numarası 10 karakterli olmalıdır"
     },
     yedekTelefonlar: {
       type: [String],
-      required: false
+      required: false,
+      // eğer array ise her biri kontrol edilecek.
+      pattern: /^\d{10}$/,
+      message: "Yedek Telefon numarası 10 karakterli olmalıdır"
     },
     email: {
       type: String,
