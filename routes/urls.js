@@ -593,7 +593,7 @@ router.post("/ekleYardimKaydi", async (req, res) => {
   //const { postId, adSoyad, telefon, sonDurum, email, aciklama } = req.body;
   try {
     await checkConnection();
-    const existingYardimKaydi = await YardimKaydi.findOne({
+    const existingYardimKaydi = await YardimKaydi.findById({
       postId: req.body.postId,
     });
     if (existingYardimKaydi) {
@@ -616,6 +616,10 @@ router.post("/ekleYardimKaydi", async (req, res) => {
         aciklama: req.body.aciklama || "",
       });
       await newYardimKaydi.save();
+    } else {
+      return res.status(400).json({
+        error: "Bu yardım kaydı zaten var, lütfen farklı bir talepte bulunun.",
+      });
     }
   } catch (error) {
     console.log(error);
