@@ -504,10 +504,14 @@ router.get("/yardim/:id", async (req, res) => {
     if (!results) {
       return res.status(404).send("Yardim not found");
     }
-    res.send({
-      results: results,
-      yardimKaydi: yardimKaydi
-    });
+
+    if(!data){
+      res.send({
+        results: results,
+        yardimKaydi: yardimKaydi
+      });
+    }
+   
   } catch (error) {
     console.error(error);
     res.status(500).send("Error occurred while fetching Yardim");
@@ -537,7 +541,10 @@ router.get("/yardimet/:id", async (req, res) => {
     if (!results) {
       return res.status(404).send("Yardim not found");
     }
-    res.send(results);
+    if(!data){
+      res.send(results);
+    }
+    
   } catch (error) {
     console.error(error);
     res.status(500).send("Error occurred while fetching Yardim");
