@@ -12,7 +12,7 @@ services:
       - mongodb
 
   mongodb:
-    restart: always
+    restart: on-failure:3
     image: zcube/bitnami-compat-mongodb
     ports:
       - 27017:27017
