@@ -598,10 +598,14 @@ module.exports = async function (app) {
 
     let yardimEtKaydi = await YardimEtKaydi.find({ postId: req.params.id });
 
-    cache.getCache().set(cacheKey, {
-      results: results,
-      yardimEtKaydi: yardimEtKaydi,
-    });
+    if (yardimEtKaydi.length > 0) {
+      cache.getCache().set(cacheKey, {
+        results: results,
+        yardimEtKaydi: yardimEtKaydi,
+      });
+    } else {
+      cache.getCache().set(cacheKey, {results:results});
+    }
     if (!results) {
       res.statusCode = 404;
       return { status: 404 };
@@ -675,13 +679,13 @@ module.exports = async function (app) {
           type: "object",
           properties: {
             postId: { type: "string" },
-            adSoyad: { type: "string" },
+            adSoyad: { type: "string", minLength: 3 },
             sonDurum: { type: "string" },
             email: { type: "string" },
             aciklama: { type: "string" },
             telefon: { type: "string" },
           },
-          required: ["postId"],
+          required: ["postId","adSoyad", "sonDurum", "telefon", "aciklama"],
         },
       },
     },
@@ -734,9 +738,9 @@ module.exports = async function (app) {
             sonDurum: { type: "string" },
             email: { type: "string" },
             aciklama: { type: "string" },
-            telefon: { type: "string" },
+            telefon: { type: "integer" },
           },
-          required: ["postId"],
+          required: ["postId", "adSoyad", "sonDurum", "telefon", "aciklama"],
         },
       },
     },
@@ -746,17 +750,6 @@ module.exports = async function (app) {
         _id: req.body.postId,
       });
       if (existingYardimEtKaydi) {
-        if (req.body.telefon) {
-          if (req.body.telefon.trim().replace(/ /g, "")) {
-            if (!check.isPhoneNumber(req.body.telefon)) {
-              res.statusCode = 400;
-              return {
-                error: "Lütfen doğru formatta bir telefon numarası giriniz.(örn: 05554443322)"
-              }
-            }
-          }
-          req.body.telefon = req.body.telefon.replace(/ /g, "");
-        }
         const newYardimEtKaydi = new YardimEtKaydi({
           postId: req.body.postId || "",
           adSoyad: req.body.adSoyad || "",
