@@ -117,7 +117,6 @@ module.exports = function (app) {
               minLength: 10,
               maxLength: 11,
               pattern: "^d+$",
-              required: false
               
             },
           },
