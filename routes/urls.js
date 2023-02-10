@@ -21,14 +21,13 @@ router.get("/yardim", async function (req, res) {
     let data;
 
     const yardimTipi = req.query.yardimTipi || "";
-    const sehir = req.query.sehir || "";
-
+    
     const startIndex = (page - 1) * limit;
     const endIndex = page * limit;
 
     const results = {};
 
-    let cacheKey = `yardim_${page}_${limit}${yardimTipi}${sehir}`;
+    let cacheKey = `yardim_${page}_${limit}${yardimTipi}`;
     if (cache.getCache().has(cacheKey)) {
       data = cache.getCache().get(cacheKey);
       return res.send(data);
@@ -53,10 +52,7 @@ router.get("/yardim", async function (req, res) {
     if (yardimTipi !== "") {
       query.yardimTipi = yardimTipi;
     }
-    if (sehir !== "") {
-      query.sehir = sehir;
-    }
-
+    
     results.totalPage = Math.ceil(
       (await Yardim.countDocuments(query)) / limit
     );
