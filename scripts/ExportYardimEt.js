@@ -1,4 +1,8 @@
+<<<<<<< HEAD
 const Database = require("../utils/Database");
+=======
+const Database = require("../mongo-connection");
+>>>>>>> d9ad086 (add export for other models)
 
 const YardimEt = require("../models/YardimEt");
 
