@@ -1,47 +1,45 @@
-const express = require("express");
-const mainRoutes = require("./routes/urls");
-const cache = require("./cache");
-const cacheRoutes = require("./routes/cacheUrls");
-
-const app = express();
-const PORT = process.env.PORT || 8080;
-var cors = require("cors");
 require("dotenv").config();
 
-const mongoUrl = process.env.MONGOURL;
 const mongoose = require("mongoose");
 
-app.use(express.json());
+const fastify = require("fastify");
+const cors = require("@fastify/cors");
+const config = require("./config.js");
+const cache = require("./cache.js");
 
-app.use(
-  cors({
-    origin: "*",
-  })
-);
 
-/*
-app.use(
-  cors({
-    origin: [
-        ""
-    ],
-  })
-);
-*/
+const mainRoutes = require("./routes/urls");
+const cacheRoutes = require("./routes/cache");
 
-app.use("/", mainRoutes);
-app.use("/cache/", cacheRoutes);
-mongoose.set("strictQuery", true);
+
+const app = fastify({
+  trustProxy: true,
+});
+app.register(cors);
+
+mainRoutes(app);
+cacheRoutes(app);
+
+
+app.decorate("mongoose", mongoose);
+app.decorate("cache", cache);
+
 
 // DB connection
 mongoose
-  .connect(mongoUrl, {
+  .connect(config.mongoUrl, {
     useNewUrlParser: true,
     useUnifiedTopology: true,
   })
-  .then((r) => {
+  .then(() => {
     cache.createCacheInstance();
-    console.log("Connected to DB...");
-    app.listen(PORT, () => console.log(`App listening on port ${PORT}...`)); // App start
+    app.log.info("Connected to DB...");
+    return app.listen({
+      port: config.port,
+      host: "0.0.0.0",
+    });
   })
-  .catch((err) => console.log(err));
+  .catch((error) => {
+    app.log.fatal("Uncaught error", error);
+    process.exit(0);
+  });
