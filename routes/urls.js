@@ -589,17 +589,24 @@ router.post("/iletisim", async function (req, res) {
   }
 });
 
-router.post("/ekleYardimKaydi", (req, res) => {
+router.post("/ekleYardimKaydi", async (req, res) => {
   //const { postId, adSoyad, telefon, sonDurum, email, aciklama } = req.body;
-try {
-  Yardim.findById(req.body.postId)
-    .then((post) => {
-      if (!post) {
-        return res.status(400).json({
-          message: "Belirtilen postId bulunamadi.",
-        });
+  try {
+    await checkConnection();
+    const existingYardimKaydi = await YardimKaydi.findOne({
+      postId: req.body.postId,
+    });
+    if (existingYardimKaydi) {
+      if (req.body.telefon) {
+        if (req.body.telefon.trim().replace(/ /g, "")) {
+          if (!/^\d+$/.test(req.body.telefon) || req.body.telefon.length !== 10) {
+            return res.status(400).json({
+              error: "Telefon numarası sadece rakamlardan ve 10 karakterden oluşmalıdır.",
+            });
+          }
+        }
+        req.body.telefon = req.body.telefon.replace(/ /g, "");
       }
-
       const newYardimKaydi = new YardimKaydi({
         postId: req.body.postId || "",
         adSoyad: req.body.adSoyad || "",
@@ -608,32 +615,27 @@ try {
         email: req.body.email || "",
         aciklama: req.body.aciklama || "",
       });
-
-      return newYardimKaydi.save();
-    })
-    .then((createdYardimKaydi) => {
-      res.status(201).json({
-        message: "Yardim kaydi basariyla olusturuldu.",
-        createdYardimKaydi,
+      await newYardimKaydi.save();
+      return res.status(201).json({message: "Yardim kaydi basariyla olusturuldu."});
+    } else {
+      return res.status(400).json({
+        error:
+          "Yardim kaydi bulunamadi, lütfen farklı bir yardim kaydi talebinde bulunun.",
       });
-    })
-    .catch((error) => {
-      res.status(500).json({
-        message: "Yardim kaydi olusturulamadi.",
-        error,
-      });
-    });
-} catch (error) {
-  console.log(error);
-  res.status(500).json({ error: "Hata! Yardım kaydi kaydedilemedi!" });
-}
+    }
+  } catch (error) {
+    console.log(error);
+    res.status(500).json({ error: "Hata! Yardım kaydi kaydedilemedi!" });
+  }
 });
 
-module.exports = router;
-
 async function checkConnection() {
-  if (mongoose.connection.readyState !== 1) {
-    await connectDB();
+  try {
+    if (mongoose.connection.readyState !== 1) {
+      await connectDB();
+    }
+  } catch (error) {
+    console.log(error);
   }
 }
 
