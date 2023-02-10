@@ -28,7 +28,7 @@ router.get("/yardim", async function (req, res) {
 
     const results = {};
 
-    let cacheKey = `yardim_${page}_${limit}${yardimTipi}`;
+    let cacheKey = `yardim_${page}_${limit}${yardimTipi}${sehir}`;
     if (cache.getCache().has(cacheKey)) {
       data = cache.getCache().get(cacheKey);
       return res.send(data);
@@ -95,7 +95,7 @@ router.post("/yardim", async function (req, res) {
   try {
     const { yardimTipi, adSoyad, adres, acilDurum } = req.body;
 
-    if (!(((yardimTipi && adSoyad ) && adres ) && acilDurum)) {
+    if (!(((yardimTipi && adSoyad) && adres) && acilDurum)) {
       return res.status(400).json({
         error: "yardimTipi, adSoyad, adres and acilDurum alanları gerekli",
       });
@@ -175,7 +175,7 @@ router.post("/yardimet", async function (req, res) {
     const { yardimTipi, adSoyad, telefon, sehir } = req.body;
 
     // Validate required fields
-    if (!(((yardimTipi && adSoyad ) && telefon ) && sehir)) {
+    if (!(((yardimTipi && adSoyad) && telefon) && sehir)) {
       return res.status(400).json({
         error: "yardimTipi, adSoyad, telefon, sehir ve ilçe alanları gerekli",
       });
@@ -270,7 +270,7 @@ router.get("/yardimet", async function (req, res) {
 
     let results = {};
 
-    const cacheKey = `yardimet_${page}_${limit}${yardimTipi}${sehir}`;
+    const cacheKey = `yardimet_${page}_${limit}${yardimTipi}${sehir}${hedefSehir}`;
 
     if (cache.getCache().has(cacheKey)) {
       data = cache.getCache().get(cacheKey);
@@ -500,7 +500,7 @@ router.get("/yardim/:id", async (req, res) => {
     if (!results) {
       return res.status(404).send("Yardim not found");
     }
-  if(!data){
+    if (!data) {
       res.send({
         results: results,
         yardimKaydi: yardimKaydi
@@ -536,7 +536,7 @@ router.get("/yardimet/:id", async (req, res) => {
     if (!results) {
       return res.status(404).send("Yardim not found");
     }
-    if(!data){
+    if (!data) {
       res.send(results);
     }
 
