@@ -13,9 +13,11 @@ const mongoose = require("mongoose");
 
 app.use(express.json());
 
-app.use(cors({
-  origin: '*'
-}));
+app.use(
+	cors({
+		origin: "*",
+	}),
+);
 
 /*
 app.use(
@@ -32,13 +34,13 @@ app.use("/cache/", cacheRoutes);
 
 // DB connection
 mongoose
-  .connect(mongoUrl, {
-    useNewUrlParser: true,
-    useUnifiedTopology: true,
-  })
-  .then((r) => {
-    cache.createCacheInstance();
-    console.log("Connected to DB...");
-    app.listen(PORT, () => console.log(`App listening on port ${PORT}...`)); // App start
-  })
-  .catch((err) => console.log(err));
+	.connect(mongoUrl, {
+		useNewUrlParser: true,
+		useUnifiedTopology: true,
+	})
+	.then((r) => {
+		cache.createCacheInstance();
+		console.log("Connected to DB...");
+		app.listen(PORT, () => console.log(`App listening on port ${PORT}...`)); // App start
+	})
+	.catch((err) => console.log(err));

@@ -1,17 +1,12 @@
-require('dotenv').config()
-const mongoUrl = process.env.MONGOURL
+require("dotenv").config();
 
-console.log('mongoUrl', mongoUrl)
+const mongoose = require("mongoose");
 
-const mongoose = require('mongoose')
-const connectDB = async () => {
-   try {
-      await mongoose.connect(mongoUrl)
-
-      console.log('MongoDB connected!!')
-   } catch (err) {
-      console.log('Failed to connect to MongoDB', err)
-   }
-}
-
-module.exports = connectDB
+module.exports.connectDB = async function () {
+	try {
+		mongoose.connect(process.env.MONGOURL);
+		console.log("Veri tabanı bağlantısı sağlandı");
+	} catch (e) {
+		console.log("Veri tabanı bağlantısında hata oluştu", e);
+	}
+};
