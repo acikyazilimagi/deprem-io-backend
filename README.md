@@ -1,10 +1,25 @@
 # deprem-io-backend
 
-## Nasıl deploy edilir
+## Requirements
 
-* Docker dosyasını kullanın
-* Env variable olarak MONGOURL kullanın
-* Container Portu 8080
+* Docker
+* .env dosyasını oluşturunuz
+* Env variable olarak MONGOURL kullanın prod url i proje adminlerinden isteyiniz.
+
+## Local kurulumu
+
+* Dockerfile build alınız
+```
+docker build -t deprem-io-backend .
+```
+
+* Container ı run ediniz
+
+```
+docker run -p 8080:80 -d deprem-io-backend
+```
+
+* localhost:8080/ adresine gidebiliyorsanız proje ayakta demektir.
 
 ## Yardımları listeleme (GET)
 istenen yardımları listeler
