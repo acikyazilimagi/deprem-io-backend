@@ -616,12 +616,6 @@ router.post("/ekleYardimKaydi", async (req, res) => {
         aciklama: req.body.aciklama || "",
       });
       await newYardimKaydi.save();
-      return res.status(201).json({message: "Yardim kaydi basariyla olusturuldu."});
-    } else {
-      return res.status(400).json({
-        error:
-          "Yardim kaydi bulunamadi, lütfen farklı bir yardim kaydi talebinde bulunun.",
-      });
     }
   } catch (error) {
     console.log(error);
