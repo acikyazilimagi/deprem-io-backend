@@ -211,7 +211,7 @@ module.exports = function (app) {
               type: "string",
             },
           },
-          required: ["yardimTipi", "adSoyad", "telefon", "sehir"],
+          required: ["yardimTipi", "adSoyad", "sehir"],
         },
       },
     },
