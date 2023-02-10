@@ -4,7 +4,6 @@ const { Schema } = require("mongoose");
 const yardimKaydiSchema = new mongoose.Schema({
   postId: {
     type: Schema.Types.ObjectId,
-    ref: "Post",
     required: true,
   },
   adSoyad: {
@@ -14,8 +13,8 @@ const yardimKaydiSchema = new mongoose.Schema({
   telefon: {
     type: String,
     required: false,
-    pattern: /^\d{10}$/,
-    message: "Telefon numarası 10 karakterli olmalıdır",
+    pattern: /^\d{10,11}$/,
+    message: "Telefon numarası 10-11 karakterli olmalıdır",
   },
   sonDurum: {
     type: String,

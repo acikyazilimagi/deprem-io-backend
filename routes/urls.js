@@ -5,6 +5,7 @@ const cache = require("../cache");
 const YardimEt = require("../models/yardimEtModel");
 const Iletisim = require("../models/iletisimModel");
 const YardimKaydi = require("../models/yardimKaydiModel");
+const check = new (require("../lib/Check"))();
 
 /**
  * @param {FastifyInstance} app
@@ -116,8 +117,8 @@ module.exports = function (app) {
               type: "string",
               minLength: 10,
               maxLength: 11,
-              pattern: "^d+$",
-              
+              pattern: "^\\d+$",
+
             },
           },
           required: ["yardimTipi", "adSoyad", "adres", "acilDurum"],
@@ -132,7 +133,7 @@ module.exports = function (app) {
         if (req.body.yedekTelefonlar.length > 0) {
           let yedekTelefonlar = req.body.yedekTelefonlar;
           for (let i = 0; i < yedekTelefonlar.length; i++) {
-            if (!/^\d+$/.test(yedekTelefonlar[i]) || yedekTelefonlar[i].length !== 10) {
+            if (!check.isPhoneNumber(yedekTelefonlar[i])) {
               res.statusCode = 400;
               return {
                 error: "Telefon numarası sadece rakamlardan oluşmalıdır.",
@@ -205,7 +206,7 @@ module.exports = function (app) {
               type: "string",
               minLength: 10,
               maxLength: 10,
-              pattern: "^d+$",
+              pattern: "^\\d+$",
             },
             sehir: {
               type: "string",
@@ -532,7 +533,7 @@ module.exports = function (app) {
           return yedekTelefon.replace(/.(?=.{4})/g, "*");
         });
       }
-    } catch (error) {}
+    } catch (error) { }
 
     let yardimKaydi = await YardimKaydi.find({ postId: req.params.id });
 
@@ -656,13 +657,13 @@ module.exports = function (app) {
     },
     async (req, res) => {
       await checkConnection();
-      const existingYardimKaydi = await YardimKaydi.findOne({
-        postId: req.body.postId,
+      const existingYardimKaydi = await Yardim.findOne({
+        _id: req.body.postId,
       });
       if (existingYardimKaydi) {
         if (req.body.telefon) {
           if (req.body.telefon.trim().replace(/ /g, "")) {
-            if (!/^\d+$/.test(req.body.telefon) || req.body.telefon.length !== 10) {
+            if (!check.isPhoneNumber(req.body.telefon)) {
               return res.status(400).json({
                 error: "Telefon numarası sadece rakamlardan ve 10 karakterden oluşmalıdır.",
               });
@@ -679,6 +680,11 @@ module.exports = function (app) {
           aciklama: req.body.aciklama || "",
         });
         await newYardimKaydi.save();
+      } else {
+        res.statusCode = 400;
+        return {
+          error: "postId bulunamadı.",
+        };
       }
 
       return { status: 200 };
