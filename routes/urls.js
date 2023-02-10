@@ -7,6 +7,7 @@ const Iletisim = require("../models/iletisimModel");
 const YardimKaydi = require("../models/yardimKaydiModel");
 const YardimEtKaydi = require("../models/yardimEtKaydiModel");
 const check = new (require("../lib/Check"))();
+const { yardimEtPostIdExists } = require("../lib/middleware");
 
 /**
  * @param {FastifyInstance} app
@@ -738,7 +739,9 @@ module.exports = async function (app) {
             sonDurum: { type: "string" },
             email: { type: "string" },
             aciklama: { type: "string" },
-            telefon: { type: "integer" },
+            telefon: {
+              type: "string",
+              pattern: '^((?:\\+[0-9][-\\s]?)?\\(?0?[0-9]{3}\\)?[-\\s]?[0-9]{3}[-\\s]?[0-9]{2}[-\\s]?[0-9]{2})$'},
           },
           required: ["postId", "adSoyad", "sonDurum", "telefon", "aciklama"],
         },
@@ -746,25 +749,18 @@ module.exports = async function (app) {
     },
     async (req, res) => {
       await checkConnection();
-      const existingYardimEtKaydi = await YardimEt.findOne({
-        _id: req.body.postId,
-      });
-      if (existingYardimEtKaydi) {
+      await yardimEtPostIdExists(req, res);
+
         const newYardimEtKaydi = new YardimEtKaydi({
-          postId: req.body.postId || "",
-          adSoyad: req.body.adSoyad || "",
-          telefon: req.body.telefon || "",
-          sonDurum: req.body.sonDurum || "",
+          postId: req.body.postId,
+          adSoyad: req.body.adSoyad,
+          telefon: req.body.telefon,
+          sonDurum: req.body.sonDurum,
           email: req.body.email || "",
-          aciklama: req.body.aciklama || "",
+          aciklama: req.body.aciklama,
         });
         await newYardimEtKaydi.save();
-      } else {
-        res.statusCode = 400;
-        return {
-          error: "postId bulunamadı.",
-        };
-      }
+
 
       return { status: 200 };
     },
