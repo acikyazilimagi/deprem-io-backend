@@ -26,14 +26,13 @@ router.get("/yardim", async function (req, res) {
     let data;
 
     const yardimTipi = req.query.yardimTipi || "";
-    const sehir = req.query.sehir || "";
 
     const startIndex = (page - 1) * limit;
     const endIndex = page * limit;
 
     const results = {};
 
-    let cacheKey = `yardim_${page}_${limit}${yardimTipi}${sehir}`;
+    let cacheKey = `yardim_${page}_${limit}${yardimTipi}`;
     if (cache.getCache().has(cacheKey)) {
       data = cache.getCache().get(cacheKey);
       return res.send(data);
@@ -57,9 +56,6 @@ router.get("/yardim", async function (req, res) {
     let query = {};
     if (yardimTipi !== "") {
       query.yardimTipi = yardimTipi;
-    }
-    if (sehir !== "") {
-      query.sehir = sehir;
     }
 
     results.totalPage = Math.ceil((await Yardim.countDocuments(query)) / limit);
@@ -91,7 +87,7 @@ router.get("/yardim", async function (req, res) {
     }
   } catch (error) {
     console.log(error);
-    res.status(500).send({ error: "Could not retrieve the Yardim documents." });
+    res.status(500).json({ error: "Could not retrieve the Yardim documents" });
   }
 });
 
@@ -159,7 +155,7 @@ router.post(
   validateResource(createAssistantCandidateSchema),
   async function (req, res) {
     try {
-      const { yardimTipi, adSoyad, telefon, sehir } = req.body;
+      const { yardimTipi, adSoyad, sehir } = req.body;
 
       await checkConnection();
 
@@ -186,7 +182,7 @@ router.post(
       const newYardim = new YardimEt({
         yardimTipi,
         adSoyad,
-        telefon: removeWhiteSpace(telefon),
+        telefon: removeWhiteSpace(req.body.telefon) || "", // optional fields
         sehir,
         ilce: req.body.ilce || "",
         hedefSehir,
@@ -209,7 +205,6 @@ router.post(
       console.log(error);
       res.status(500).json({
         error: "Hata! Yardım dökümanı kaydedilemedi!",
-        message: error.message,
       });
     }
   }
@@ -276,10 +271,14 @@ router.get("/yardimet", async function (req, res) {
     results.data = results.data.map((yardim) => {
       yardim.telefon = yardim.telefon.replace(/.(?=.{4})/g, "*");
       const names = yardim.adSoyad.split(" ");
-      if (names.length > 1) {
-        yardim.adSoyad = `${names[0].charAt(0)}${"*".repeat(
-          names[0].length - 2
-        )} ${names[1].charAt(0)}${"*".repeat(names[1].length - 2)}`;
+
+      if (names.length > 0) {
+        const name = names[0];
+        const surname = names[names.length - 1];
+        // hidden name and surname
+        yardim.adSoyad = `${name[0]}${"*".repeat(name.length - 1)} ${
+          surname[0]
+        }${"*".repeat(surname.length - 1)}`;
       }
       const yedekTelefonlar = yardim.yedekTelefonlar;
       if (yedekTelefonlar) {
@@ -297,18 +296,17 @@ router.get("/yardimet", async function (req, res) {
     }
   } catch (error) {
     console.log(error);
-    res.status(500).send({ error: "Could not retrieve the Yardim documents." });
+    res.status(500).json({ error: "Could not retrieve the Yardim documents!" });
   }
 });
 
 router.get("/ara-yardimet", async (req, res) => {
-  const queryString = req.query.q;
-  const yardimDurumuQuery = req.query.yardimDurumu;
-  const helpType = req.query.yardimTipi || "";
-  const location = req.query.sehir || "";
-  const dest = req.query.hedefSehir || "";
-
   try {
+    const queryString = req.query.q;
+    const yardimDurumuQuery = req.query.yardimDurumu;
+    const helpType = req.query.yardimTipi || "";
+    const location = req.query.sehir || "";
+    const dest = req.query.hedefSehir || "";
     let query = {
       $or: [
         { adSoyad: { $regex: queryString, $options: "i" } },
@@ -361,18 +359,18 @@ router.get("/ara-yardimet", async (req, res) => {
     });
     res.json(results.data);
   } catch (error) {
+    console.log(error);
     res.status(500).json({ message: error.message });
   }
 });
 
 router.get("/ara-yardim", async (req, res) => {
-  const queryString = req.query.q || "";
-  const yardimDurumuQuery = req.query.yardimDurumu;
-  const acilDurumQuery = req.query.acilDurum;
-  const helpType = req.query.yardimTipi;
-  const vehicle = req.query.aracDurumu;
-
   try {
+    const queryString = req.query.q || "";
+    const yardimDurumuQuery = req.query.yardimDurumu;
+    const acilDurumQuery = req.query.acilDurum;
+    const helpType = req.query.yardimTipi;
+    const vehicle = req.query.aracDurumu;
     let query = {
       $or: [
         { adSoyad: { $regex: queryString, $options: "i" } },
@@ -389,8 +387,25 @@ router.get("/ara-yardim", async (req, res) => {
     }
 
     if (vehicle) {
+      let q1 = {
+        $or: [
+          {
+            fields: {
+              aracDurumu: vehicle,
+              kvkk: "on",
+            },
+          },
+          {
+            fields: {
+              aracDurumu: vehicle,
+              kvkk: "",
+            },
+          },
+        ],
+      };
+
       query = {
-        $and: [query, { aracDurumu: vehicle }],
+        $and: [query, q1],
       };
     }
 
@@ -425,6 +440,7 @@ router.get("/ara-yardim", async (req, res) => {
     });
     res.json(results.data);
   } catch (error) {
+    console.log(error);
     res.status(500).json({ message: error.message });
   }
 });
@@ -468,7 +484,7 @@ router.get("/yardim/:id", async (req, res) => {
     }
   } catch (error) {
     console.error(error);
-    res.status(500).send("Error occurred while fetching Yardim");
+    res.status(500).json({ message: error.message });
   }
 });
 
@@ -500,7 +516,7 @@ router.get("/yardimet/:id", async (req, res) => {
     }
   } catch (error) {
     console.error(error);
-    res.status(500).send("Error occurred while fetching Yardim");
+    res.status(500).json({ message: error.message });
   }
 });
 
@@ -524,9 +540,8 @@ router.post(
             "Bu iletişim talebi zaten var, lütfen farklı bir talepte bulunun.",
         });
       }
-
-      // Create a new Yardim document
       const telefon = removeWhiteSpace(req.body.telefon);
+      // Create a new Yardim document
       const newIletisim = new Iletisim({
         adSoyad: req.body.adSoyad || "",
         email: req.body.email || "",
@@ -543,17 +558,28 @@ router.post(
   }
 );
 
-router.post("/ekleYardimKaydi", (req, res) => {
+router.post("/ekleYardimKaydi", async (req, res) => {
   //const { postId, adSoyad, telefon, sonDurum, email, aciklama } = req.body;
-
-  Yardim.findById(req.body.postId)
-    .then((post) => {
-      if (!post) {
-        return res.status(400).json({
-          message: "Belirtilen postId bulunamadi.",
-        });
+  try {
+    await checkConnection();
+    const existingYardimKaydi = await YardimKaydi.findById({
+      postId: req.body.postId,
+    });
+    if (existingYardimKaydi) {
+      if (req.body.telefon) {
+        if (req.body.telefon.trim().replace(/ /g, "")) {
+          if (
+            !/^\d+$/.test(req.body.telefon) ||
+            req.body.telefon.length !== 10
+          ) {
+            return res.status(400).json({
+              error:
+                "Telefon numarası sadece rakamlardan ve 10 karakterden oluşmalıdır.",
+            });
+          }
+        }
+        req.body.telefon = req.body.telefon.replace(/ /g, "");
       }
-
       const newYardimKaydi = new YardimKaydi({
         postId: req.body.postId || "",
         adSoyad: req.body.adSoyad || "",
@@ -562,28 +588,25 @@ router.post("/ekleYardimKaydi", (req, res) => {
         email: req.body.email || "",
         aciklama: req.body.aciklama || "",
       });
-
-      return newYardimKaydi.save();
-    })
-    .then((createdYardimKaydi) => {
-      res.status(201).json({
-        message: "Yardim kaydi basariyla olusturuldu.",
-        createdYardimKaydi,
+      await newYardimKaydi.save();
+    } else {
+      return res.status(400).json({
+        error: "Bu yardım kaydı zaten var, lütfen farklı bir talepte bulunun.",
       });
-    })
-    .catch((error) => {
-      res.status(500).json({
-        message: "Yardim kaydi olusturulamadi.",
-        error,
-      });
-    });
+    }
+  } catch (error) {
+    console.log(error);
+    res.status(500).json({ error: "Hata! Yardım kaydi kaydedilemedi!" });
+  }
 });
 
-module.exports = router;
-
 async function checkConnection() {
-  if (mongoose.connection.readyState !== 1) {
-    await connectDB();
+  try {
+    if (mongoose.connection.readyState !== 1) {
+      await connectDB();
+    }
+  } catch (error) {
+    console.log(error);
   }
 }
 

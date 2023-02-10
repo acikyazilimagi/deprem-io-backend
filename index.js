@@ -13,9 +13,11 @@ const mongoose = require("mongoose");
 
 app.use(express.json());
 
-app.use(cors({
-  origin: '*'
-}));
+app.use(
+  cors({
+    origin: "*",
+  })
+);
 
 /*
 app.use(
@@ -29,6 +31,7 @@ app.use(
 
 app.use("/", mainRoutes);
 app.use("/cache/", cacheRoutes);
+mongoose.set("strictQuery", true);
 
 // DB connection
 mongoose
