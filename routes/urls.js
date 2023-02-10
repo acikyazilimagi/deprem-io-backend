@@ -86,8 +86,7 @@ module.exports = async function (app) {
       results.data = await Yardim.find(query).sort({ _id: -1 }).limit(limit).skip(startIndex).exec();
 
       results.data = results.data.map((yardim) => {
-
-        if(yardim.email){
+        if (yardim.email) {
           yardim.email = check.hideEmailCharacters(yardim.email);
         }
         yardim.telefon = yardim.telefon.replace(/.(?=.{4})/g, "*");
@@ -132,7 +131,7 @@ module.exports = async function (app) {
               type: "string",
             },
             telefon: {
-              type: "string"
+              type: "string",
             },
           },
           required: ["yardimTipi", "adSoyad", "adres", "acilDurum"],
@@ -215,7 +214,7 @@ module.exports = async function (app) {
             yardimTipi: { type: "string" },
             adSoyad: { type: "string" },
             telefon: {
-              type: "string"
+              type: "string",
             },
             sehir: {
               type: "string",
@@ -344,7 +343,7 @@ module.exports = async function (app) {
       results.totalPage = Math.ceil((await YardimEt.countDocuments(searchQuery)) / limit);
 
       results.data = await YardimEt.find(searchQuery).sort({ _id: -1 }).limit(limit).skip(startIndex).exec();
-      results.data = results.data.map((yardim) => { 
+      results.data = results.data.map((yardim) => {
         //console.log('res: '+Object.values(results));
         yardim.telefon = yardim.telefon.replace(/.(?=.{4})/g, "*");
         const names = yardim.adSoyad.split(" ");
@@ -424,7 +423,7 @@ module.exports = async function (app) {
 
       // hidden phone number for security
       results.data = results.data.map((yardim) => {
-       // console.log('res: '+Object.values(results));
+        // console.log('res: '+Object.values(results));
         yardim.telefon = yardim.telefon.replace(/.(?=.{4})/g, "*");
         const names = yardim.adSoyad.split(" ");
         if (names.length > 1) {
@@ -503,8 +502,8 @@ module.exports = async function (app) {
       let results = {};
       results.data = await Yardim.find(query);
       results.data = results.data.map((yardim) => {
-        if(yardim.email){
-          yardim.email=check.hideEmailCharacters(yardim.email);
+        if (yardim.email) {
+          yardim.email = check.hideEmailCharacters(yardim.email);
         }
         yardim.telefon = yardim.telefon.replace(/.(?=.{4})/g, "*");
         const names = yardim.adSoyad.split(" ");
@@ -534,16 +533,14 @@ module.exports = async function (app) {
       return cache.getCache().get(cacheKey);
     }
     await checkConnection();
-    let results = await Yardim.findById(req.params.id);  
+    let results = await Yardim.findById(req.params.id);
     let yardimKaydi = await YardimKaydi.find({ postId: req.params.id });
-    try { 
-
+    try {
       yardimKaydi.map((yardim) => {
-        if(yardim.email){
-          yardim.email=check.hideEmailCharacters(yardim.email);
+        if (yardim.email) {
+          yardim.email = check.hideEmailCharacters(yardim.email);
         }
       });
-      
 
       results.telefon = results.telefon.replace(/.(?=.{4})/g, "*");
       const yedekTelefonlar = results.yedekTelefonlar;
@@ -552,9 +549,7 @@ module.exports = async function (app) {
           return yedekTelefon.replace(/.(?=.{4})/g, "*");
         });
       }
-    } catch (error) { }
-
-    
+    } catch (error) {}
 
     cache.getCache().set(cacheKey, {
       results: results,
@@ -678,8 +673,8 @@ module.exports = async function (app) {
             if (!check.isPhoneNumber(req.body.telefon)) {
               res.statusCode = 400;
               return {
-                error: "Lütfen doğru formatta bir telefon numarası giriniz.(örn: 05554443322)"
-              }
+                error: "Lütfen doğru formatta bir telefon numarası giriniz.(örn: 05554443322)",
+              };
             }
           }
           req.body.telefon = req.body.telefon.replace(/ /g, "");
