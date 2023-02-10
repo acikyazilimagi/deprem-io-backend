@@ -63,6 +63,8 @@ router.get("/yardim", async function (req, res) {
       .exec();
 
     results.data = results.data.map((yardim) => {
+
+      yardim.email = check.hideEmailCharacters(yardim.email); 
       yardim.telefon = yardim.telefon.replace(/.(?=.{4})/g, "*");
       const names = yardim.adSoyad.split(" ");
       if (names.length > 1) {
@@ -95,7 +97,7 @@ router.post("/yardim", async function (req, res) {
       return res.status(400).json({
         error: "yardimTipi, adSoyad, adres and acilDurum alanları gerekli",
       });
-    }
+    } 
     if (req.body.telefon.trim().replace(/ /g, "")) {
       if (!/^\d+$/.test(req.body.telefon)) {
         return res.status(400).json({
@@ -311,6 +313,7 @@ router.get("/yardimet", async function (req, res) {
       .skip(startIndex)
       .exec();
     results.data = results.data.map((yardim) => {
+      yardim.email = check.hideEmailCharacters(yardim.email);
       yardim.telefon = yardim.telefon.replace(/.(?=.{4})/g, "*");
       const names = yardim.adSoyad.split(" ");
       if (names.length > 1) {
@@ -378,8 +381,9 @@ router.get("/ara-yardimet", async (req, res) => {
     let results = {};
     results.data = await YardimEt.find(query);
 
-    // hidden phone number for security
+    // hidden phone number & email for security
     results.data = results.data.map((yardim) => {
+      yardim.email = check.hideEmailCharacters(yardim.email);
       yardim.telefon = yardim.telefon.replace(/.(?=.{4})/g, "*");
       const names = yardim.adSoyad.split(" ");
       if (names.length > 1) {
@@ -443,6 +447,7 @@ router.get("/ara-yardim", async (req, res) => {
     let results = {};
     results.data = await Yardim.find(query);
     results.data = results.data.map((yardim) => {
+      yardim.email = check.hideEmailCharacters(yardim.email);
       yardim.telefon = yardim.telefon.replace(/.(?=.{4})/g, "*");
       const names = yardim.adSoyad.split(" ");
       if (names.length > 1) {
@@ -476,6 +481,7 @@ router.get("/yardim/:id", async (req, res) => {
     await checkConnection();
     let results = await Yardim.findById(req.params.id);
     try {
+      results.email = check.hideEmailCharacters(results.email);
       results.telefon = results.telefon.replace(/.(?=.{4})/g, "*");
       const yedekTelefonlar = results.yedekTelefonlar;
       if (results.yedekTelefonlar) {
@@ -521,6 +527,7 @@ router.get("/yardimet/:id", async (req, res) => {
     }
     await checkConnection();
     const results = await YardimEt.findById(req.params.id);
+    results.email = check.hideEmailCharacters(results.email);
     results.telefon = results.telefon.replace(/.(?=.{4})/g, "*");
     const yedekTelefonlar = results.yedekTelefonlar;
     if (results.yedekTelefonlar) {
