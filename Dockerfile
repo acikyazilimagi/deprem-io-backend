@@ -1,8 +1,5 @@
 FROM node:18-alpine AS build
 
-ENV PORT 80
-ENV HOST 0.0.0.0
-
 WORKDIR /app
 
 COPY package*.json ./
