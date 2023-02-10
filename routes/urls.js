@@ -588,7 +588,7 @@ router.post("/ekleYardimKaydi", (req, res) => {
       }
 
        //
-      if (!check.isPhoneNumber(telefon)) {
+      if (!check.isPhoneNumber(req.body.telefon )) {
         return res.status(400).json({
           error: "Lütfen telefon numarasını doğru formatta giriniz.",
         });
@@ -621,6 +621,7 @@ router.post("/ekleYardimKaydi", (req, res) => {
       });
     })
     .catch((error) => {
+      console.log(error);
       res.status(500).json({
         message: "Yardim kaydi olusturulamadi.",
         error,
