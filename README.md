@@ -1,12 +1,36 @@
-# `deprem.io` backend
+# deprem-io-backend
 
 Bu proje deprem.io sitesinin backend implementasyonunu icerir.
-This project includes the implementation of the deprem.io website.
+* **English**: This project includes the implementation of the deprem.io website.
 
-## Nasıl deploy edilir? (How can I deploy?)
+## Requirements
 
-* Docker dosyasını kullanın ve env variable olarak MONGOURL kullanın
-* **English**: Use a dockerfile and set environment variable for MONGOURL.
+* Docker
+* .env dosyasını oluşturunuz içerisine .env-example da yazılanları koyunuz.
+* `MONGOURL` env. variable değerini proje leadlerinden isteyiniz
+
+
+* **English**:
+* Create .env file and copy content from .env-example
+* Get `MONGOURL` variable value from the project leads
+
+## Local Installment
+
+* Dockerfile build alınız
+* **English**:  Build docker container with following command 
+```
+docker build -t deprem-io-backend .
+```
+
+* Container ı run ediniz
+* **English**: Run docker container with following command
+```
+docker run -p 8080:80 -d deprem-io-backend
+```
+
+* localhost:8080/ adresine gidebiliyorsanız proje ayakta demektir.
+* **English**: if you are able to load localhost:8080/ url, good job project is running up.
+
 
 ## Postman Workspace
 https://www.postman.com/minikdev/workspace/depremio
