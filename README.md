@@ -43,7 +43,10 @@ localhost:8080/yardim
 
 ## YardımEt ekleme (GET)
 insanların sağladığı yardımları listeler
-localhost:8080/yardimet
+* localhost:8080/yardimet
+
+Şehir filtrelemesi:
+* localhost:8080/yardimet?sehir=Istanbul
 
 ## YardımEt ekleme (POST)
 Json Yolla
