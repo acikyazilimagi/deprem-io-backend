@@ -10,9 +10,26 @@ const check = new (require("../lib/Check"))();
 /**
  * @param {FastifyInstance} app
  */
-module.exports = function (app) {
-  app.get("/", () => ({ status: "up" }));
-
+module.exports = async function (app) {
+  app.get(
+    "/",
+    {
+      schema: {
+        tags: ["main"],
+        description: "Main page",
+        response: {
+          200: {
+            description: "Successful response",
+            type: "object",
+            properties: {
+              status: { type: "string" },
+            },
+          },
+        },
+      },
+    },
+    () => ({ status: "up" }),
+  );
   app.get(
     "/yardim",
     {
@@ -34,6 +51,7 @@ module.exports = function (app) {
           },
           required: [],
         },
+        description: "Yardim listesi",
       },
     },
     async function (req, res) {
@@ -115,8 +133,6 @@ module.exports = function (app) {
               maxLength: 11,
 
               pattern: "^\\d+$",
-
-
             },
           },
           required: ["yardimTipi", "adSoyad", "adres", "acilDurum"],
@@ -522,7 +538,7 @@ module.exports = function (app) {
           return yedekTelefon.replace(/.(?=.{4})/g, "*");
         });
       }
-    } catch (error) { }
+    } catch (error) {}
 
     let yardimKaydi = await YardimKaydi.find({ postId: req.params.id });
 
