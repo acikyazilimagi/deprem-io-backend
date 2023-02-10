@@ -53,9 +53,7 @@ router.get("/yardim", async function (req, res) {
       query.yardimTipi = yardimTipi;
     }
 
-    results.totalPage = Math.ceil(
-      (await Yardim.countDocuments(query)) / limit
-    );
+    results.totalPage = Math.ceil((await Yardim.countDocuments(query)) / limit);
     results.data = await Yardim.find(query)
       .sort({ _id: -1 })
       .limit(limit)
@@ -66,8 +64,9 @@ router.get("/yardim", async function (req, res) {
       yardim.telefon = yardim.telefon.replace(/.(?=.{4})/g, "*");
       const names = yardim.adSoyad.split(" ");
       if (names.length > 1) {
-        yardim.adSoyad =
-          `${names[0].charAt(0)}${"*".repeat(names[0].length - 2)} ${names[1].charAt(0)}${"*".repeat(names[1].length - 2)}`;
+        yardim.adSoyad = `${names[0].charAt(0)}${"*".repeat(
+          names[0].length - 2
+        )} ${names[1].charAt(0)}${"*".repeat(names[1].length - 2)}`;
       }
       const yedekTelefonlar = yardim.yedekTelefonlar;
       if (yedekTelefonlar) {
@@ -91,7 +90,7 @@ router.post("/yardim", async function (req, res) {
   try {
     const { yardimTipi, adSoyad, adres, acilDurum } = req.body;
 
-    if (!(((yardimTipi && adSoyad) && adres) && acilDurum)) {
+    if (!(yardimTipi && adSoyad && adres && acilDurum)) {
       return res.status(400).json({
         error: "yardimTipi, adSoyad, adres and acilDurum alanları gerekli",
       });
@@ -173,7 +172,7 @@ router.post("/yardimet", async function (req, res) {
     const { yardimTipi, adSoyad, telefon, sehir } = req.body;
 
     // Validate required fields
-    if (!(((yardimTipi && adSoyad) && telefon) && sehir)) {
+    if (!(yardimTipi && adSoyad && telefon && sehir)) {
       return res.status(400).json({
         error: "yardimTipi, adSoyad, telefon, sehir ve ilçe alanları gerekli",
       });
@@ -314,6 +313,7 @@ router.get("/yardimet", async function (req, res) {
     results.data = results.data.map((yardim) => {
       yardim.telefon = yardim.telefon.replace(/.(?=.{4})/g, "*");
       const names = yardim.adSoyad.split(" ");
+
       if (names.length > 0) {
         const name = names[0];
         const surname = names[names.length - 1];
@@ -385,8 +385,9 @@ router.get("/ara-yardimet", async (req, res) => {
       yardim.telefon = yardim.telefon.replace(/.(?=.{4})/g, "*");
       const names = yardim.adSoyad.split(" ");
       if (names.length > 1) {
-        yardim.adSoyad =
-          `${names[0].charAt(0)}${"*".repeat(names[0].length - 2)} ${names[1].charAt(0)}${"*".repeat(names[1].length - 2)}`;
+        yardim.adSoyad = `${names[0].charAt(0)}${"*".repeat(
+          names[0].length - 2
+        )} ${names[1].charAt(0)}${"*".repeat(names[1].length - 2)}`;
       }
       const yedekTelefonlar = yardim.yedekTelefonlar;
       if (yedekTelefonlar) {
@@ -426,8 +427,25 @@ router.get("/ara-yardim", async (req, res) => {
     }
 
     if (vehicle) {
+      let q1 = {
+        $or: [
+          {
+            fields: {
+              aracDurumu: vehicle,
+              kvkk: "on",
+            },
+          },
+          {
+            fields: {
+              aracDurumu: vehicle,
+              kvkk: "",
+            },
+          },
+        ],
+      };
+
       query = {
-        $and: [query, { aracDurumu: vehicle }],
+        $and: [query, q1],
       };
     }
 
@@ -448,8 +466,9 @@ router.get("/ara-yardim", async (req, res) => {
       yardim.telefon = yardim.telefon.replace(/.(?=.{4})/g, "*");
       const names = yardim.adSoyad.split(" ");
       if (names.length > 1) {
-        yardim.adSoyad =
-          `${names[0].charAt(0)}${"*".repeat(names[0].length - 2)} ${names[1].charAt(0)}${"*".repeat(names[1].length - 2)}`;
+        yardim.adSoyad = `${names[0].charAt(0)}${"*".repeat(
+          names[0].length - 2
+        )} ${names[1].charAt(0)}${"*".repeat(names[1].length - 2)}`;
       }
       const yedekTelefonlar = yardim.yedekTelefonlar;
       if (yedekTelefonlar) {
@@ -486,15 +505,13 @@ router.get("/yardim/:id", async (req, res) => {
           return yedekTelefon.replace(/.(?=.{4})/g, "*");
         });
       }
-
-    } catch (error) {
-    }
+    } catch (error) {}
 
     let yardimKaydi = await YardimKaydi.find({ postId: req.params.id });
 
     cache.getCache().set(cacheKey, {
       results: results,
-      yardimKaydi: yardimKaydi
+      yardimKaydi: yardimKaydi,
     });
     if (!results) {
       return res.status(404).send("Yardim not found");
@@ -502,10 +519,9 @@ router.get("/yardim/:id", async (req, res) => {
     if (!data) {
       res.send({
         results: results,
-        yardimKaydi: yardimKaydi
+        yardimKaydi: yardimKaydi,
       });
     }
-
   } catch (error) {
     console.error(error);
     res.status(500).json({ message: error.message });
@@ -538,7 +554,6 @@ router.get("/yardimet/:id", async (req, res) => {
     if (!data) {
       res.send(results);
     }
-
   } catch (error) {
     console.error(error);
     res.status(500).json({ message: error.message });
