@@ -86,6 +86,10 @@ module.exports = async function (app) {
       results.data = await Yardim.find(query).sort({ _id: -1 }).limit(limit).skip(startIndex).exec();
 
       results.data = results.data.map((yardim) => {
+
+        if(yardim.email){
+          yardim.email = check.hideEmailCharacters(yardim.email);
+        }
         yardim.telefon = yardim.telefon.replace(/.(?=.{4})/g, "*");
         const names = yardim.adSoyad.split(" ");
         if (names.length > 1) {
@@ -351,7 +355,8 @@ module.exports = async function (app) {
       results.totalPage = Math.ceil((await YardimEt.countDocuments(searchQuery)) / limit);
 
       results.data = await YardimEt.find(searchQuery).sort({ _id: -1 }).limit(limit).skip(startIndex).exec();
-      results.data = results.data.map((yardim) => {
+      results.data = results.data.map((yardim) => { 
+        //console.log('res: '+Object.values(results));
         yardim.telefon = yardim.telefon.replace(/.(?=.{4})/g, "*");
         const names = yardim.adSoyad.split(" ");
         if (names.length > 0) {
@@ -430,6 +435,7 @@ module.exports = async function (app) {
 
       // hidden phone number for security
       results.data = results.data.map((yardim) => {
+       // console.log('res: '+Object.values(results));
         yardim.telefon = yardim.telefon.replace(/.(?=.{4})/g, "*");
         const names = yardim.adSoyad.split(" ");
         if (names.length > 1) {
@@ -508,6 +514,9 @@ module.exports = async function (app) {
       let results = {};
       results.data = await Yardim.find(query);
       results.data = results.data.map((yardim) => {
+        if(yardim.email){
+          yardim.email=check.hideEmailCharacters(yardim.email);
+        }
         yardim.telefon = yardim.telefon.replace(/.(?=.{4})/g, "*");
         const names = yardim.adSoyad.split(" ");
         if (names.length > 1) {
@@ -538,6 +547,8 @@ module.exports = async function (app) {
     await checkConnection();
     let results = await Yardim.findById(req.params.id);
     try {
+
+      //console.log('res email: '+results.email);
       results.telefon = results.telefon.replace(/.(?=.{4})/g, "*");
       const yedekTelefonlar = results.yedekTelefonlar;
       if (results.yedekTelefonlar) {
