@@ -2,14 +2,18 @@ version: '3.9'
 
 services:
   app:
+    restart: always
     build: .
     ports:
       - 8080:8080
     environment:
-      - MONGOURL=mongodb://db:27017
+      - MONGOURL=mongodb://mongodb:27017
+    depends_on:
+      - mongodb
 
-  db:
-    image: bitnami/mongodb
+  mongodb:
+    restart: always
+    image: zcube/bitnami-compat-mongodb
     ports:
       - 27017:27017
     volumes:
