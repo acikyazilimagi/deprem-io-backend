@@ -115,8 +115,10 @@ module.exports = function (app) {
             telefon: {
               type: "string",
               minLength: 10,
-              maxLength: 10,
+              maxLength: 11,
               pattern: "^d+$",
+              required: false
+              
             },
           },
           required: ["yardimTipi", "adSoyad", "adres", "acilDurum"],
