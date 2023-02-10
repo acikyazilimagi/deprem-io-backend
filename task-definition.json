@@ -1,4 +1,5 @@
 {
+  "$schema": "https://ecs-intellisense.s3-us-west-2.amazonaws.com/task-definition/schema.json",
   "containerDefinitions": [
     {
       "name": "container-name",
@@ -13,7 +14,10 @@
         }
       ],
       "essential": true,
-      "environment": [],
+      "environment": [{
+        "name": "NODE_ENV",
+        "value": "production"
+      }],
       "mountPoints": [],
       "volumesFrom": [],
       "secrets": [
