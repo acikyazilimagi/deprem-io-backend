@@ -13,9 +13,7 @@ const yardimKaydiSchema = new mongoose.Schema({
   },
   telefon: {
     type: String,
-    required: false,
-    pattern: /^\d{10,11}$/,
-    message: "Telefon numarası 10-11 karakterli olmalıdır",
+    required: false
   },
   sonDurum: {
     type: String,
