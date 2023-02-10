@@ -522,10 +522,17 @@ module.exports = function (app) {
       return cache.getCache().get(cacheKey);
     }
     await checkConnection();
-    let results = await Yardim.findById(req.params.id);
-    try {
+    let results = await Yardim.findById(req.params.id);  
+    let yardimKaydi = await YardimKaydi.find({ postId: req.params.id });
+    try { 
 
-      //console.log('res email: '+results.email);
+      yardimKaydi.map((yardim) => {
+        if(yardim.email){
+          yardim.email=check.hideEmailCharacters(yardim.email);
+        }
+      });
+      
+
       results.telefon = results.telefon.replace(/.(?=.{4})/g, "*");
       const yedekTelefonlar = results.yedekTelefonlar;
       if (results.yedekTelefonlar) {
@@ -535,7 +542,7 @@ module.exports = function (app) {
       }
     } catch (error) { }
 
-    let yardimKaydi = await YardimKaydi.find({ postId: req.params.id });
+    
 
     cache.getCache().set(cacheKey, {
       results: results,
