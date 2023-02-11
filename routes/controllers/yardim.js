@@ -1,44 +1,55 @@
-const cache = require("../../cache");
+const { readCache, writeCache } = require("../../middlewares/cacheMiddleware");
 const check = new (require("../../lib/Check"))();
 const { checkConnection } = require("../utils");
 const Yardim = require("../../models/yardimModel");
 const YardimKaydi = require("../../models/yardimKaydiModel");
 
+const getYardimCacheKeyGenerator = (request) => {
+  const { page, limit, yardimTipi } = request.query;
+  if (page === undefined || limit === undefined || yardimTipi === undefined) {
+    return undefined;
+  }
+  return `yardim_${request.query.page}_${request.query.limit}${request.query.yardimTipi}`;
+};
+
+const getYardimSchema = {
+  querystring: {
+    type: "object",
+    properties: {
+      page: {
+        type: "number",
+        default: 1,
+      },
+      limit: {
+        type: "number",
+        default: 10,
+      },
+      yardimTipi: {
+        type: "string",
+      },
+    },
+    required: [],
+  },
+  description: "Yardim listesi",
+};
+
+/**
+ *
+ * @param {FastifyInstance} fastifyInstance
+ */
 module.exports = async function (fastifyInstance) {
   fastifyInstance.get(
     "/yardim",
     {
-      schema: {
-        querystring: {
-          type: "object",
-          properties: {
-            page: {
-              type: "number",
-              default: 1,
-            },
-            limit: {
-              type: "number",
-              default: 10,
-            },
-            yardimTipi: {
-              type: "string",
-            },
-          },
-          required: [],
-        },
-        description: "Yardim listesi",
-      },
+      schema: getYardimSchema,
+      preHandler: readCache(getYardimCacheKeyGenerator),
+      onSend: writeCache(getYardimCacheKeyGenerator),
     },
     async function (req, res) {
       const { page, limit, yardimTipi } = req.query;
       const startIndex = (page - 1) * limit;
       const endIndex = page * limit;
       const results = {};
-
-      let cacheKey = `yardim_${page}_${limit}${yardimTipi}`;
-      if (cache.getCache().has(cacheKey)) {
-        return cache.getCache().get(cacheKey);
-      }
 
       await checkConnection(fastifyInstance);
       if (endIndex < (await Yardim.countDocuments().exec())) {
@@ -79,8 +90,6 @@ module.exports = async function (fastifyInstance) {
         }
         return yardim;
       });
-
-      cache.getCache().set(cacheKey, results);
 
       return results;
     },
