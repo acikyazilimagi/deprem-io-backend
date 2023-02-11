@@ -7,10 +7,12 @@ const yardimEtSchema = new mongoose.Schema(
       // Yolcu Taşıma - konaklama - işmakinesi kullanma
       type: String,
       required: true,
+      maxLength: 1000,
     },
     adSoyad: {
       type: String,
       required: true,
+      maxLength: 1000,
     },
     telefon: {
       type: String,
@@ -36,13 +38,13 @@ const yardimEtSchema = new mongoose.Schema(
     aciklama: {
       type: String,
       required: false,
+      maxLength: 10000,
     },
     fields: {
       // Tüm alternatif kullanımlar için buraya json yollayın
       type: Object,
       required: false,
     },
-
     yardimDurumu: {
       type: String,
       enum: ["bekleniyor", "yolda", "yapildi"],
@@ -55,7 +57,7 @@ const yardimEtSchema = new mongoose.Schema(
       select: false,
     },
   },
-  { timestamps: true },
+  { timestamps: true }
 );
 
 const YardimEt = mongoose.model("yardimet", yardimEtSchema);

@@ -10,6 +10,7 @@ const yardimKaydiSchema = new mongoose.Schema({
   adSoyad: {
     type: String,
     required: true,
+    maxLength: 1000,
   },
   telefon: {
     type: String,
@@ -32,6 +33,7 @@ const yardimKaydiSchema = new mongoose.Schema({
   aciklama: {
     type: String,
     required: true,
+    maxLength: 10000,
   },
 });
 
