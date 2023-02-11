@@ -6,12 +6,13 @@ const iletisimSchema = new mongoose.Schema(
     adSoyad: {
       type: String,
       required: false,
+      maxLength: 1000,
     },
     email: {
       type: String,
       required: false,
+      maxLength: 1000,
     },
-
     telefon: {
       type: String,
       required: false,
@@ -19,6 +20,7 @@ const iletisimSchema = new mongoose.Schema(
     mesaj: {
       type: String,
       required: false,
+      maxLength: 10000,
     },
     ip: {
       type: String,

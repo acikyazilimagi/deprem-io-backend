@@ -7,10 +7,12 @@ const yardimSchema = new mongoose.Schema(
       // Gıda, İlaç, Enkaz, Isınma, Kayıp
       type: String,
       required: true,
+      maxLength: 1000,
     },
     adSoyad: {
       type: String,
       required: true,
+      maxLength: 1000,
     },
     telefon: {
       type: String,
@@ -23,14 +25,17 @@ const yardimSchema = new mongoose.Schema(
     email: {
       type: String,
       required: false,
+      maxLength: 1000,
     },
     adres: {
       type: String,
       required: true,
+      maxLength: 10000,
     },
     adresTarifi: {
       type: String,
       required: false,
+      maxLength: 10000,
     },
     acilDurum: {
       type: String,
@@ -40,6 +45,7 @@ const yardimSchema = new mongoose.Schema(
     kisiSayisi: {
       type: String,
       required: false,
+      maxLength: 1000,
     },
     yardimDurumu: {
       type: String,
@@ -49,15 +55,18 @@ const yardimSchema = new mongoose.Schema(
     fizikiDurum: {
       type: String,
       required: false,
+      maxLength: 1000,
     },
     googleMapLink: {
       type: String,
       required: false,
+      maxLength: 1000,
     },
 
     tweetLink: {
       type: String,
       required: false,
+      maxLength: 1000,
     },
 
     fields: {
