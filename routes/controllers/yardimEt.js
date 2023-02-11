@@ -2,6 +2,7 @@ const cache = require("../../cache");
 const check = new (require("../../lib/Check"))();
 const { checkConnection } = require("../utils");
 const YardimEt = require("../../models/yardimEtModel");
+const YardimKaydi = require("../../models/yardimKaydiModel");
 
 module.exports = async function (fastifyInstance) {
   fastifyInstance.post(
@@ -173,6 +174,7 @@ module.exports = async function (fastifyInstance) {
   );
 
   fastifyInstance.get("/yardimet/:id", async (req, res) => {
+    
     const cacheKey = `yardimet_${req.params.id}`;
 
     if (cache.getCache().has(cacheKey)) {
@@ -180,6 +182,14 @@ module.exports = async function (fastifyInstance) {
     }
     await checkConnection(fastifyInstance);
     const results = await YardimEt.findById(req.params.id);
+    let yardimKaydi = await YardimKaydi.find({ postId: req.params.id });
+    try {
+      yardimKaydi.map((yardim) => {
+        if (yardim.email) {
+          yardim.email = check.hideEmailCharacters(yardim.email);
+        }
+      });
+    } catch (error) {}
     results.telefon = results.telefon.replace(/.(?=.{4})/g, "*");
     const yedekTelefonlar = results.yedekTelefonlar;
     if (results.yedekTelefonlar) {
@@ -193,7 +203,10 @@ module.exports = async function (fastifyInstance) {
       return { status: 404 };
     }
 
-    return results;
+    return {
+      results,
+      yardimKaydi,
+    };
   });
 
   fastifyInstance.get(
