@@ -108,13 +108,12 @@ module.exports = async function (fastifyInstance) {
         },
       },
     },
-    // @ts-ignore
+
     async function (req, res) {
       const { page, limit, yardimTipi, sehir, hedefSehir } = req.query;
       const startIndex = (page - 1) * limit;
       const endIndex = page * limit;
 
-      // @ts-ignore
       let data;
       let results = {};
 
@@ -179,12 +178,11 @@ module.exports = async function (fastifyInstance) {
     }
 
     const results = await YardimEt.findById(req.params.id);
-    // @ts-ignore
+
     results.telefon = results.telefon.replace(/.(?=.{4})/g, "*");
     const yedekTelefonlar = results.yedekTelefonlar;
     if (results.yedekTelefonlar) {
       results.yedekTelefonlar = yedekTelefonlar.map((yedekTelefon) => {
-        // @ts-ignore
         return yedekTelefon.replace(/.(?=.{4})/g, "*");
       });
     }
@@ -214,7 +212,7 @@ module.exports = async function (fastifyInstance) {
         },
       },
     },
-    // @ts-ignore
+
     async (req, res) => {
       const queryString = req.query.q;
       const yardimDurumuQuery = req.query.yardimDurumu;
@@ -226,28 +224,24 @@ module.exports = async function (fastifyInstance) {
       };
 
       if (helpType) {
-        // @ts-ignore
         query = {
           $and: [query, { yardimTipi: helpType }],
         };
       }
 
       if (location) {
-        // @ts-ignore
         query = {
           $and: [query, { sehir: location }],
         };
       }
 
       if (dest) {
-        // @ts-ignore
         query = {
           $and: [query, { hedefSehir: dest }],
         };
       }
 
       if (yardimDurumuQuery) {
-        // @ts-ignore
         query = {
           $and: [query, { yardimDurumu: yardimDurumuQuery }],
         };

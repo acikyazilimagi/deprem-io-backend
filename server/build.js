@@ -49,7 +49,6 @@ module.exports = function () {
     dir: path.join(__dirname, "../routes/controllers"),
   });
 
-  // @ts-ignore
   cacheRoutes(app);
 
   return app;

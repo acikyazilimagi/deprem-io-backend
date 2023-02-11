@@ -8,7 +8,7 @@ const app = buildServer();
 const Database = require("./utils/Database");
 
 // DB connection
-Database.connect()
+Database.connect(app.log.info)
   .then(() => {
     cache.createCacheInstance();
     app.log.info("Connected to DB...");

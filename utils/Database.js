@@ -2,12 +2,12 @@ require("dotenv").config();
 
 const mongoose = require("mongoose");
 
-module.exports.connect = async function () {
+module.exports.connect = async function (log = (m) => {}) {
   try {
     await connection;
-    console.log("Veri tabanı bağlantısı sağlandı");
+    log("Veri tabanı bağlantısı sağlandı");
   } catch (e) {
-    console.error("Veri tabanı bağlantısında hata oluştu", e);
+    log("Veri tabanı bağlantısında hata oluştu");
     process.exit(1);
   }
 };
@@ -16,7 +16,6 @@ const connection = new Promise(function (resolve, reject) {
   mongoose.connect(
     process.env.MONGOURL,
     {
-      // @ts-ignore
       useNewUrlParser: true,
       useUnifiedTopology: true,
     },

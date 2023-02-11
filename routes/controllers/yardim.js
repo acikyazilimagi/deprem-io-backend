@@ -29,7 +29,7 @@ module.exports = async function (fastifyInstance) {
         description: "Yardim listesi",
       },
     },
-    // @ts-ignore
+
     async function (req, res) {
       const { page, limit, yardimTipi } = req.query;
       const startIndex = (page - 1) * limit;
@@ -198,12 +198,10 @@ module.exports = async function (fastifyInstance) {
         }
       });
 
-      // @ts-ignore
       results.telefon = results.telefon.replace(/.(?=.{4})/g, "*");
       const yedekTelefonlar = results.yedekTelefonlar;
       if (results.yedekTelefonlar) {
         results.yedekTelefonlar = yedekTelefonlar.map((yedekTelefon) => {
-          // @ts-ignore
           return yedekTelefon.replace(/.(?=.{4})/g, "*");
         });
       }
@@ -241,7 +239,7 @@ module.exports = async function (fastifyInstance) {
         },
       },
     },
-    // @ts-ignore
+
     async (req, res) => {
       const queryString = req.query.q || "";
       const yardimDurumuQuery = req.query.yardimDurumu;
@@ -258,28 +256,24 @@ module.exports = async function (fastifyInstance) {
       };
 
       if (helpType) {
-        // @ts-ignore
         query = {
           $and: [query, { yardimTipi: helpType }],
         };
       }
 
       if (vehicle) {
-        // @ts-ignore
         query = {
           $and: [query, { aracDurumu: vehicle }],
         };
       }
 
       if (yardimDurumuQuery) {
-        // @ts-ignore
         query = {
           $and: [query, { yardimDurumu: yardimDurumuQuery }],
         };
       }
 
       if (acilDurumQuery) {
-        // @ts-ignore
         query = {
           $and: [query, { acilDurum: acilDurumQuery }],
         };
