@@ -32,6 +32,7 @@ module.exports = async function (fastifyInstance) {
       },
     },
     async function (req, res) {
+      req.body = check.xssFilter(req.body);
       const { yardimTipi, adSoyad, telefon, sehir, yedekTelefonlar } = req.body;
 
       if (telefon && !check.isPhoneNumber(telefon)) {

@@ -19,6 +19,7 @@ module.exports = async function (fastifyInstance) {
       },
     },
     async function (req, res) {
+      req.body = check.xssFilter(req.body);
       await checkConnection(fastifyInstance);
 
       const existingIletisim = await Iletisim.findOne({
@@ -30,7 +31,8 @@ module.exports = async function (fastifyInstance) {
       if (existingIletisim) {
         res.statusCode = 400;
         return {
-          error: "Bu iletişim talebi zaten var, lütfen farklı bir talepte bulunun.",
+          error:
+            "Bu iletişim talebi zaten var, lütfen farklı bir talepte bulunun.",
         };
       }
 
@@ -39,7 +41,8 @@ module.exports = async function (fastifyInstance) {
       if (telefon && !check.isPhoneNumber(telefon)) {
         res.statusCode = 400;
         return {
-          error: "Lütfen doğru formatta bir telefon numarası giriniz.(örn: 05554443322)",
+          error:
+            "Lütfen doğru formatta bir telefon numarası giriniz.(örn: 05554443322)",
         };
       }
 
@@ -54,6 +57,6 @@ module.exports = async function (fastifyInstance) {
 
       await newIletisim.save();
       return { message: "İletişim talebiniz başarıyla alındı" };
-    },
+    }
   );
 };

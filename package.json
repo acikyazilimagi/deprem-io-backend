@@ -28,7 +28,8 @@
     "dotenv": "^16.0.3",
     "fastify": "^4.13.0",
     "mongoose": "^6.9.1",
-    "node-cache": "^5.1.2"
+    "node-cache": "^5.1.2",
+    "xss": "^1.0.14"
   },
   "devDependencies": {
     "@vitest/coverage-c8": "^0.28.4",
