@@ -57,7 +57,7 @@ const yardimEtSchema = new mongoose.Schema(
       select: false,
     },
   },
-  { timestamps: true }
+  { timestamps: true },
 );
 
 const YardimEt = mongoose.model("yardimet", yardimEtSchema);

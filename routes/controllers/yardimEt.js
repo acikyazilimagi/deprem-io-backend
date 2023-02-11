@@ -38,8 +38,7 @@ module.exports = async function (fastifyInstance) {
       if (telefon && !check.isPhoneNumber(telefon)) {
         res.statusCode = 400;
         return {
-          error:
-            "Lütfen doğru formatta bir telefon numarası giriniz.(örn: 05554443322)",
+          error: "Lütfen doğru formatta bir telefon numarası giriniz.(örn: 05554443322)",
         };
       }
 
@@ -47,8 +46,7 @@ module.exports = async function (fastifyInstance) {
         if (!check.arePhoneNumbers(yedekTelefonlar)) {
           res.statusCode = 400;
           return {
-            error:
-              "Lütfen doğru formatta bir telefon numarası giriniz.(örn: 05554443322)",
+            error: "Lütfen doğru formatta bir telefon numarası giriniz.(örn: 05554443322)",
           };
         }
       }
@@ -94,7 +92,7 @@ module.exports = async function (fastifyInstance) {
       cache.getCache().flushAll();
       await newYardim.save();
       return { message: "Yardım talebiniz başarıyla alındı" };
-    }
+    },
   );
 
   fastifyInstance.get(
@@ -148,15 +146,9 @@ module.exports = async function (fastifyInstance) {
       if (hedefSehir) searchQuery.hedefSehir = hedefSehir;
       if (sehir) searchQuery.sehir = sehir;
 
-      results.totalPage = Math.ceil(
-        (await YardimEt.countDocuments(searchQuery)) / limit
-      );
+      results.totalPage = Math.ceil((await YardimEt.countDocuments(searchQuery)) / limit);
 
-      results.data = await YardimEt.find(searchQuery)
-        .sort({ _id: -1 })
-        .limit(limit)
-        .skip(startIndex)
-        .exec();
+      results.data = await YardimEt.find(searchQuery).sort({ _id: -1 }).limit(limit).skip(startIndex).exec();
       results.data = results.data.map((yardim) => {
         try {
           //console.log('res: '+Object.values(results));
@@ -166,9 +158,7 @@ module.exports = async function (fastifyInstance) {
             const name = names[0];
             const surname = names[names.length - 1];
             // hidden name and surname
-            yardim.adSoyad = `${name[0]}${"*".repeat(name.length - 1)} ${
-              surname[0]
-            }${"*".repeat(surname.length - 1)}`;
+            yardim.adSoyad = `${name[0]}${"*".repeat(name.length - 1)} ${surname[0]}${"*".repeat(surname.length - 1)}`;
           }
           const yedekTelefonlar = yardim.yedekTelefonlar;
           if (yedekTelefonlar) {
@@ -183,7 +173,7 @@ module.exports = async function (fastifyInstance) {
       cache.getCache().set(cacheKey, results);
 
       return results;
-    }
+    },
   );
 
   fastifyInstance.get("/yardimet/:id", async (req, res) => {
@@ -209,7 +199,6 @@ module.exports = async function (fastifyInstance) {
         });
       }
     } catch (error) {}
-
 
     cache.getCache().set(cacheKey, {
       results,
@@ -251,10 +240,7 @@ module.exports = async function (fastifyInstance) {
       const location = req.query.sehir || "";
       const dest = req.query.hedefSehir || "";
       let query = {
-        $or: [
-          { adSoyad: { $regex: queryString, $options: "i" } },
-          { telefon: { $regex: queryString, $options: "i" } },
-        ],
+        $or: [{ adSoyad: { $regex: queryString, $options: "i" } }, { telefon: { $regex: queryString, $options: "i" } }],
       };
 
       if (helpType) {
@@ -290,9 +276,9 @@ module.exports = async function (fastifyInstance) {
           yardim.telefon = yardim.telefon.replace(/.(?=.{4})/g, "*");
           const names = yardim.adSoyad.split(" ");
           if (names.length > 1) {
-            yardim.adSoyad = `${names[0].charAt(0)}${"*".repeat(
-              names[0].length - 2
-            )} ${names[1].charAt(0)}${"*".repeat(names[1].length - 2)}`;
+            yardim.adSoyad = `${names[0].charAt(0)}${"*".repeat(names[0].length - 2)} ${names[1].charAt(0)}${"*".repeat(
+              names[1].length - 2,
+            )}`;
           }
           const yedekTelefonlar = yardim.yedekTelefonlar;
           if (yedekTelefonlar) {
@@ -305,6 +291,6 @@ module.exports = async function (fastifyInstance) {
       });
 
       return results.data;
-    }
+    },
   );
 };

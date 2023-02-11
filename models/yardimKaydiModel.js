@@ -18,12 +18,7 @@ const yardimKaydiSchema = new mongoose.Schema({
   },
   sonDurum: {
     type: String,
-    enum: [
-      "yardim-bekleniyor",
-      "yardim-edildi",
-      "yetersiz-bilgi",
-      "yardim-edilemedi",
-    ],
+    enum: ["yardim-bekleniyor", "yardim-edildi", "yetersiz-bilgi", "yardim-edilemedi"],
     required: false,
   },
   email: {
