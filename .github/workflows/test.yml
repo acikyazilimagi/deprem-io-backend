@@ -36,15 +36,11 @@ jobs:
       - name: Install dependencies
         run: npm install
 
-      - name: Lint
-        run: rome check .
-
-      - name: Format
-        run: rome format .
+      - name: Linter & Formatter
+        run: rome ci .
 
       - name: Test
         run: npm test
 
       - name: Coverage
         uses: codecov/codecov-action@v3
-        
