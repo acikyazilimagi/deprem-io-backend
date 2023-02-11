@@ -210,10 +210,12 @@ module.exports = async function (fastifyInstance) {
       }
     } catch (error) {}
 
+
     cache.getCache().set(cacheKey, {
       results,
       yardimKaydi,
     });
+
     if (!results) {
       res.statusCode = 404;
       return { status: 404 };
