@@ -54,8 +54,7 @@ module.exports = async function (fastifyInstance) {
           limit,
         };
       }
-
-      let query = yardimTipi ? { yardimTipi } : {};
+      const query = yardimTipi ? { yardimTipi } : {};
 
       results.totalPage = Math.ceil((await Yardim.countDocuments(query)) / limit);
       results.data = await Yardim.find(query).sort({ _id: -1 }).limit(limit).skip(startIndex).exec();
@@ -65,7 +64,7 @@ module.exports = async function (fastifyInstance) {
           yardim.email = check.hideEmailCharacters(yardim.email);
         }
         yardim.telefon = yardim.telefon.replace(/.(?=.{4})/g, "*");
-        const names = yardim.adSoyad.split(" ");
+        const names = yardim.adSoyad.trim().split(" ");
         if (names.length > 1) {
           yardim.adSoyad = `${names[0].charAt(0)}${"*".repeat(names[0].length - 2)} ${names[1].charAt(0)}${"*".repeat(
             names[1].length - 2,
