@@ -134,7 +134,9 @@ module.exports = async function (fastifyInstance) {
       },
     },
     async function (req, res) {
+
       req.body = check.xssFilter(req.body);
+
       const {
         yardimTipi,
         adSoyad,
