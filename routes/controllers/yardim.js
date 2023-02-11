@@ -57,33 +57,46 @@ module.exports = async function (fastifyInstance) {
 
       let query = yardimTipi ? { yardimTipi } : {};
 
-      results.totalPage = Math.ceil((await Yardim.countDocuments(query)) / limit);
-      results.data = await Yardim.find(query).sort({ _id: -1 }).limit(limit).skip(startIndex).exec();
+      results.totalPage = Math.ceil(
+        (await Yardim.countDocuments(query)) / limit
+      );
+      results.data = await Yardim.find(query)
+        .sort({ _id: -1 })
+        .limit(limit)
+        .skip(startIndex)
+        .exec();
 
       results.data = results.data.map((yardim) => {
         if (yardim.email) {
           yardim.email = check.hideEmailCharacters(yardim.email);
         }
-        yardim.telefon = yardim.telefon.replace(/.(?=.{4})/g, "*");
-        const names = yardim.adSoyad.split(" ");
-        if (names.length > 1) {
-          yardim.adSoyad = `${names[0].charAt(0)}${"*".repeat(names[0].length - 2)} ${names[1].charAt(0)}${"*".repeat(
-            names[1].length - 2,
-          )}`;
-        }
-        const yedekTelefonlar = yardim.yedekTelefonlar;
-        if (yedekTelefonlar) {
-          yardim.yedekTelefonlar = yedekTelefonlar.map((yedekTelefon) => {
-            return yedekTelefon.replace(/.(?=.{4})/g, "*");
-          });
+
+        try {
+          yardim.telefon = yardim.telefon.replace(/.(?=.{4})/g, "*");
+          const names = yardim.adSoyad.split(" ");
+          if (names.length > 1) {
+            yardim.adSoyad = `${names[0].charAt(0)}${"*".repeat(
+              names[0].length - 2
+            )} ${names[1].charAt(0)}${"*".repeat(names[1].length - 2)}`;
+          }
+          const yedekTelefonlar = yardim.yedekTelefonlar;
+          if (yedekTelefonlar) {
+            yardim.yedekTelefonlar = yedekTelefonlar.map((yedekTelefon) => {
+              return yedekTelefon.replace(/.(?=.{4})/g, "*");
+            });
+          }
+        } catch (error) {
+          console.log(error);
         }
         return yardim;
       });
 
       cache.getCache().set(cacheKey, results);
 
+      console.log("results");
+
       return results;
-    },
+    }
   );
 
   fastifyInstance.post(
@@ -120,12 +133,20 @@ module.exports = async function (fastifyInstance) {
       },
     },
     async function (req, res) {
-      const { yardimTipi, adSoyad, adres, acilDurum, telefon, yedekTelefonlar } = req.body;
+      const {
+        yardimTipi,
+        adSoyad,
+        adres,
+        acilDurum,
+        telefon,
+        yedekTelefonlar,
+      } = req.body;
 
       if (telefon && !check.isPhoneNumber(telefon)) {
         res.statusCode = 400;
         return {
-          error: "Lütfen doğru formatta bir telefon numarası giriniz.(örn: 05554443322)",
+          error:
+            "Lütfen doğru formatta bir telefon numarası giriniz.(örn: 05554443322)",
         };
       }
 
@@ -133,7 +154,8 @@ module.exports = async function (fastifyInstance) {
         if (!check.arePhoneNumbers(yedekTelefonlar)) {
           res.statusCode = 400;
           return {
-            error: "Lütfen doğru formatta bir telefon numarası giriniz.(örn: 05554443322)",
+            error:
+              "Lütfen doğru formatta bir telefon numarası giriniz.(örn: 05554443322)",
           };
         }
       }
@@ -181,7 +203,7 @@ module.exports = async function (fastifyInstance) {
       cache.getCache().flushAll();
       await newYardim.save();
       return { message: "Yardım talebiniz başarıyla alındı" };
-    },
+    }
   );
 
   fastifyInstance.get("/yardim/:id", async (req, res) => {
@@ -287,22 +309,24 @@ module.exports = async function (fastifyInstance) {
         if (yardim.email) {
           yardim.email = check.hideEmailCharacters(yardim.email);
         }
-        yardim.telefon = yardim.telefon.replace(/.(?=.{4})/g, "*");
-        const names = yardim.adSoyad.split(" ");
-        if (names.length > 1) {
-          yardim.adSoyad = `${names[0].charAt(0)}${"*".repeat(names[0].length - 2)} ${names[1].charAt(0)}${"*".repeat(
-            names[1].length - 2,
-          )}`;
-        }
-        const yedekTelefonlar = yardim.yedekTelefonlar;
-        if (yedekTelefonlar) {
-          yardim.yedekTelefonlar = yedekTelefonlar.map((yedekTelefon) => {
-            return yedekTelefon.replace(/.(?=.{4})/g, "*");
-          });
-        }
+        try {
+          yardim.telefon = yardim.telefon.replace(/.(?=.{4})/g, "*");
+          const names = yardim.adSoyad.split(" ");
+          if (names.length > 1) {
+            yardim.adSoyad = `${names[0].charAt(0)}${"*".repeat(
+              names[0].length - 2
+            )} ${names[1].charAt(0)}${"*".repeat(names[1].length - 2)}`;
+          }
+          const yedekTelefonlar = yardim.yedekTelefonlar;
+          if (yedekTelefonlar) {
+            yardim.yedekTelefonlar = yedekTelefonlar.map((yedekTelefon) => {
+              return yedekTelefon.replace(/.(?=.{4})/g, "*");
+            });
+          }
+        } catch (error) {}
         return yardim;
       });
       return results.data;
-    },
+    }
   );
 };
