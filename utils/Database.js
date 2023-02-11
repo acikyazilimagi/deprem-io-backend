@@ -7,7 +7,8 @@ module.exports.connect = async function () {
     await connection;
     console.log("Veri tabanı bağlantısı sağlandı");
   } catch (e) {
-    console.log("Veri tabanı bağlantısında hata oluştu", e);
+    console.error("Veri tabanı bağlantısında hata oluştu", e);
+    process.exit(1);
   }
 };
 

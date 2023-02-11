@@ -1,6 +1,6 @@
 const Database = require("../utils/Database");
 
-const YardimKaydi = require("../models/YardimKaydi");
+const YardimKaydi = require("../models/yardimKaydiModel");
 
 const CsvExporter = require("../utils/CsvExporter");
 

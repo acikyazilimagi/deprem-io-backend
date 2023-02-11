@@ -1,5 +1,5 @@
 const check = new (require("../../lib/Check"))();
-const Iletisim = require("../../models/İletisim");
+const Iletisim = require("../../models/iletisimModel");
 
 module.exports = async function (fastifyInstance) {
   fastifyInstance.post(

@@ -1,8 +1,8 @@
 const cache = require("../../cache");
 const check = new (require("../../lib/Check"))();
 
-const Yardim = require("../../models/Yardim");
-const YardimKaydi = require("../../models/YardimKaydi");
+const Yardim = require("../../models/yardimModel");
+const YardimKaydi = require("../../models/yardimKaydiModel");
 
 module.exports = async function (fastifyInstance) {
   fastifyInstance.get(

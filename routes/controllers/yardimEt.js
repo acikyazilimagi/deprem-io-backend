@@ -1,7 +1,7 @@
 const cache = require("../../cache");
 const check = new (require("../../lib/Check"))();
 
-const YardimEt = require("../../models/YardimEt");
+const YardimEt = require("../../models/yardimEtModel");
 
 module.exports = async function (fastifyInstance) {
   fastifyInstance.post(
