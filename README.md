@@ -53,9 +53,8 @@ localhost:8080/yardim?page=1&limit=1
 
 Json Yolla
 localhost:8080/yardim
-
-- /models/yardimModel.js e bak
-  ÖRNEK JSON POSTU
+* /models/yardimModel.js e bak 
+ÖRNEK JSON POSTU
 
 ```
 {

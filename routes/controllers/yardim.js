@@ -1,6 +1,6 @@
 const cache = require("../../cache");
 const check = new (require("../../lib/Check"))();
-const { checkConnection } = require("../utils");
+
 const Yardim = require("../../models/yardimModel");
 const YardimKaydi = require("../../models/yardimKaydiModel");
 
@@ -29,6 +29,7 @@ module.exports = async function (fastifyInstance) {
         description: "Yardim listesi",
       },
     },
+
     async function (req, res) {
       const { page, limit, yardimTipi } = req.query;
       const startIndex = (page - 1) * limit;
@@ -40,7 +41,6 @@ module.exports = async function (fastifyInstance) {
         return cache.getCache().get(cacheKey);
       }
 
-      await checkConnection(fastifyInstance);
       if (endIndex < (await Yardim.countDocuments().exec())) {
         results.next = {
           page: page + 1,
@@ -138,8 +138,6 @@ module.exports = async function (fastifyInstance) {
         }
       }
 
-      await checkConnection(fastifyInstance);
-
       // check exist
       const existingYardim = await Yardim.findOne({ adSoyad, adres });
       if (existingYardim) {
@@ -185,14 +183,12 @@ module.exports = async function (fastifyInstance) {
   );
 
   fastifyInstance.get("/yardim/:id", async (req, res) => {
-    let data;
-
     const cacheKey = `yardim_${req.params.id}`;
 
     if (cache.getCache().has(cacheKey)) {
       return cache.getCache().get(cacheKey);
     }
-    await checkConnection(fastifyInstance);
+
     let results = await Yardim.findById(req.params.id);
     let yardimKaydi = await YardimKaydi.find({ postId: req.params.id });
     try {
@@ -243,6 +239,7 @@ module.exports = async function (fastifyInstance) {
         },
       },
     },
+
     async (req, res) => {
       const queryString = req.query.q || "";
       const yardimDurumuQuery = req.query.yardimDurumu;
