@@ -26,7 +26,7 @@ const iletisimSchema = new mongoose.Schema(
       select: false,
     },
   },
-  { timestamps: true },
+  { timestamps: true }
 );
 
 const Iletisim = mongoose.model("iletisim", iletisimSchema);
