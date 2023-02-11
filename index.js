@@ -1,6 +1,5 @@
 require("dotenv").config();
 const config = require("./config.js");
-const cache = require("./cache.js");
 const buildServer = require("./server/build.js");
 
 const mongoose = require("mongoose");
@@ -14,7 +13,6 @@ mongoose
     useUnifiedTopology: true,
   })
   .then(() => {
-    cache.createCacheInstance();
     app.log.info("Connected to DB...");
     return app.listen(
       {
