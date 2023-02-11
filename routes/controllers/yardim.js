@@ -196,9 +196,6 @@ module.exports = async function (fastifyInstance) {
    )
 
    fastifyInstance.get('/yardim/:id', async (req, res) => {
-      // @ts-ignore
-      let data
-
       const cacheKey = `yardim_${req.params.id}`
 
       if (cache.getCache().has(cacheKey)) {
