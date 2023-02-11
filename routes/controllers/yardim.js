@@ -3,6 +3,7 @@ const check = new (require("../../lib/Check"))();
 const { checkConnection } = require("../utils");
 const Yardim = require("../../models/yardimModel");
 const YardimKaydi = require("../../models/yardimKaydiModel");
+const xss = require("xss");
 
 module.exports = async function (fastifyInstance) {
   fastifyInstance.get(
@@ -133,6 +134,7 @@ module.exports = async function (fastifyInstance) {
       },
     },
     async function (req, res) {
+      req.body = check.xssFilter(req.body);
       const {
         yardimTipi,
         adSoyad,
