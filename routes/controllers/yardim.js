@@ -291,8 +291,25 @@ module.exports = async function (fastifyInstance) {
       }
 
       if (vehicle) {
+        q1 = {
+          $or: [
+            {
+              fields: {
+                aracDurumu: vehicle,
+                kvkk: "",
+              },
+            },
+            {
+              fields: {
+                aracDurumu: vehicle,
+                kvkk: "on",
+              },
+            },
+          ],
+        };
+
         query = {
-          $and: [query, { aracDurumu: vehicle }],
+          $and: [query, q1],
         };
       }
 
