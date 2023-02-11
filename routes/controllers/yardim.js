@@ -116,6 +116,10 @@ module.exports = async function (fastifyInstance) {
             telefon: {
               type: "string",
             },
+            tweetLink: {
+              type: "string",
+              pattern: "twitter.com"
+            },
             yedekTelefonlar: {
               type: "array",
               items: {
@@ -123,7 +127,7 @@ module.exports = async function (fastifyInstance) {
               },
             },
           },
-          required: ["yardimTipi", "adSoyad", "adres", "acilDurum"],
+          required: ["yardimTipi", "adSoyad", "adres", "acilDurum"]
         },
       },
     },
