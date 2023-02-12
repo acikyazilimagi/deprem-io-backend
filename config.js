@@ -8,10 +8,8 @@ if (fs.existsSync(".env")) {
 }
 
 module.exports = {
-  port: parseInt(process.env.PORT, 10) || 8080,
-
+  port: parseInt(process.env.PORT, 10) || 80,
   mongoUrl: process.env.MONGOURL || "mongodb://localhost:27017",
-
-  redisUrl: process.env.REDIS_URL,
+  redisUrl: process.env.REDIS_URL || "",
   NODE_ENV: process.env.NODE_ENV || "development",
 };
