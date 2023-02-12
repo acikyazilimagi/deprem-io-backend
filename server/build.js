@@ -16,6 +16,7 @@ module.exports = function () {
     logger: { level: "info" },
     trustProxy: true,
     ignoreTrailingSlash: true,
+    disableRequestLogging: true,
   });
 
   if (config.redisUrl.length === 0) {
@@ -34,7 +35,8 @@ module.exports = function () {
     },
   });
 
-  app.register(require("@fastify/redis"), { client: redis }).register(require("@fastify/caching"), {
+  app.register(require("@fastify/redis"), { client: redis });
+  app.register(require("@fastify/caching"), {
     cache: abcache,
   });
 
