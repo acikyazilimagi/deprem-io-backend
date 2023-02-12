@@ -45,6 +45,7 @@ async function sendYardimList(yardimTipi) {
     await transporter.sendMail(mailOptions);
   }
 }
+
 async function sendYardimEtProviderList(yardimTipi) {
   const transporter = nodemailer.createTransport({
     host: config.email.host,

@@ -15,6 +15,7 @@ function run() {
       await sendYardimList("konaklama");
       await sendYardimList("yolcuTasima");
       logger.info("Successfully sent help list");
+
       logger.info("Sending provider list");
       await sendYardimEtProviderList("gida");
       await sendYardimEtProviderList("enkaz");
