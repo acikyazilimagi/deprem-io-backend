@@ -118,7 +118,7 @@ module.exports = async function (fastifyInstance) {
             },
             tweetLink: {
               type: "string",
-              pattern: "twitter.com"
+              pattern: "twitter.com",
             },
             yedekTelefonlar: {
               type: "array",
@@ -127,7 +127,7 @@ module.exports = async function (fastifyInstance) {
               },
             },
           },
-          required: ["yardimTipi", "adSoyad", "adres", "acilDurum"]
+          required: ["yardimTipi", "adSoyad", "adres", "acilDurum"],
         },
       },
     },
@@ -223,7 +223,7 @@ module.exports = async function (fastifyInstance) {
           return yedekTelefon.replace(/.(?=.{4})/g, "*");
         });
       }
-    } catch (error) { }
+    } catch (error) {}
 
     cache.getCache().set(cacheKey, {
       results: results,
@@ -264,11 +264,11 @@ module.exports = async function (fastifyInstance) {
       const helpType = req.query.yardimTipi;
       const vehicle = req.query.aracDurumu;
 
-      if (!queryString && !yardimDurumuQuery && !acilDurumQuery && !helpType && !vehicle) {
+      if (!(queryString || yardimDurumuQuery || acilDurumQuery || helpType || vehicle)) {
         res.statusCode = 400;
         return {
-          error: "Lütfen en az bir adet filtre giriniz."
-        }
+          error: "Lütfen en az bir adet filtre giriniz.",
+        };
       }
 
       let query = {
@@ -340,7 +340,7 @@ module.exports = async function (fastifyInstance) {
               return yedekTelefon.replace(/.(?=.{4})/g, "*");
             });
           }
-        } catch (error) { }
+        } catch (error) {}
         return yardim;
       });
       return results.data;
