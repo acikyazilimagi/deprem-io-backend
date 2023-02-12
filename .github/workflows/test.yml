@@ -17,15 +17,6 @@ jobs:
   install:
     runs-on: ubuntu-latest
 
-    services:
-      redis:
-        image: redis
-        options: >-
-          --health-cmd "redis-cli ping"
-          --health-interval 10s
-          --health-timeout 5s
-          --health-retries 5
-
     steps:
       - uses: actions/checkout@v3
 
@@ -41,6 +32,9 @@ jobs:
 
       - name: Start MongoDB
         uses: supercharge/mongodb-github-action@1.9.0
+
+      - name: Start Redis
+        uses: supercharge/redis-github-action@1.4.0
 
       - name: Install dependencies
         run: npm install
