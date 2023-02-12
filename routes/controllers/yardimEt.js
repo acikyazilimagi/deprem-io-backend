@@ -39,7 +39,8 @@ module.exports = async function (fastifyInstance) {
       if (telefon && !check.isPhoneNumber(telefon)) {
         res.statusCode = 400;
         return {
-          error: "Lütfen doğru formatta bir telefon numarası giriniz.(örn: 05554443322)",
+          error:
+            "Lütfen doğru formatta bir telefon numarası giriniz.(örn: 05554443322)",
         };
       }
 
@@ -47,7 +48,8 @@ module.exports = async function (fastifyInstance) {
         if (!check.arePhoneNumbers(yedekTelefonlar)) {
           res.statusCode = 400;
           return {
-            error: "Lütfen doğru formatta bir telefon numarası giriniz.(örn: 05554443322)",
+            error:
+              "Lütfen doğru formatta bir telefon numarası giriniz.(örn: 05554443322)",
           };
         }
       }
@@ -95,9 +97,9 @@ module.exports = async function (fastifyInstance) {
       await fastifyInstance.flush();
       await newYardim.save();
       return { message: "Yardım talebiniz başarıyla alındı" };
-    },
+    }
   );
-
+  /*
   fastifyInstance.get(
     "/yardimet",
     {
@@ -293,4 +295,5 @@ module.exports = async function (fastifyInstance) {
       return results.data;
     },
   );
+  */
 };
