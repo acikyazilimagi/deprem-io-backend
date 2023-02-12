@@ -1,6 +1,6 @@
 const cache = require("../../cache");
 const check = new (require("../../lib/Check"))();
-const { checkConnection } = require("../utils");
+const { checkConnection, validateModel} = require("../utils");
 const Yardim = require("../../models/yardimModel");
 const YardimKaydi = require("../../models/yardimKaydiModel");
 const xss = require("xss");
@@ -187,6 +187,15 @@ module.exports = async function (fastifyInstance) {
         ip: req.ip,
         fields: fields || {},
       });
+
+      try {
+        await validateModel(newYardim);
+      } catch (e) {
+        res.statusCode = 400;
+        return {
+          error: e.message,
+        };
+      }
 
       cache.getCache().flushAll();
       await newYardim.save();

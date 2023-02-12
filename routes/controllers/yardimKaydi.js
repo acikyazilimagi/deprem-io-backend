@@ -1,4 +1,4 @@
-const { checkConnection } = require("../utils");
+const { checkConnection, validateModel} = require("../utils");
 const Yardim = require("../../models/yardimModel");
 const check = new (require("../../lib/Check"))();
 const YardimKaydi = require("../../models/yardimKaydiModel");
@@ -49,6 +49,16 @@ module.exports = async function (fastifyInstance) {
           email: req.body.email || "",
           aciklama: req.body.aciklama || "",
         });
+
+        try {
+          await validateModel(newYardimKaydi);
+        } catch (e) {
+          res.statusCode = 400;
+          return {
+            error: e.message,
+          };
+        }
+
         cache.getCache().flushAll();
         await newYardimKaydi.save();
       } else {
