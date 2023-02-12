@@ -27,6 +27,46 @@
         {
           "name": "REDIS_URL",
           "valueFrom": "arn:aws:secretsmanager:eu-central-1:366354050833:secret:depremio-prod-env-oZ5Dz9:REDIS_URL::"
+        },
+        {
+          "name": "MAIL_RECEIVERS",
+          "valueFrom": "arn:aws:secretsmanager:eu-central-1:366354050833:secret:depremio-prod-env-oZ5Dz9:MAIL_RECEIVERS::"
+        },
+        {
+          "name": "MAIL_SUBJECT",
+          "valueFrom": "arn:aws:secretsmanager:eu-central-1:366354050833:secret:depremio-prod-env-oZ5Dz9:MAIL_SUBJECT::"
+        },
+        {
+          "name": "MAIL_SUBJECT_PROVIDER",
+          "valueFrom": "arn:aws:secretsmanager:eu-central-1:366354050833:secret:depremio-prod-env-oZ5Dz9:MAIL_SUBJECT_PROVIDER::"
+        },
+        {
+          "name": "MAILGUN_FROM",
+          "valueFrom": "arn:aws:secretsmanager:eu-central-1:366354050833:secret:depremio-prod-env-oZ5Dz9:MAILGUN_FROM::"
+        },
+        {
+          "name": "MAILGUN_DOMAIN",
+          "valueFrom": "arn:aws:secretsmanager:eu-central-1:366354050833:secret:depremio-prod-env-oZ5Dz9:MAILGUN_DOMAIN::"
+        },
+        {
+          "name": "MAILGUN_API_KEY",
+          "valueFrom": "arn:aws:secretsmanager:eu-central-1:366354050833:secret:depremio-prod-env-oZ5Dz9:MAILGUN_API_KEY::"
+        },
+        {
+          "name": "EMAIL_SMTP",
+          "valueFrom": "arn:aws:secretsmanager:eu-central-1:366354050833:secret:depremio-prod-env-oZ5Dz9:EMAIL_SMTP::"
+        },
+        {
+          "name": "EMAIL_PORT",
+          "valueFrom": "arn:aws:secretsmanager:eu-central-1:366354050833:secret:depremio-prod-env-oZ5Dz9:EMAIL_PORT::"
+        },
+        {
+          "name": "EMAIL_USER",
+          "valueFrom": "arn:aws:secretsmanager:eu-central-1:366354050833:secret:depremio-prod-env-oZ5Dz9:EMAIL_USER::"
+        },
+        {
+          "name": "EMAIL_PASS",
+          "valueFrom": "arn:aws:secretsmanager:eu-central-1:366354050833:secret:depremio-prod-env-oZ5Dz9:EMAIL_PASS::"
         }
       ],
       "logConfiguration": {
