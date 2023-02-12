@@ -38,6 +38,9 @@
     "fastify": "^4.13.0",
     "ioredis": "^5.3.0",
     "mongoose": "^6.9.1",
+    "node-cron": "^3.0.2",
+    "nodemailer": "^6.9.1",
+    "pino-pretty": "^9.2.0",
     "xss": "^1.0.14"
   },
   "devDependencies": {
