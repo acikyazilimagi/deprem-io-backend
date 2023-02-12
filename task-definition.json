@@ -23,6 +23,10 @@
         {
           "name": "MONGOURL",
           "valueFrom": "arn:aws:secretsmanager:eu-central-1:366354050833:secret:depremio-prod-env-oZ5Dz9:MONGOURL::"
+        },
+        {
+          "name": "REDIS_URL",
+          "valueFrom": "arn:aws:secretsmanager:eu-central-1:366354050833:secret:depremio-prod-env-oZ5Dz9:REDIS_URL::"
         }
       ],
       "logConfiguration": {
