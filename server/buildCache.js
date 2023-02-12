@@ -1,4 +1,5 @@
 const IORedis = require("ioredis");
+const AbstractCache = require("abstract-cache");
 const config = require("../config.js");
 const cacheDecorator = require("../cacheDecorator");
 
@@ -15,7 +16,7 @@ async function registerRedis(fastifyInstance) {
   try {
     await new Promise((resolve, reject) => {
       redis.on("ready", () => {
-        const abcache = require("abstract-cache")({
+        const abcache = AbstractCache({
           useAwait: true,
           driver: {
             name: "abstract-cache-redis",

@@ -1,16 +1,16 @@
 const nodemailer = require("nodemailer");
 const Yardim = require("../models/yardimModel");
+const config = require("../config.js");
+const logger = require("../server/logger.js");
+
 async function sendYardimList(yardimTipi) {
   const transporter = nodemailer.createTransport({
-    host: process.env.MAILGUN_SMTP,
-    port: process.env.MAILGUN_PORT,
-    secure: false, // SSL güvenli bağlantı için true olabilir
+    host: config.email.host,
+    port: config.email.port,
+    secure: true,
     auth: {
-      user: process.env.MAILGUN_USER,
-      pass: process.env.MAILGUN_PASS,
-    },
-    tls: {
-      rejectUnauthorized: false,
+      user: config.email.user,
+      pass: config.email.pass,
     },
   });
 
@@ -30,11 +30,11 @@ async function sendYardimList(yardimTipi) {
 
     const to = process.env.MAIL_RECEIVERS;
     const str = `${process.env.MAIL_SUBJECT} - ${yardimTipi.toUpperCase()}`;
-    let hourandMinute = new Date().toLocaleTimeString().split(":");
+    const [hour, minute] = new Date().toLocaleTimeString().split(":");
     let subject = str.replace("%s", yardimSayisi);
-    subject += ` - ${new Date().toLocaleDateString()} - ${hourandMinute[0]}:${hourandMinute[1]}`;
+    subject += ` - ${new Date().toLocaleDateString()} - ${hour}:${minute}`;
     subject += " Tarihli Mail";
-    console.log(`${yardimSayisi} adet ${yardimTipi} yardım talebi gönderildi.`);
+    logger.info(`${yardimSayisi} adet ${yardimTipi} yardım talebi gönderildi.`);
     const mailOptions = {
       from: process.env.MAILGUN_FROM,
       to: to || "mehmetik@gmail.com",
