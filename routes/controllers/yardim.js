@@ -118,7 +118,6 @@ module.exports = async function (fastifyInstance) {
             },
             tweetLink: {
               type: "string",
-              pattern: "twitter.com",
             },
             yedekTelefonlar: {
               type: "array",
