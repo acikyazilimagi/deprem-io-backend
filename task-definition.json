@@ -29,14 +29,14 @@
         "logDriver": "awslogs",
         "options": {
           "awslogs-create-group": "true",
-          "awslogs-group": "/ecs/depremio",
+          "awslogs-group": "/ecs/depremio-api",
           "awslogs-region": "eu-central-1",
           "awslogs-stream-prefix": "ecs"
         }
       }
     }
   ],
-  "family": "depremio-TD",
+  "family": "depremio-api",
   "executionRoleArn": "arn:aws:iam::366354050833:role/ecsServiceRole",
   "networkMode": "awsvpc",
   "volumes": [],
