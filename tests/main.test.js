@@ -1,6 +1,6 @@
 import { describe, assert, test } from "vitest";
 
-const buildServer = require("../../../server/build.js");
+const buildServer = require("../server/build.js");
 
 describe("Main Controller Tests", () => {
   test("/", async () => {
