@@ -134,20 +134,12 @@ module.exports = async function (fastifyInstance) {
     async function (req, res) {
       req.body = check.xssFilter(req.body);
 
-      const {
-        yardimTipi,
-        adSoyad,
-        adres,
-        acilDurum,
-        telefon,
-        yedekTelefonlar,
-      } = req.body;
+      const { yardimTipi, adSoyad, adres, acilDurum, telefon, yedekTelefonlar } = req.body;
 
       if (telefon && !check.isPhoneNumber(telefon)) {
         res.statusCode = 400;
         return {
-          error:
-            "Lütfen doğru formatta bir telefon numarası giriniz.(örn: 05554443322)",
+          error: "Lütfen doğru formatta bir telefon numarası giriniz.(örn: 05554443322)",
         };
       }
 
@@ -155,8 +147,7 @@ module.exports = async function (fastifyInstance) {
         if (!check.arePhoneNumbers(yedekTelefonlar)) {
           res.statusCode = 400;
           return {
-            error:
-              "Lütfen doğru formatta bir telefon numarası giriniz.(örn: 05554443322)",
+            error: "Lütfen doğru formatta bir telefon numarası giriniz.(örn: 05554443322)",
           };
         }
       }
@@ -203,7 +194,7 @@ module.exports = async function (fastifyInstance) {
 
       await newYardim.save();
       return { message: "Yardım talebiniz başarıyla alındı" };
-    }
+    },
   );
   /*
   fastifyInstance.get("/yardim/:id", async (req, res) => {
