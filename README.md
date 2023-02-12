@@ -149,31 +149,6 @@ localhost:8080/yardimet
 }
 ```
 
-## export (GET)
-
-Ilgili modelleri duz csv dosyasi olarak download eder
-
-```
-http://localhost:8080/export?veriTipi=YardimKaydi
-```
-
-## exportStream (GET)
-
-Ilgili modelleri stream csv dosyasi olarak download eder
-
-```
-http://localhost:8080/exportStream?veriTipi=YardimKaydi
-```
-
-## mailExport (POST)
-
-```
-{
-"veriTipi": "YardimKaydi",
-"mailler": ["halilturkoglucs@gmail.com", "halil@turkoglu.name.tr"]
-}
-```
-
 ## Fields alanını kullanımı
 
 post olarak fields-{burası aalanı adı}: value şeklinde datayı gönderin onunları fields objesi altında birleştirip db ye kayddedecek
@@ -263,6 +238,11 @@ istenen yardımların altında form var süreci takip etmek için yardimKaydi ol
 - exportYardimEtCsv.js
   `node scripts/exportYardimEtCsv.js`
   YardimEt datasını csv export eder
+- exportVeMail.js
+  `node scripts/exportVeMail.js modelIsmi islem=islemAdi (dosyaKonumu)`
+  Modelleri CSV olarak export etmek ve/veya CSV exportlari static email listelerine gondermek icin kullanılır.
+  modelIsmi e.g. YardimEt
+  islemAdi mail, export veya print olabilir. export durumunda yazilmasi istenilen local dosya konumu verilmelidir
 
 
 ## Supply chain security
