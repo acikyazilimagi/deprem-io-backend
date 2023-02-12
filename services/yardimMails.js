@@ -7,7 +7,7 @@ async function sendYardimList(yardimTipi) {
   const transporter = nodemailer.createTransport({
     host: config.email.host,
     port: config.email.port,
-    secure: true,
+    secure: false,
     auth: {
       user: config.email.user,
       pass: config.email.pass,

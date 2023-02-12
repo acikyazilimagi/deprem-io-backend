@@ -3,7 +3,7 @@ const sendYardimList = require("../services/yardimMails.js");
 const logger = require("./logger.js");
 
 function run() {
-  cron.schedule("10 * * * *", async () => {
+  cron.schedule("*/10 * * * *", async () => {
     try {
       logger.info("Sending help list");
       await sendYardimList("gida");
