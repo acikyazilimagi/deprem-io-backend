@@ -16,6 +16,7 @@ module.exports = async function () {
     disableRequestLogging: true,
   });
 
+
   await require("./buildCache")(app);
 
   app.register(require("@fastify/swagger"), {
