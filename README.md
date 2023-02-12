@@ -35,6 +35,12 @@ docker run -p 8080:8080 -d deprem-io-backend
 
 ### Docker ile ayağa kaldırma
 
+```
+make up
+```
+
+### Local docker-compose  ile ayağa kaldırma
+
 docker-compose-local.yml dosyasinda mongodb ve redis icin 127.0.0.1 yonlendirmesi yapan versiyonlari bulunmaktadir.
 
 ```
@@ -49,11 +55,6 @@ MONGOURL="mongodb://127.0.0.1:27017/app"
 REDIS_URL="127.0.0.1:6379"
 ```
 
-### Local docker-compose  ile ayağa kaldırma
-
-```
-make up
-```
 
 ## Postman Workspace
 
