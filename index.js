@@ -1,4 +1,11 @@
-require("dotenv").config();
+const fs = require("fs");
+
+if (fs.existsSync(".env")) {
+  require("dotenv").config();
+  console.log("Using environment variables from .env file");
+} else {
+  console.log(".env file not found");
+}
 const config = require("./config.js");
 const buildServer = require("./server/build.js");
 
@@ -23,7 +30,7 @@ mongoose
         if (config.NODE_ENV === "development") {
           console.log(`Available routes: \n${app.printRoutes()}`);
         }
-      },
+      }
     );
   })
   .catch((error) => {
