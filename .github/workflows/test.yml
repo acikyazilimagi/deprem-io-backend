@@ -1,12 +1,8 @@
-name: Build
+name: Test
 
 on:
-  push:
-    branches:
-      - main
   pull_request:
-    branches:
-      - main
+    types: [opened, reopened]
 
 # This allows a subsequently queued workflow run to interrupt previous runs
 concurrency:
@@ -14,7 +10,8 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
-  install:
+  test:
+    name: Test
     runs-on: ubuntu-latest
 
     steps:
