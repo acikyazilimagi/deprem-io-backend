@@ -12,7 +12,7 @@ module.exports = function (fastify, segmentName) {
       // cache exposes a method that deletes a single key asynchronously.
       // using that would be terrible for node performance ad medium scale.
       // instead, use del(...keys) from redis directly
-      await fastify.redis.del(...keys.map((k) => `${segmentName}:${k}`));
+      if (keys.length) await fastify.redis.del(...keys.map((k) => `${segmentName}:${k}`));
     } else if (fastify.cache.client._cache?._keymap) {
       const _keys = fastify.cache.client._cache._keymap.keys();
       const _keysToDelete = [];
