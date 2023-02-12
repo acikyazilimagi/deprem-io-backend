@@ -1,9 +1,11 @@
-const cache = require("../../cache");
 const check = new (require("../../lib/Check"))();
 const { checkConnection, validateModel } = require("../utils");
 const YardimEt = require("../../models/yardimEtModel");
 const YardimKaydi = require("../../models/yardimKaydiModel");
 
+/**
+ * @param {FastifyInstance} fastifyInstance
+ */
 module.exports = async function (fastifyInstance) {
   fastifyInstance.post(
     "/yardimet",
@@ -98,7 +100,7 @@ module.exports = async function (fastifyInstance) {
         };
       }
 
-      cache.getCache().flushAll();
+      await fastifyInstance.flush();
       await newYardim.save();
       return { message: "Yardım talebiniz başarıyla alındı" };
     },
