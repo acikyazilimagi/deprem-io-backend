@@ -16,6 +16,12 @@ Bu proje deprem.io sitesinin backend implementasyonunu icerir.
 
 ## Local Installment
 
+* Yerel geliştirme için paketlerini kurun
+* **English**: Install packages for local development
+```
+npm run setup
+```
+
 * Dockerfile build alınız
 * **English**:  Build docker container with following command 
 ```
