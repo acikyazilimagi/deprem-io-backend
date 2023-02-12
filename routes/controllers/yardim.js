@@ -226,10 +226,14 @@ module.exports = async function (fastifyInstance) {
       }
     } catch (error) {}
 
-    fastifyInstance.cache.set(cacheKey, {
-      results: results,
-      yardimKaydi: yardimKaydi,
-    }, 1000 * 60 * 60);
+    fastifyInstance.cache.set(
+      cacheKey,
+      {
+        results: results,
+        yardimKaydi: yardimKaydi,
+      },
+      1000 * 60 * 60,
+    );
     if (!results) {
       res.statusCode = 404;
       return { status: 404 };
