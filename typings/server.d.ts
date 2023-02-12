@@ -1,4 +1,3 @@
-import type { MongoClient } from "mongoose";
 import type {
   FastifyInstance as OriginalFastifyInstance,
   FastifyRequest as OriginalFastifyRequest,
@@ -13,6 +12,8 @@ declare global {
     config: typeof config;
     mongoose: typeof mongoose;
     cache: typeof cache;
+    selectiveFlush: (prefix: string) => Promise<void>;
+    flush: () => Promise<void>;
   }
 
   interface FastifyRequest extends OriginalFastifyRequest {}
