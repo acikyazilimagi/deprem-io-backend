@@ -22,6 +22,12 @@ Bu proje deprem.io sitesinin backend implementasyonunu icerir.
 npm run setup
 ```
 
+* Husky kurulumunu yapın
+
+```bash
+npm run prepare
+```
+
 * Dockerfile build alınız
 * **English**:  Build docker container with following command 
 ```
@@ -44,6 +50,10 @@ docker run -p 8080:8080 -d deprem-io-backend
 ```bash
 make up
 ```
+
+## Code Quality
+
+Projede kod kalitesini iyileştirmek için husky paketi kullanılmaktadır. Husky, commit oluşturulmadan önce otomatik olarak format, lint scriptlerini çalıştıracaktır.
 
 ## Postman Workspace
 

@@ -1,21 +1,34 @@
 const fastify = require("fastify");
 const cors = require("@fastify/cors");
 const autoload = require("@fastify/autoload");
+const sensible = require("@fastify/sensible");
 const path = require("node:path");
-const config = require("../config.js");
-
-const cacheRoutes = require("../routes/cache");
-
 const mongoose = require("mongoose");
+
+const config = require("../config.js");
+const logger = require("./logger.js");
+const cacheRoutes = require("../routes/cache");
 
 module.exports = async function () {
   const app = fastify({
-    logger: { level: "info" },
     trustProxy: true,
     ignoreTrailingSlash: true,
     disableRequestLogging: true,
+    logger: config.NODE_ENV === "test" ? undefined : logger,
   });
 
+  app.setErrorHandler(async (error) => {
+    if (error.statusCode) {
+      throw error;
+    }
+
+    app.log.error(error);
+    throw app.httpErrors.internalServerError();
+  });
+
+  /** @type {import('@fastify/sensible').SensibleOptions} */
+  const sensibleOptions = { errorHandler: false };
+  app.register(sensible, sensibleOptions);
 
   await require("./buildCache")(app);
 

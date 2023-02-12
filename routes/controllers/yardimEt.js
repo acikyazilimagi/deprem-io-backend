@@ -1,5 +1,4 @@
 const check = new (require("../../lib/Check"))();
-const { checkConnection } = require("../utils");
 const YardimEt = require("../../models/yardimEtModel");
 const YardimKaydi = require("../../models/yardimKaydiModel");
 
@@ -40,7 +39,8 @@ module.exports = async function (fastifyInstance) {
       if (telefon && !check.isPhoneNumber(telefon)) {
         res.statusCode = 400;
         return {
-          error: "Lütfen doğru formatta bir telefon numarası giriniz.(örn: 05554443322)",
+          error:
+            "Lütfen doğru formatta bir telefon numarası giriniz.(örn: 05554443322)",
         };
       }
 
@@ -48,12 +48,11 @@ module.exports = async function (fastifyInstance) {
         if (!check.arePhoneNumbers(yedekTelefonlar)) {
           res.statusCode = 400;
           return {
-            error: "Lütfen doğru formatta bir telefon numarası giriniz.(örn: 05554443322)",
+            error:
+              "Lütfen doğru formatta bir telefon numarası giriniz.(örn: 05554443322)",
           };
         }
       }
-
-      await checkConnection(fastifyInstance);
 
       // check exist
       const existingYardim = await YardimEt.findOne({
@@ -98,9 +97,9 @@ module.exports = async function (fastifyInstance) {
       await fastifyInstance.flush();
       await newYardim.save();
       return { message: "Yardım talebiniz başarıyla alındı" };
-    },
+    }
   );
-
+  /*
   fastifyInstance.get(
     "/yardimet",
     {
@@ -128,10 +127,10 @@ module.exports = async function (fastifyInstance) {
 
       const cacheKey = `yardimet_${page}_${limit}${yardimTipi}${sehir}${hedefSehir}`;
 
-      if (cache.getCache().has(cacheKey)) {
-        return cache.getCache().get(cacheKey);
+      const cacheResult = await fastifyInstance.cache.get(cacheKey);
+      if (cacheResult?.item) {
+        return cacheResult.item;
       }
-      await checkConnection(fastifyInstance);
 
       if (endIndex < (await YardimEt.countDocuments().exec())) {
         results.next = {
@@ -176,7 +175,7 @@ module.exports = async function (fastifyInstance) {
         return yardim;
       });
 
-      cache.getCache().set(cacheKey, results);
+      await fastifyInstance.cache.set(cacheKey, results, 1000 * 60 * 60);
 
       return results;
     },
@@ -185,10 +184,10 @@ module.exports = async function (fastifyInstance) {
   fastifyInstance.get("/yardimet/:id", async (req, res) => {
     const cacheKey = `yardimet_${req.params.id}`;
 
-    if (cache.getCache().has(cacheKey)) {
-      return cache.getCache().get(cacheKey);
+    const cacheResult = await fastifyInstance.cache.get(cacheKey);
+    if (cacheResult?.item) {
+      return cacheResult.item;
     }
-    await checkConnection(fastifyInstance);
     const results = await YardimEt.findById(req.params.id);
     let yardimKaydi = await YardimKaydi.find({ postId: req.params.id });
     try {
@@ -206,10 +205,7 @@ module.exports = async function (fastifyInstance) {
       }
     } catch (error) {}
 
-    cache.getCache().set(cacheKey, {
-      results,
-      yardimKaydi,
-    });
+    await fastifyInstance.cache.set(cacheKey, results, 1000 * 60 * 60);
 
     if (!results) {
       res.statusCode = 404;
@@ -299,4 +295,5 @@ module.exports = async function (fastifyInstance) {
       return results.data;
     },
   );
+  */
 };
