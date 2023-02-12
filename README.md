@@ -187,11 +187,14 @@ fields alanını kullanın isteidğiniz gibi json objesi post edebilirsiniz
 
 ## Local Email Saglayici Ayari
 
-Export Mail ozelligi icin email saglayicinin API key degerini .env dosyasina girmeniz gerekmektedir.
+Export E-Mail ozelligi icin email saglayicinin API key degerini .env dosyasina girmeniz gerekmektedir.
+
+Ayrica email atilmasi istediginiz hesaplari (coklu ise virgul ile ayirarak) asagidaki gibi tanimlayiniz.
 
 e.g.
 ```.env
 EMAIL_PROVIDER_API_KEY="EXAMPLEAPIKEY"
+EXPORT_EMAILS="email@example.com"
 ```
 
 ## Cache i temizleme
