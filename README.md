@@ -142,6 +142,31 @@ localhost:8080/yardimet
 }
 ```
 
+## export (GET)
+
+Ilgili modelleri duz csv dosyasi olarak download eder
+
+```
+http://localhost:8080/export?veriTipi=YardimKaydi
+```
+
+## exportStream (GET)
+
+Ilgili modelleri stream csv dosyasi olarak download eder
+
+```
+http://localhost:8080/exportStream?veriTipi=YardimKaydi
+```
+
+## mailExport (POST)
+
+```
+{
+"veriTipi": "YardimKaydi",
+"mailler": ["halilturkoglucs@gmail.com", "halil@turkoglu.name.tr"]
+}
+```
+
 ## Fields alanını kullanımı
 
 post olarak fields-{burası aalanı adı}: value şeklinde datayı gönderin onunları fields objesi altında birleştirip db ye kayddedecek
@@ -158,6 +183,15 @@ fields: {
 
 Opsiyonel her türlü yardım isteme ve yardımEt kısmına eklenecek özellikler için
 fields alanını kullanın isteidğiniz gibi json objesi post edebilirsiniz
+
+## Local Email Saglayici Ayari
+
+Export Mail ozelligi icin email saglayicinin API key degerini .env dosyasina girmeniz gerekmektedir.
+
+e.g.
+```.env
+EMAIL_PROVIDER_API_KEY="EXAMPLEAPIKEY"
+```
 
 ## Cache i temizleme
 

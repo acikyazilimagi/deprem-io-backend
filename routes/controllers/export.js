@@ -4,8 +4,17 @@ const Yardim = require("../../models/yardimModel");
 const YardimEt = require("../../models/yardimEtModel");
 const YardimKaydi = require("../../models/yardimKaydiModel");
 const Iletisim = require("../../models/iletisimModel");
+const config = require('../../config');
+const sgMail = require("@sendgrid/mail");
+let emailProviderSetup = false;
+
+if (config.emailProviderAPIKey && config.emailProviderAPIKey !== "") {
+  emailProviderSetup = true;
+  sgMail.setApiKey(config.emailProviderAPIKey);
+}
 
 module.exports = async function (fastifyInstance) {
+
   fastifyInstance.get(
     "/export",
     {
@@ -100,7 +109,7 @@ module.exports = async function (fastifyInstance) {
             veriTipi: { type: "string" },
             mailler: { type: "array" },
           },
-          required: ["veriTipi", "mailler"],
+          required: ["veriTipi"],
         },
       },
     },
@@ -111,10 +120,11 @@ module.exports = async function (fastifyInstance) {
       let veriTipi = req.body.veriTipi;
       let mailler = req.body.mailler;
 
+      mailler = mailler || config.exportEmails;
       if (!mailler || mailler.length === 0) {
         res.statusCode = 400;
         return {
-          error: "Lutfen mail belirtiniz.",
+          error: "Lutfen exportun gonderilecegi mail adreslerini belirtiniz.",
         };
       }
 
@@ -127,25 +137,68 @@ module.exports = async function (fastifyInstance) {
           };
         }
 
-        res.raw.setHeader("Content-Type", "text/csv charset=utf-8");
-        res.raw.setHeader("Content-Encoding", "utf-8,%EF%BB%BF");
-        res.raw.setHeader(
-          "Content-Disposition",
-          `attachment; filename=${veriTipi} export ${Date.now()}.csv`
-        );
-
-        // Email gonder
-        console.log(data)
+        if (emailProviderSetup) {
+          return await sendEmail(mailler, veriTipi, data, res)
+        } else {
+          res.statusCode = 500;
+          return {
+            error: "Email saglayici baglantisi henuz yapilmadi, email gonderilemiyor.",
+          };
+        }
       } catch (e) {
         res.statusCode = 500;
         return {
           error: "exportu mail atarken hata olustu.",
         };
       }
-
     },
   );
 };
+
+function sendEmail(to, veriTipi, data, res) {
+  let multipleEmail = to.split(",");
+  if (multipleEmail.length > 0) {
+    to = multipleEmail;
+  }
+
+  // Simdilik SendGrid free trier kullanabiliriz, ardindan istenilen saglayiciya gecilebilir
+  const msg = {
+    to: to,
+    from: 'depremiotest@gmail.com',
+    subject: 'deprem.io ' + veriTipi + ' Export',
+    html: '<strong>deprem.io ciktilari ektedir.</strong>',
+    attachments: [
+      {
+        content: Buffer.from(data).toString("base64"),
+        filename: veriTipi + " export " + Date.now() + ".csv",
+        type: "text/csv",
+        disposition: "attachment",
+        content_id: "depremio_csv"
+      }
+    ]
+  }
+
+  return sgMail
+    .send(msg)
+    .then((response) => {
+      console.log(response[0].statusCode)
+      console.log(response[0].headers)
+
+      return {
+        status: 'ok',
+        message: 'Email gonderme istegi basariyla alindi.',
+      }
+    })
+    .catch((error) => {
+      console.error(error)
+
+      res.status(500)
+      return {
+        status: 'error',
+        message: 'Email gonderirken hata olustu.'
+      }
+    });
+}
 
 async function exportData(veriTipi, io) {
   let select;
@@ -174,7 +227,7 @@ async function exportData(veriTipi, io) {
       return data;
     })
 
-  processData(data, io);
+  data = processData(data, io);
 
   if (io) {
     io.end();
