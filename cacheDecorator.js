@@ -10,5 +10,4 @@ module.exports = function (fastify, segmentName) {
 
     await fastify.redis.del(...keys.map((k) => `${segmentName}:${k}`));
   });
-  fastify.log.info("cachePlugin loaded");
 };
