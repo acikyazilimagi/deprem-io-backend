@@ -20,7 +20,11 @@ module.exports = function () {
   });
 
   if (config.redisUrl.length === 0) {
-    throw new Error("REDIS_URL is missing from .env");
+    // TODO Fix this poor implementation
+    config.redisUrl = process.env.REDIS_URL;
+    if (config.redisUrl.length === 0) {
+      throw new Error("REDIS_URL is missing from .env");
+    }
   }
 
   const redis = new IORedis(config.redisUrl);
