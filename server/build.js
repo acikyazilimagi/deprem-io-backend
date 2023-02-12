@@ -1,17 +1,14 @@
 const fastify = require("fastify");
-const IORedis = require("ioredis");
 const cors = require("@fastify/cors");
 const autoload = require("@fastify/autoload");
 const path = require("node:path");
 const config = require("../config.js");
-const cacheDecorator = require("../cacheDecorator");
 
 const cacheRoutes = require("../routes/cache");
 
 const mongoose = require("mongoose");
-const SEGMENT = "cache";
 
-module.exports = function () {
+module.exports = async function () {
   const app = fastify({
     logger: { level: "info" },
     trustProxy: true,
@@ -19,32 +16,7 @@ module.exports = function () {
     disableRequestLogging: true,
   });
 
-  if (config.redisUrl.length === 0) {
-    // TODO Fix this poor implementation
-    config.redisUrl = process.env.REDIS_URL;
-    if (config.redisUrl.length === 0) {
-      throw new Error("REDIS_URL is missing from .env");
-    }
-  }
-
-  const redis = new IORedis(config.redisUrl);
-  const abcache = require("abstract-cache")({
-    useAwait: true,
-    driver: {
-      name: "abstract-cache-redis",
-      options: {
-        client: redis,
-        segment: SEGMENT,
-      },
-    },
-  });
-
-  app.register(require("@fastify/redis"), { client: redis });
-  app.register(require("@fastify/caching"), {
-    cache: abcache,
-  });
-
-  cacheDecorator(app, SEGMENT);
+  await require("./buildCache")(app);
 
   app.register(require("@fastify/swagger"), {
     openapi: {

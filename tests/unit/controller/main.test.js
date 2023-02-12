@@ -4,7 +4,7 @@ const buildServer = require("../../../server/build.js");
 
 describe("Main Controller Tests", () => {
   test("/", async () => {
-    const app = buildServer();
+    const app = await buildServer();
     const response = await app.inject({
       method: "GET",
       url: "/",
