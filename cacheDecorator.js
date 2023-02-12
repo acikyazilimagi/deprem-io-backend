@@ -1,3 +1,7 @@
+/**
+ * @param {FastifyInstance} fastify
+ * @param {string} segmentName
+ */
 module.exports = function (fastify, segmentName) {
   fastify.decorate("selectiveFlush", async function (prefix) {
     // this is a blocking operation in redis.
@@ -10,5 +14,8 @@ module.exports = function (fastify, segmentName) {
 
     await fastify.redis.del(...keys.map((k) => `${segmentName}:${k}`));
   });
-  fastify.log.info("cachePlugin loaded");
+
+  fastify.decorate("flush", async function () {
+    await fastify.redis.del();
+  });
 };

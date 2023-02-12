@@ -2,7 +2,6 @@ const check = new (require("../../lib/Check"))();
 const { checkConnection } = require("../utils");
 const Yardim = require("../../models/yardimModel");
 const YardimKaydi = require("../../models/yardimKaydiModel");
-const xss = require("xss");
 
 const LIST_PREFIX = "yardim_list";
 

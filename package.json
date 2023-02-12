@@ -36,7 +36,6 @@
     "fastify": "^4.13.0",
     "ioredis": "^5.3.0",
     "mongoose": "^6.9.1",
-    "node-cache": "^5.1.2",
     "xss": "^1.0.14"
   },
   "devDependencies": {

@@ -2,7 +2,7 @@ const fastify = require("fastify");
 const IORedis = require("ioredis");
 const cors = require("@fastify/cors");
 const autoload = require("@fastify/autoload");
-const path = require("path");
+const path = require("node:path");
 const config = require("../config.js");
 const cacheDecorator = require("../cacheDecorator");
 
@@ -16,7 +16,12 @@ module.exports = function () {
     logger: { level: "info" },
     trustProxy: true,
     ignoreTrailingSlash: true,
+    disableRequestLogging: true,
   });
+
+  if (config.redisUrl.length === 0) {
+    throw new Error("REDIS_URL is missing from .env");
+  }
 
   const redis = new IORedis(config.redisUrl);
   const abcache = require("abstract-cache")({
@@ -30,7 +35,8 @@ module.exports = function () {
     },
   });
 
-  app.register(require("@fastify/redis"), { client: redis }).register(require("@fastify/caching"), {
+  app.register(require("@fastify/redis"), { client: redis });
+  app.register(require("@fastify/caching"), {
     cache: abcache,
   });
 
