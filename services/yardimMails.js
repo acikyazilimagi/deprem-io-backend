@@ -61,10 +61,12 @@ async function sendYardimEtProviderList(yardimTipi) {
   const yardimSayisi = yardimlar.length;
   if (yardimSayisi >= 10) {
     let html =
-      '<table border="1"><thead><tr><th>Sağlayıcı Tipi</th><th>Ad Soyad</th><th>Telefon</th><th>Email</th><th>Adres</th><th>Adres Tarifi</th><th>Acil Durum</th><th>Kişi Sayısı</th><th>Yardım Durumu</th><th>Fiziki Durum</th><th>Google Map Link</th><th>Tweet Link</th><th>IP</th><th>Gönderildi</th></tr></thead><tbody>';
-
+      '<table border="1"><thead><tr><th>Sağlayıcı Tipi</th><th>Ad Soyad</th><th>Telefon</th><th>Yedek Telefonlar</th><th>Şehir</th><th>İlçe</th><th>Hedef Şehir</th><th>Açıklama</th><th>Alanlar</th><th>Yardım Durumu</th><th>IP</th><th>Gönderildi</th></tr></thead><tbody>';
     for (let yardim of yardimlar) {
-      html += `<tr><td>${yardim.yardimTipi}</td><td>${yardim.adSoyad}</td><td>${yardim.telefon}</td><td>${yardim.email}</td><td>${yardim.adres}</td><td>${yardim.adresTarifi}</td><td>${yardim.acilDurum}</td><td>${yardim.kisiSayisi}</td><td>${yardim.yardimDurumu}</td><td>${yardim.fizikiDurum}</td><td>${yardim.googleMapLink}</td><td>${yardim.tweetLink}</td><td>${yardim.ip}</td><td>${yardim.gonderildi}</td></tr>`;
+      if (typeof yardim.fields === "object") {
+        yardim.fields = JSON.stringify(yardim.fields);
+      }
+      html += `<tr><td>${yardim.yardimTipi}</td><td>${yardim.adSoyad}</td><td>${yardim.telefon}</td><td>${yardim.yedekTelefonlar}</td><td>${yardim.sehir}</td><td>${yardim.ilce}</td><td>${yardim.hedefSehir}</td><td>${yardim.aciklama}</td><td>${yardim.fields}</td><td>${yardim.yardimDurumu}</td><td>${yardim.ip}</td><td>${yardim.gonderildi}</td></tr>`;
       yardim.gonderildi = true;
       await yardim.save();
     }
