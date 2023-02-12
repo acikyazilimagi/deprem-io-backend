@@ -13,25 +13,29 @@ async function registerRedis(fastifyInstance) {
   if (config.redisUrl === undefined || config.redisUrl?.length === 0) return false;
   const redis = new IORedis(config.redisUrl);
   try {
-    await redis.connect();
+    await new Promise((resolve, reject) => {
+      redis.on("ready", () => {
+        const abcache = require("abstract-cache")({
+          useAwait: true,
+          driver: {
+            name: "abstract-cache-redis",
+            options: {
+              client: redis,
+              segment: SEGMENT,
+            },
+          },
+        });
+        fastifyInstance.register(require("@fastify/redis"), { client: redis });
+        fastifyInstance.register(require("@fastify/caching"), { cache: abcache });
+        cacheDecorator(fastifyInstance, SEGMENT);
+        resolve();
+      });
+      redis.on("error", reject);
+    });
+    return true;
   } catch (error) {
     return false;
   }
-  const abcache = require("abstract-cache")({
-    useAwait: true,
-    driver: {
-      name: "abstract-cache-redis",
-      options: {
-        client: redis,
-        segment: SEGMENT,
-      },
-    },
-  });
-  fastifyInstance.register(require("@fastify/redis"), { client: redis });
-  fastifyInstance.register(require("@fastify/caching"), {
-    cache: abcache,
-  });
-  cacheDecorator(fastifyInstance, SEGMENT);
 }
 
 function registerNodeCache(fastifyInstance) {
