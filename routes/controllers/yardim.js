@@ -6,6 +6,7 @@ const YardimKaydi = require("../../models/yardimKaydiModel");
 const LIST_PREFIX = "yardim_list";
 
 module.exports = async function (fastifyInstance) {
+  /*
   fastifyInstance.get(
     "/yardim",
     {
@@ -95,7 +96,7 @@ module.exports = async function (fastifyInstance) {
       return results;
     },
   );
-
+  */
   fastifyInstance.post(
     "/yardim",
     {
@@ -136,12 +137,20 @@ module.exports = async function (fastifyInstance) {
     async function (req, res) {
       req.body = check.xssFilter(req.body);
 
-      const { yardimTipi, adSoyad, adres, acilDurum, telefon, yedekTelefonlar } = req.body;
+      const {
+        yardimTipi,
+        adSoyad,
+        adres,
+        acilDurum,
+        telefon,
+        yedekTelefonlar,
+      } = req.body;
 
       if (telefon && !check.isPhoneNumber(telefon)) {
         res.statusCode = 400;
         return {
-          error: "Lütfen doğru formatta bir telefon numarası giriniz.(örn: 05554443322)",
+          error:
+            "Lütfen doğru formatta bir telefon numarası giriniz.(örn: 05554443322)",
         };
       }
 
@@ -149,7 +158,8 @@ module.exports = async function (fastifyInstance) {
         if (!check.arePhoneNumbers(yedekTelefonlar)) {
           res.statusCode = 400;
           return {
-            error: "Lütfen doğru formatta bir telefon numarası giriniz.(örn: 05554443322)",
+            error:
+              "Lütfen doğru formatta bir telefon numarası giriniz.(örn: 05554443322)",
           };
         }
       }
@@ -198,9 +208,10 @@ module.exports = async function (fastifyInstance) {
 
       await newYardim.save();
       return { message: "Yardım talebiniz başarıyla alındı" };
-    },
+    }
   );
 
+  /*
   fastifyInstance.get("/yardim/:id", async (req, res) => {
     let data;
 
@@ -235,7 +246,7 @@ module.exports = async function (fastifyInstance) {
         results: results,
         yardimKaydi: yardimKaydi,
       },
-      1000 * 60 * 60,
+      1000 * 60 * 60
     );
     if (!results) {
       res.statusCode = 404;
@@ -272,7 +283,15 @@ module.exports = async function (fastifyInstance) {
       const helpType = req.query.yardimTipi;
       const vehicle = req.query.aracDurumu;
 
-      if (!(queryString || yardimDurumuQuery || acilDurumQuery || helpType || vehicle)) {
+      if (
+        !(
+          queryString ||
+          yardimDurumuQuery ||
+          acilDurumQuery ||
+          helpType ||
+          vehicle
+        )
+      ) {
         res.statusCode = 400;
         return {
           error: "Lütfen en az bir adet filtre giriniz.",
@@ -338,9 +357,9 @@ module.exports = async function (fastifyInstance) {
           yardim.telefon = yardim.telefon.replace(/.(?=.{4})/g, "*");
           const names = yardim.adSoyad.split(" ");
           if (names.length > 1) {
-            yardim.adSoyad = `${names[0].charAt(0)}${"*".repeat(names[0].length - 2)} ${names[1].charAt(0)}${"*".repeat(
-              names[1].length - 2,
-            )}`;
+            yardim.adSoyad = `${names[0].charAt(0)}${"*".repeat(
+              names[0].length - 2
+            )} ${names[1].charAt(0)}${"*".repeat(names[1].length - 2)}`;
           }
           const yedekTelefonlar = yardim.yedekTelefonlar;
           if (yedekTelefonlar) {
@@ -352,6 +371,7 @@ module.exports = async function (fastifyInstance) {
         return yardim;
       });
       return results.data;
-    },
+    }
   );
+  */
 };
