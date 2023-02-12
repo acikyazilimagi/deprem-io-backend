@@ -35,7 +35,7 @@ docker run -p 8080:8080 -d deprem-io-backend
 
 ### Docker ile ayağa kaldırma
 
-```
+```bash
 make up
 ```
 
