@@ -1,5 +1,5 @@
 const cron = require("node-cron");
-const sendYardimList = require("../services/yardimMails.js");
+const { sendYardimList, sendYardimEtProviderList } = require("../services/yardimMails.js");
 const logger = require("./logger.js");
 
 function run() {
@@ -15,6 +15,16 @@ function run() {
       await sendYardimList("konaklama");
       await sendYardimList("yolcuTasima");
       logger.info("Successfully sent help list");
+      logger.info("Sending provider list");
+      await sendYardimEtProviderList("gida");
+      await sendYardimEtProviderList("enkaz");
+      await sendYardimEtProviderList("isinma");
+      await sendYardimEtProviderList("cadirKurma");
+      await sendYardimEtProviderList("gidaSaglama");
+      await sendYardimEtProviderList("isMakinasi");
+      await sendYardimEtProviderList("konaklama");
+      await sendYardimEtProviderList("yolcuTasima");
+      logger.info("Successfully sent provider list");
     } catch (error) {
       logger.fatal(error);
     }

@@ -56,6 +56,11 @@ const yardimEtSchema = new mongoose.Schema(
       required: true,
       select: false,
     },
+    gonderildi: {
+      type: Boolean,
+      required: false,
+      default: false,
+    },
   },
   { timestamps: true },
 );
