@@ -10,7 +10,7 @@ async function checkConnection(fastifyInstance) {
 
 async function validateModel(model) {
   let validationSonuc = await model.validate()
-  if (validationSonuc && validationSonuc.errors) {
+  if (validationSonuc?.errors) {
     throw new Error(validationSonuc.message);
   }
 }
