@@ -14,7 +14,7 @@ async function sendYardimList(yardimTipi) {
     },
   });
 
-  const yardimlar = await Yardim.find({ yardimTipi: yardimTipi, gonderilen: false }).exec();
+  const yardimlar = await Yardim.find({ yardimTipi: yardimTipi, gonderildi: false }).exec();
   const yardimSayisi = yardimlar.length;
   if (yardimSayisi >= 10) {
     let html =
