@@ -7,12 +7,12 @@ const yardimEtSchema = new mongoose.Schema(
       // Yolcu Taşıma - konaklama - işmakinesi kullanma
       type: String,
       required: true,
-      maxLength: 1000,
+      maxLength: 2000,
     },
     adSoyad: {
       type: String,
       required: true,
-      maxLength: 1000,
+      maxLength: 2000,
     },
     telefon: {
       type: String,
@@ -38,7 +38,7 @@ const yardimEtSchema = new mongoose.Schema(
     aciklama: {
       type: String,
       required: false,
-      maxLength: 10000,
+      maxLength: 20000,
     },
     fields: {
       // Tüm alternatif kullanımlar için buraya json yollayın
@@ -55,6 +55,11 @@ const yardimEtSchema = new mongoose.Schema(
       type: String,
       required: true,
       select: false,
+    },
+    gonderildi: {
+      type: Boolean,
+      required: false,
+      default: false,
     },
   },
   { timestamps: true },

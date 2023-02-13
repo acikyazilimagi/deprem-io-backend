@@ -1,12 +1,8 @@
-name: Build
+name: Test
 
 on:
-  push:
-    branches:
-      - main
   pull_request:
-    branches:
-      - main
+    types: [opened, reopened]
 
 # This allows a subsequently queued workflow run to interrupt previous runs
 concurrency:
@@ -14,7 +10,8 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
-  install:
+  test:
+    name: Test
     runs-on: ubuntu-latest
 
     steps:
@@ -33,6 +30,9 @@ jobs:
       - name: Start MongoDB
         uses: supercharge/mongodb-github-action@1.9.0
 
+      - name: Start Redis
+        uses: supercharge/redis-github-action@1.4.0
+
       - name: Install dependencies
         run: npm install
 
@@ -41,6 +41,8 @@ jobs:
 
       - name: Test
         run: npm test
+        env:
+          REDIS_URL: redis://localhost:6379
 
       - name: Coverage
         uses: codecov/codecov-action@v3

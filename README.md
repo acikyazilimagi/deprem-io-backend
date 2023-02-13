@@ -16,6 +16,18 @@ Bu proje deprem.io sitesinin backend implementasyonunu icerir.
 
 ## Local Installment
 
+* Yerel geliştirme için paketlerini kurun
+* **English**: Install packages for local development
+```
+npm run setup
+```
+
+* Husky kurulumunu yapın
+
+```bash
+npm run prepare
+```
+
 * Dockerfile build alınız
 * **English**:  Build docker container with following command 
 ```
@@ -38,6 +50,10 @@ docker run -p 8080:8080 -d deprem-io-backend
 ```bash
 make up
 ```
+
+## Code Quality
+
+Projede kod kalitesini iyileştirmek için husky paketi kullanılmaktadır. Husky, commit oluşturulmadan önce otomatik olarak format, lint scriptlerini çalıştıracaktır.
 
 ## Postman Workspace
 
@@ -203,3 +219,12 @@ istenen yardımların altında form var süreci takip etmek için yardimKaydi ol
 - exportYardimEtCsv.js
   `node scripts/exportYardimEtCsv.js`
   YardimEt datasını csv export eder
+
+
+## Supply chain security
+
+Avoid running lifecycle scripts from packages 
+- added `--ignore-scripts` to Dockerfile.
+- installed and configured allow-scripts for development - to only run allowed ones.
+
+run `npx allow-scripts auto` to update the list after new packages with install scripts have been added.

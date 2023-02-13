@@ -1,19 +1,14 @@
 FROM node:18-alpine AS build
 
+RUN apk add --no-cache tini
+
 WORKDIR /app
 
 COPY package*.json ./
 
-RUN npm install --omit=dev
+RUN npm install --ignore-scripts --omit=dev
 
 COPY . .
-
-FROM alpine
-COPY --from=build /app /app
-WORKDIR /app
-
-RUN apk add --update nodejs npm
-RUN apk add --no-cache tini
 
 ENTRYPOINT ["/sbin/tini", "--"]
 

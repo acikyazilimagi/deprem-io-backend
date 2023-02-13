@@ -1,4 +1,3 @@
-const { checkConnection } = require("../utils");
 const Iletisim = require("../../models/iletisimModel");
 const check = new (require("../../lib/Check"))();
 
@@ -20,7 +19,6 @@ module.exports = async function (fastifyInstance) {
     },
     async function (req, res) {
       req.body = check.xssFilter(req.body);
-      await checkConnection(fastifyInstance);
 
       const existingIletisim = await Iletisim.findOne({
         adSoyad: req.body.adSoyad,

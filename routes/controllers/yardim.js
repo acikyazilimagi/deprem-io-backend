@@ -1,11 +1,11 @@
-const cache = require("../../cache");
 const check = new (require("../../lib/Check"))();
-const { checkConnection } = require("../utils");
 const Yardim = require("../../models/yardimModel");
 const YardimKaydi = require("../../models/yardimKaydiModel");
-const xss = require("xss");
+
+const LIST_PREFIX = "yardim_list";
 
 module.exports = async function (fastifyInstance) {
+  /*
   fastifyInstance.get(
     "/yardim",
     {
@@ -36,12 +36,13 @@ module.exports = async function (fastifyInstance) {
       const endIndex = page * limit;
       const results = {};
 
-      let cacheKey = `yardim_${page}_${limit}${yardimTipi}`;
-      if (cache.getCache().has(cacheKey)) {
-        return cache.getCache().get(cacheKey);
+      let cacheKey = `${LIST_PREFIX}_${page}_${limit}${yardimTipi}`;
+
+      const cacheResult = await fastifyInstance.cache.get(cacheKey);
+      if (cacheResult?.item) {
+        return cacheResult.item;
       }
 
-      await checkConnection(fastifyInstance);
       if (endIndex < (await Yardim.countDocuments().exec())) {
         results.next = {
           page: page + 1,
@@ -86,14 +87,14 @@ module.exports = async function (fastifyInstance) {
         return yardim;
       });
 
-      cache.getCache().set(cacheKey, results);
+      await fastifyInstance.cache.set(cacheKey, results, 1000 * 60 * 60);
 
       console.log("results");
 
       return results;
     },
   );
-
+  */
   fastifyInstance.post(
     "/yardim",
     {
@@ -152,8 +153,6 @@ module.exports = async function (fastifyInstance) {
         }
       }
 
-      await checkConnection(fastifyInstance);
-
       // check exist
       const existingYardim = await Yardim.findOne({ adSoyad, adres });
       if (existingYardim) {
@@ -192,21 +191,22 @@ module.exports = async function (fastifyInstance) {
         fields: fields || {},
       });
 
-      cache.getCache().flushAll();
+      fastifyInstance.selectiveFlush(LIST_PREFIX);
+
       await newYardim.save();
       return { message: "Yardım talebiniz başarıyla alındı" };
     },
   );
-
+  /*
   fastifyInstance.get("/yardim/:id", async (req, res) => {
     let data;
 
     const cacheKey = `yardim_${req.params.id}`;
 
-    if (cache.getCache().has(cacheKey)) {
-      return cache.getCache().get(cacheKey);
+    const cacheResult = await fastifyInstance.cache.get(cacheKey);
+    if (cacheResult?.item) {
+      return cacheResult.item;
     }
-    await checkConnection(fastifyInstance);
     let results = await Yardim.findById(req.params.id);
     let yardimKaydi = await YardimKaydi.find({ postId: req.params.id });
     try {
@@ -225,10 +225,14 @@ module.exports = async function (fastifyInstance) {
       }
     } catch (error) {}
 
-    cache.getCache().set(cacheKey, {
-      results: results,
-      yardimKaydi: yardimKaydi,
-    });
+    fastifyInstance.cache.set(
+      cacheKey,
+      {
+        results: results,
+        yardimKaydi: yardimKaydi,
+      },
+      1000 * 60 * 60
+    );
     if (!results) {
       res.statusCode = 404;
       return { status: 404 };
@@ -330,9 +334,9 @@ module.exports = async function (fastifyInstance) {
           yardim.telefon = yardim.telefon.replace(/.(?=.{4})/g, "*");
           const names = yardim.adSoyad.split(" ");
           if (names.length > 1) {
-            yardim.adSoyad = `${names[0].charAt(0)}${"*".repeat(names[0].length - 2)} ${names[1].charAt(0)}${"*".repeat(
-              names[1].length - 2,
-            )}`;
+            yardim.adSoyad = `${names[0].charAt(0)}${"*".repeat(
+              names[0].length - 2
+            )} ${names[1].charAt(0)}${"*".repeat(names[1].length - 2)}`;
           }
           const yedekTelefonlar = yardim.yedekTelefonlar;
           if (yedekTelefonlar) {
@@ -344,6 +348,7 @@ module.exports = async function (fastifyInstance) {
         return yardim;
       });
       return results.data;
-    },
+    }
   );
+  */
 };

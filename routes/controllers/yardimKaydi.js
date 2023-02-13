@@ -1,9 +1,10 @@
-const { checkConnection } = require("../utils");
 const Yardim = require("../../models/yardimModel");
 const check = new (require("../../lib/Check"))();
 const YardimKaydi = require("../../models/yardimKaydiModel");
-const cache = require("../../cache");
 
+/**
+ * @param {FastifyInstance} fastifyInstance
+ */
 module.exports = async function (fastifyInstance) {
   fastifyInstance.post(
     "/ekleYardimKaydi",
@@ -25,7 +26,6 @@ module.exports = async function (fastifyInstance) {
     },
     async (req, res) => {
       req.body = check.xssFilter(req.body);
-      await checkConnection(fastifyInstance);
       const existingYardimKaydi = await Yardim.findOne({
         _id: req.body.postId,
       });
@@ -49,7 +49,7 @@ module.exports = async function (fastifyInstance) {
           email: req.body.email || "",
           aciklama: req.body.aciklama || "",
         });
-        cache.getCache().flushAll();
+        await fastifyInstance.flush();
         await newYardimKaydi.save();
       } else {
         res.statusCode = 400;

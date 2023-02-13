@@ -3,7 +3,7 @@ name: Deploy API Prod
 on:
   push:
     branches:
-      - main
+      - prod
 
 jobs:
   deploy:
@@ -30,7 +30,7 @@ jobs:
         id: build-image
         env:
           ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
-          ECR_REPOSITORY: depremio-ecr
+          ECR_REPOSITORY: depremio-api-ecr
           IMAGE_TAG: ${{ github.sha }}
         run: |
           # Build a docker container and
@@ -52,6 +52,6 @@ jobs:
         uses: aws-actions/amazon-ecs-deploy-task-definition@v1
         with:
           task-definition: ${{ steps.container-name.outputs.task-definition }}
-          service: depremio-service
+          service: depremio-api
           cluster: base-cluster
           wait-for-service-stability: false
