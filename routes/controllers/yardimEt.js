@@ -97,10 +97,11 @@ module.exports = async function (fastifyInstance) {
       return { message: "Yardım talebiniz başarıyla alındı" };
     },
   );
-  /*
+
   fastifyInstance.get(
     "/yardimet",
     {
+      preHandler: [check.checkAPIKey],
       schema: {
         querystring: {
           type: "object",
@@ -179,7 +180,7 @@ module.exports = async function (fastifyInstance) {
     },
   );
 
-  fastifyInstance.get("/yardimet/:id", async (req, res) => {
+  fastifyInstance.get("/yardimet/:id", { preHandler: [check.checkAPIKey] }, async (req, res) => {
     const cacheKey = `yardimet_${req.params.id}`;
 
     const cacheResult = await fastifyInstance.cache.get(cacheKey);
@@ -219,6 +220,7 @@ module.exports = async function (fastifyInstance) {
   fastifyInstance.get(
     "/ara-yardimet",
     {
+      preHandler: [check.checkAPIKey],
       schema: {
         querystring: {
           type: "object",
@@ -293,5 +295,4 @@ module.exports = async function (fastifyInstance) {
       return results.data;
     },
   );
-  */
 };

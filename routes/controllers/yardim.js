@@ -5,10 +5,10 @@ const YardimKaydi = require("../../models/yardimKaydiModel");
 const LIST_PREFIX = "yardim_list";
 
 module.exports = async function (fastifyInstance) {
-  /*
   fastifyInstance.get(
     "/yardim",
     {
+      preHandler: [check.checkAPIKey],
       schema: {
         querystring: {
           type: "object",
@@ -94,7 +94,7 @@ module.exports = async function (fastifyInstance) {
       return results;
     },
   );
-  */
+
   fastifyInstance.post(
     "/yardim",
     {
@@ -197,8 +197,8 @@ module.exports = async function (fastifyInstance) {
       return { message: "Yardım talebiniz başarıyla alındı" };
     },
   );
-  /*
-  fastifyInstance.get("/yardim/:id", async (req, res) => {
+
+  fastifyInstance.get("/yardim/:id", { preHandler: [check.checkAPIKey] }, async (req, res) => {
     let data;
 
     const cacheKey = `yardim_${req.params.id}`;
@@ -231,7 +231,7 @@ module.exports = async function (fastifyInstance) {
         results: results,
         yardimKaydi: yardimKaydi,
       },
-      1000 * 60 * 60
+      1000 * 60 * 60,
     );
     if (!results) {
       res.statusCode = 404;
@@ -247,6 +247,7 @@ module.exports = async function (fastifyInstance) {
   fastifyInstance.get(
     "/ara-yardim",
     {
+      preHandler: [check.checkAPIKey],
       schema: {
         querystring: {
           type: "object",
@@ -334,9 +335,9 @@ module.exports = async function (fastifyInstance) {
           yardim.telefon = yardim.telefon.replace(/.(?=.{4})/g, "*");
           const names = yardim.adSoyad.split(" ");
           if (names.length > 1) {
-            yardim.adSoyad = `${names[0].charAt(0)}${"*".repeat(
-              names[0].length - 2
-            )} ${names[1].charAt(0)}${"*".repeat(names[1].length - 2)}`;
+            yardim.adSoyad = `${names[0].charAt(0)}${"*".repeat(names[0].length - 2)} ${names[1].charAt(0)}${"*".repeat(
+              names[1].length - 2,
+            )}`;
           }
           const yedekTelefonlar = yardim.yedekTelefonlar;
           if (yedekTelefonlar) {
@@ -348,7 +349,6 @@ module.exports = async function (fastifyInstance) {
         return yardim;
       });
       return results.data;
-    }
+    },
   );
-  */
 };
