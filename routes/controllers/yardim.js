@@ -62,7 +62,7 @@ module.exports = async function (fastifyInstance) {
       results.totalPage = Math.ceil((await Yardim.countDocuments(query)) / limit);
       results.data = await Yardim.find(query).sort({ _id: -1 }).limit(limit).skip(startIndex).exec();
 
-      results.data = results.data.map((yardim) => {
+      /* results.data = results.data.map((yardim) => {
         if (yardim.email) {
           yardim.email = check.hideEmailCharacters(yardim.email);
         }
@@ -85,7 +85,7 @@ module.exports = async function (fastifyInstance) {
           console.log(error);
         }
         return yardim;
-      });
+      }); */
 
       await fastifyInstance.cache.set(cacheKey, results, 1000 * 60 * 60);
 
@@ -209,21 +209,21 @@ module.exports = async function (fastifyInstance) {
     }
     let results = await Yardim.findById(req.params.id);
     let yardimKaydi = await YardimKaydi.find({ postId: req.params.id });
-    try {
-      yardimKaydi.map((yardim) => {
-        if (yardim.email) {
-          yardim.email = check.hideEmailCharacters(yardim.email);
-        }
-      });
+    // try {
+    //   yardimKaydi.map((yardim) => {
+    //     if (yardim.email) {
+    //       yardim.email = check.hideEmailCharacters(yardim.email);
+    //     }
+    //   });
 
-      results.telefon = results.telefon.replace(/.(?=.{4})/g, "*");
-      const yedekTelefonlar = results.yedekTelefonlar;
-      if (results.yedekTelefonlar) {
-        results.yedekTelefonlar = yedekTelefonlar.map((yedekTelefon) => {
-          return yedekTelefon.replace(/.(?=.{4})/g, "*");
-        });
-      }
-    } catch (error) {}
+    //   results.telefon = results.telefon.replace(/.(?=.{4})/g, "*");
+    //   const yedekTelefonlar = results.yedekTelefonlar;
+    //   if (results.yedekTelefonlar) {
+    //     results.yedekTelefonlar = yedekTelefonlar.map((yedekTelefon) => {
+    //       return yedekTelefon.replace(/.(?=.{4})/g, "*");
+    //     });
+    //   }
+    // } catch (error) {}
 
     fastifyInstance.cache.set(
       cacheKey,
@@ -327,7 +327,7 @@ module.exports = async function (fastifyInstance) {
       }
       let results = {};
       results.data = await Yardim.find(query);
-      results.data = results.data.map((yardim) => {
+      /* results.data = results.data.map((yardim) => {
         if (yardim.email) {
           yardim.email = check.hideEmailCharacters(yardim.email);
         }
@@ -347,7 +347,7 @@ module.exports = async function (fastifyInstance) {
           }
         } catch (error) {}
         return yardim;
-      });
+      }); */
       return results.data;
     },
   );

@@ -190,18 +190,18 @@ module.exports = async function (fastifyInstance) {
     const results = await YardimEt.findById(req.params.id);
     let yardimKaydi = await YardimKaydi.find({ postId: req.params.id });
     try {
-      yardimKaydi.map((yardim) => {
+      /* yardimKaydi.map((yardim) => {
         if (yardim.email) {
           yardim.email = check.hideEmailCharacters(yardim.email);
         }
-      });
-      results.telefon = results.telefon.replace(/.(?=.{4})/g, "*");
+      }); */
+      /* results.telefon = results.telefon.replace(/.(?=.{4})/g, "*");
       const yedekTelefonlar = results.yedekTelefonlar;
       if (results.yedekTelefonlar) {
         results.yedekTelefonlar = yedekTelefonlar.map((yedekTelefon) => {
           return yedekTelefon.replace(/.(?=.{4})/g, "*");
         });
-      }
+      } */
     } catch (error) {}
 
     await fastifyInstance.cache.set(cacheKey, results, 1000 * 60 * 60);
