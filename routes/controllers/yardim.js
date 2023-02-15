@@ -5,10 +5,10 @@ const YardimKaydi = require("../../models/yardimKaydiModel");
 const LIST_PREFIX = "yardim_list";
 
 module.exports = async function (fastifyInstance) {
-  /*
   fastifyInstance.get(
     "/yardim",
     {
+      preHandler: [check.checkAPIKey],
       schema: {
         querystring: {
           type: "object",
@@ -62,7 +62,7 @@ module.exports = async function (fastifyInstance) {
       results.totalPage = Math.ceil((await Yardim.countDocuments(query)) / limit);
       results.data = await Yardim.find(query).sort({ _id: -1 }).limit(limit).skip(startIndex).exec();
 
-      results.data = results.data.map((yardim) => {
+      /* results.data = results.data.map((yardim) => {
         if (yardim.email) {
           yardim.email = check.hideEmailCharacters(yardim.email);
         }
@@ -85,7 +85,7 @@ module.exports = async function (fastifyInstance) {
           console.log(error);
         }
         return yardim;
-      });
+      }); */
 
       await fastifyInstance.cache.set(cacheKey, results, 1000 * 60 * 60);
 
@@ -94,7 +94,7 @@ module.exports = async function (fastifyInstance) {
       return results;
     },
   );
-  */
+
   fastifyInstance.post(
     "/yardim",
     {
@@ -119,6 +119,7 @@ module.exports = async function (fastifyInstance) {
             },
             tweetLink: {
               type: "string",
+              pattern: "twitter.com",
             },
             yedekTelefonlar: {
               type: "array",
@@ -196,8 +197,8 @@ module.exports = async function (fastifyInstance) {
       return { message: "Yardım talebiniz başarıyla alındı" };
     },
   );
-  /*
-  fastifyInstance.get("/yardim/:id", async (req, res) => {
+
+  fastifyInstance.get("/yardim/:id", { preHandler: [check.checkAPIKey] }, async (req, res) => {
     let data;
 
     const cacheKey = `yardim_${req.params.id}`;
@@ -208,21 +209,21 @@ module.exports = async function (fastifyInstance) {
     }
     let results = await Yardim.findById(req.params.id);
     let yardimKaydi = await YardimKaydi.find({ postId: req.params.id });
-    try {
-      yardimKaydi.map((yardim) => {
-        if (yardim.email) {
-          yardim.email = check.hideEmailCharacters(yardim.email);
-        }
-      });
+    // try {
+    //   yardimKaydi.map((yardim) => {
+    //     if (yardim.email) {
+    //       yardim.email = check.hideEmailCharacters(yardim.email);
+    //     }
+    //   });
 
-      results.telefon = results.telefon.replace(/.(?=.{4})/g, "*");
-      const yedekTelefonlar = results.yedekTelefonlar;
-      if (results.yedekTelefonlar) {
-        results.yedekTelefonlar = yedekTelefonlar.map((yedekTelefon) => {
-          return yedekTelefon.replace(/.(?=.{4})/g, "*");
-        });
-      }
-    } catch (error) {}
+    //   results.telefon = results.telefon.replace(/.(?=.{4})/g, "*");
+    //   const yedekTelefonlar = results.yedekTelefonlar;
+    //   if (results.yedekTelefonlar) {
+    //     results.yedekTelefonlar = yedekTelefonlar.map((yedekTelefon) => {
+    //       return yedekTelefon.replace(/.(?=.{4})/g, "*");
+    //     });
+    //   }
+    // } catch (error) {}
 
     fastifyInstance.cache.set(
       cacheKey,
@@ -230,7 +231,7 @@ module.exports = async function (fastifyInstance) {
         results: results,
         yardimKaydi: yardimKaydi,
       },
-      1000 * 60 * 60
+      1000 * 60 * 60,
     );
     if (!results) {
       res.statusCode = 404;
@@ -246,6 +247,7 @@ module.exports = async function (fastifyInstance) {
   fastifyInstance.get(
     "/ara-yardim",
     {
+      preHandler: [check.checkAPIKey],
       schema: {
         querystring: {
           type: "object",
@@ -267,15 +269,7 @@ module.exports = async function (fastifyInstance) {
       const helpType = req.query.yardimTipi;
       const vehicle = req.query.aracDurumu;
 
-      if (
-        !(
-          queryString ||
-          yardimDurumuQuery ||
-          acilDurumQuery ||
-          helpType ||
-          vehicle
-        )
-      ) {
+      if (!(queryString || yardimDurumuQuery || acilDurumQuery || helpType || vehicle)) {
         res.statusCode = 400;
         return {
           error: "Lütfen en az bir adet filtre giriniz.",
@@ -333,7 +327,7 @@ module.exports = async function (fastifyInstance) {
       }
       let results = {};
       results.data = await Yardim.find(query);
-      results.data = results.data.map((yardim) => {
+      /* results.data = results.data.map((yardim) => {
         if (yardim.email) {
           yardim.email = check.hideEmailCharacters(yardim.email);
         }
@@ -341,9 +335,9 @@ module.exports = async function (fastifyInstance) {
           yardim.telefon = yardim.telefon.replace(/.(?=.{4})/g, "*");
           const names = yardim.adSoyad.split(" ");
           if (names.length > 1) {
-            yardim.adSoyad = `${names[0].charAt(0)}${"*".repeat(
-              names[0].length - 2
-            )} ${names[1].charAt(0)}${"*".repeat(names[1].length - 2)}`;
+            yardim.adSoyad = `${names[0].charAt(0)}${"*".repeat(names[0].length - 2)} ${names[1].charAt(0)}${"*".repeat(
+              names[1].length - 2,
+            )}`;
           }
           const yedekTelefonlar = yardim.yedekTelefonlar;
           if (yedekTelefonlar) {
@@ -353,9 +347,8 @@ module.exports = async function (fastifyInstance) {
           }
         } catch (error) {}
         return yardim;
-      });
+      }); */
       return results.data;
-    }
+    },
   );
-  */
 };

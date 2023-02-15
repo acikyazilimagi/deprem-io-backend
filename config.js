@@ -5,6 +5,7 @@ module.exports = {
   mongoUrl: process.env.MONGOURL || "mongodb://localhost:27017",
   redisUrl: process.env.REDIS_URL || "redis://localhost:6379",
   NODE_ENV: process.env.NODE_ENV || "development",
+  API_KEY: process.env.API_KEY || "",
   email: {
     host: process.env.EMAIL_SMTP || "",
     port: process.env.EMAIL_PORT || "",

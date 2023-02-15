@@ -97,10 +97,11 @@ module.exports = async function (fastifyInstance) {
       return { message: "Yardım talebiniz başarıyla alındı" };
     },
   );
-  /*
+
   fastifyInstance.get(
     "/yardimet",
     {
+      preHandler: [check.checkAPIKey],
       schema: {
         querystring: {
           type: "object",
@@ -179,7 +180,7 @@ module.exports = async function (fastifyInstance) {
     },
   );
 
-  fastifyInstance.get("/yardimet/:id", async (req, res) => {
+  fastifyInstance.get("/yardimet/:id", { preHandler: [check.checkAPIKey] }, async (req, res) => {
     const cacheKey = `yardimet_${req.params.id}`;
 
     const cacheResult = await fastifyInstance.cache.get(cacheKey);
@@ -189,18 +190,18 @@ module.exports = async function (fastifyInstance) {
     const results = await YardimEt.findById(req.params.id);
     let yardimKaydi = await YardimKaydi.find({ postId: req.params.id });
     try {
-      yardimKaydi.map((yardim) => {
+      /* yardimKaydi.map((yardim) => {
         if (yardim.email) {
           yardim.email = check.hideEmailCharacters(yardim.email);
         }
-      });
-      results.telefon = results.telefon.replace(/.(?=.{4})/g, "*");
+      }); */
+      /* results.telefon = results.telefon.replace(/.(?=.{4})/g, "*");
       const yedekTelefonlar = results.yedekTelefonlar;
       if (results.yedekTelefonlar) {
         results.yedekTelefonlar = yedekTelefonlar.map((yedekTelefon) => {
           return yedekTelefon.replace(/.(?=.{4})/g, "*");
         });
-      }
+      } */
     } catch (error) {}
 
     await fastifyInstance.cache.set(cacheKey, results, 1000 * 60 * 60);
@@ -219,6 +220,7 @@ module.exports = async function (fastifyInstance) {
   fastifyInstance.get(
     "/ara-yardimet",
     {
+      preHandler: [check.checkAPIKey],
       schema: {
         querystring: {
           type: "object",
@@ -293,5 +295,4 @@ module.exports = async function (fastifyInstance) {
       return results.data;
     },
   );
-  */
 };
