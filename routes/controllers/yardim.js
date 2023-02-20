@@ -244,7 +244,7 @@ module.exports = async function (fastifyInstance) {
               " " +
               yardimObject2.googleMapLink,
             channel: "depremio",
-            extra_parameters: yardimObject2,
+            extra_parameters: JSON.stringify(yardimObject2),
             epoch: Date.now(),
           },
         ],
@@ -406,7 +406,7 @@ module.exports = async function (fastifyInstance) {
               " " +
               yardimObject2.googleMapLink,
             channel: "depremio",
-            extra_parameters: yardimObject2,
+            extra_parameters: JSON.stringify(yardimObject2),
             epoch: Date.now(),
           },
         ],
