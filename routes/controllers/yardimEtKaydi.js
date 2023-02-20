@@ -35,7 +35,7 @@ module.exports = async function (fastifyInstance) {
             if (!check.isPhoneNumber(req.body.telefon)) {
               res.statusCode = 400;
               return {
-                error: "Lütfen doğru formatta bir telefon numarası giriniz.(örn: 05554443322)",
+                error: "Lütfen doğru formatta bir telefon numarası giriniz.(örn: 5554443322)",
               };
             }
           }
