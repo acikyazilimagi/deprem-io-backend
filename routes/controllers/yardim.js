@@ -250,7 +250,7 @@ module.exports = async function (fastifyInstance) {
         ],
       };
       try {
-        const headers = { "X-Api-Key": config.API_KEY };
+        const headers = { "X-Api-Key": config.AFET_HARITA_KEY };
         const response = await axios.post(
           config.afetharitaUrl + "/events",
           afetHaritaObj,
@@ -412,7 +412,7 @@ module.exports = async function (fastifyInstance) {
         ],
       };
 
-      const headers = { "X-Api-Key": config.API_KEY };
+      const headers = { "X-Api-Key": config.AFET_HARITA_KEY };
       const response = await axios.post(
         config.afetharitaUrl + "/events",
         afetHaritaObj,
