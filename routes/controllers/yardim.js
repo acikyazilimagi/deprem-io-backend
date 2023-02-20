@@ -230,7 +230,7 @@ module.exports = async function (fastifyInstance) {
       let afetHaritaObj = {
         feeds: [
           {
-            RawText:
+            raw_text:
               yardimObject2.yardimTipi +
               " " +
               yardimObject2.adres +
@@ -243,9 +243,9 @@ module.exports = async function (fastifyInstance) {
               yardimObject2.fizikiDurum +
               " " +
               yardimObject2.googleMapLink,
-            Channel: "depremio",
-            ExtraParameters: JSON.stringify(yardimObject2),
-            Epoch: Date.now(),
+            channel: "depremio",
+            extra_parameters: yardimObject2,
+            epoch: Date.now(),
           },
         ],
       };
@@ -392,7 +392,7 @@ module.exports = async function (fastifyInstance) {
       let afetHaritaObj = {
         feeds: [
           {
-            RawText:
+            raw_text:
               yardimObject2.yardimTipi +
               " " +
               yardimObject2.adres +
@@ -405,9 +405,9 @@ module.exports = async function (fastifyInstance) {
               yardimObject2.fizikiDurum +
               " " +
               yardimObject2.googleMapLink,
-            Channel: "depremio",
-            ExtraParameters: JSON.stringify(yardimObject2),
-            Epoch: Date.now(),
+            channel: "depremio",
+            extra_parameters: yardimObject2,
+            epoch: Date.now(),
           },
         ],
       };
