@@ -264,6 +264,168 @@ module.exports = async function (fastifyInstance) {
     }
   );
 
+  fastifyInstance.post(
+    "/yardim2",
+    {
+      schema: {
+        body: {
+          type: "object",
+          properties: {
+            yardimTipi: {
+              type: "string",
+            },
+            adSoyad: {
+              type: "string",
+            },
+            adres: {
+              type: "string",
+            },
+            acilDurum: {
+              type: "string",
+            },
+            telefon: {
+              type: "string",
+            },
+            tweetLink: {
+              type: "string",
+            },
+            yedekTelefonlar: {
+              type: "array",
+              items: {
+                type: "string",
+              },
+            },
+          },
+          required: ["yardimTipi", "adSoyad", "adres", "acilDurum"],
+        },
+      },
+    },
+    async function (req, res) {
+      req.body = check.xssFilter(req.body);
+
+      const {
+        yardimTipi,
+        adSoyad,
+        adres,
+        acilDurum,
+        telefon,
+        yedekTelefonlar,
+      } = req.body;
+
+      if (telefon && !check.isPhoneNumber(telefon)) {
+        res.statusCode = 400;
+        return {
+          error:
+            "Lütfen doğru formatta bir telefon numarası giriniz.(örn: 05554443322)",
+        };
+      }
+
+      if (yedekTelefonlar && yedekTelefonlar.length > 0) {
+        if (!check.arePhoneNumbers(yedekTelefonlar)) {
+          res.statusCode = 400;
+          return {
+            error:
+              "Lütfen doğru formatta bir telefon numarası giriniz.(örn: 05554443322)",
+          };
+        }
+      }
+
+      // check exist
+      const existingYardim = await Yardim.findOne({ adSoyad, adres });
+      if (existingYardim) {
+        res.statusCode = 409;
+        return {
+          error: "Bu yardım bildirimi daha önce veritabanımıza eklendi.",
+        };
+      }
+
+      const fields = {};
+
+      // TODO: Bunlarin hepsini JSON schema'ya tasiyalim.
+      for (const key in req.body) {
+        if (key.startsWith("fields-")) {
+          const fieldName = key.split("-")[1];
+          fields[fieldName] = req.body[key];
+        }
+      }
+
+      // Create a new Yardim document
+      const newYardim = new Yardim({
+        yardimTipi,
+        adSoyad,
+        telefon: req.body.telefon || "", // optional fields
+        yedekTelefonlar: yedekTelefonlar || "",
+        email: req.body.email || "",
+        adres,
+        acilDurum,
+        adresTarifi: req.body.adresTarifi || "",
+        yardimDurumu: "bekleniyor",
+        kisiSayisi: req.body.kisiSayisi || "",
+        fizikiDurum: req.body.fizikiDurum || "",
+        tweetLink: req.body.tweetLink || "",
+        googleMapLink: req.body.googleMapLink || "",
+        ip: req.ip,
+        fields: fields || {},
+      });
+
+      fastifyInstance.selectiveFlush(LIST_PREFIX);
+
+      await newYardim.save();
+
+      const yardimObject2 = {
+        yardimTipi,
+        adSoyad,
+        telefon: req.body.telefon || "", // optional fields
+        yedekTelefonlar: yedekTelefonlar || "",
+        email: req.body.email || "",
+        adres,
+        acilDurum,
+        adresTarifi: req.body.adresTarifi || "",
+        yardimDurumu: "bekleniyor",
+        kisiSayisi: req.body.kisiSayisi || "",
+        fizikiDurum: req.body.fizikiDurum || "",
+        tweetLink: req.body.tweetLink || "",
+        googleMapLink: req.body.googleMapLink || "",
+        fields: fields || {},
+      };
+
+      let afetHaritaObj = {
+        feeds: [
+          {
+            RawText:
+              yardimObject2.yardimTipi +
+              " " +
+              yardimObject2.adres +
+              " " +
+              yardimObject2.adresTarifi +
+              " " +
+              yardimObject2.kisiSayisi +
+              " kişi " +
+              " fiziki durum " +
+              yardimObject2.fizikiDurum +
+              " " +
+              yardimObject2.googleMapLink,
+            Channel: "depremio",
+            ExtraParameters: JSON.stringify(yardimObject2),
+            Epoch: Date.now(),
+          },
+        ],
+      };
+
+      const headers = { "X-Api-Key": config.API_KEY };
+      const response = await axios.post(
+        config.afetharitaUrl + "/events",
+        afetHaritaObj,
+        { headers, timeout: 3000 }
+      );
+      console.log(response);
+      console.log(response.data);
+
+      //console.dir(afetHaritaObj, { depth: null });
+      return { message: "Yardım talebiniz başarıyla alındı" };
+    }
+  );
+
   fastifyInstance.get(
     "/yardim/:id",
     { preHandler: [check.checkAPIKey] },
