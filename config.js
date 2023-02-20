@@ -12,4 +12,6 @@ module.exports = {
     user: process.env.EMAIL_USER || "",
     pass: process.env.EMAIL_PASS || "",
   },
+  afetharitaUrl: process.env.AFET_HARITA_URL || "",
+  afetharitaKey: process.env.AFET_HARITA_KEY || "",
 };
