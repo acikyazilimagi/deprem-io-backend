@@ -67,6 +67,14 @@
         {
           "name": "EMAIL_PASS",
           "valueFrom": "arn:aws:secretsmanager:eu-central-1:366354050833:secret:depremio-prod-env-oZ5Dz9:EMAIL_PASS::"
+        },
+        {
+          "name": "AFET_HARITA_URL",
+          "valueFrom": "arn:aws:secretsmanager:eu-central-1:366354050833:secret:depremio-prod-env-oZ5Dz9:AFET_HARITA_URL::"
+        },
+        {
+          "name": "AFET_HARITA_KEY",
+          "valueFrom": "arn:aws:secretsmanager:eu-central-1:366354050833:secret:depremio-prod-env-oZ5Dz9:AFET_HARITA_KEY::"
         }
       ],
       "logConfiguration": {
