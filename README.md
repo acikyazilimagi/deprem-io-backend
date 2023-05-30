@@ -7,8 +7,6 @@ Bu proje deprem.io sitesinin backend implementasyonunu icerir.
 
 * Docker
 * .env dosyasını oluşturunuz içerisine .env-example da yazılanları koyunuz.
-* `MONGOURL` env. variable değerini proje leadlerinden isteyiniz
-
 
 * **English**:
 * Create .env file and copy content from .env-example
